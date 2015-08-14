@@ -301,37 +301,6 @@ public class Box {
         printBox(nowturn);
     }
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-
-        Box box = new Box();
-        box.setBoxData(3);
-
-        for(int i = 0; i < 50; i++){
-
-            box.turnLeft();
-            printAry(box.getNowturnBoxAry());
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // TODO 自動產生 catch 區塊
-                e.printStackTrace();
-            }
-        }
-
-        /*for(int style = 1; style <= BoxBase.getStyleCount(); style++){
-            BoxBase box = new BoxBase();
-            box.setBoxData(style);
-            for(int i = 0; i < box.getTrunKind(); i++){
-                box.printBox(i);
-            }
-        }*/
-    }
-    
-
 
     //測試用，印出陣列
     public static void printAry(int [][] tmp){

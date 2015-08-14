@@ -387,9 +387,4 @@ public class AudioPlayer{
 		callbackTartet = null;
 		callbackObj = null;
 	}
-
-
-	public static void main(String [] args){
-
-	}
 } 

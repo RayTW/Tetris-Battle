@@ -50,13 +50,4 @@ public class CheckCleanLineThread extends Thread{
         obj = null;
     }
 
-
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-
-
-    }
-
 }

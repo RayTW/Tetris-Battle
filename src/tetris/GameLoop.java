@@ -479,25 +479,4 @@ public class GameLoop implements Runnable,CleanLineI{
         System.out.println("==================");
     }*/
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        GameLoop gl = new GameLoop();
-        //gl.startGame();
-        gl.setBoxList("1|2|3|4");
-
-
-        System.out.println("gl.nextBox()"+gl.nextBox());
-        System.out.println("gl.nextBox()"+gl.nextBox());
-
-        String [] b = gl.getN_box(3);
-
-        for(int i = 0; i < b.length; i++){
-            System.out.println(b[i]);
-        }
-    }
-
-
-
 }

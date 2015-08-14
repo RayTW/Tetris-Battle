@@ -27,6 +27,7 @@ public class GameView extends JComponent implements ViewDelegate{
 	private int BOX_IMG_H = 19 * VIEW_MODE;            //每個方塊格高
 	private int ALPHA = 125;								//陰影透明度0~250
 	private long score;
+	private Image mCanvasBuffer = null;
 	private Color [] color = {null
 			,new Color(0,255,255,250)
 	,new Color(0,0,255,250)
@@ -122,30 +123,35 @@ public class GameView extends JComponent implements ViewDelegate{
 	//	雙緩衝區繪圖
 	@Override
 	public void paintComponent(Graphics g){
-		Image bufferImg = createImage(FRAME_W, FRAME_H);//新建一張image的圖
-		Graphics buffImg = bufferImg.getGraphics();//從image裡取出一張畫布
+		Graphics canvas = null;
+		
+		if(mCanvasBuffer == null){
+			mCanvasBuffer = createImage(FRAME_W, FRAME_H);//新建一張image的圖
+		}else{
+			mCanvasBuffer.getGraphics().clearRect(0, 0, FRAME_W, FRAME_H);
+		}
+		canvas = mCanvasBuffer.getGraphics();
 
 		//把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
 		int [][] boxAry = tetrisGame.getBoxAry();
-		showBacegroundBox(boxAry, buffImg);
+		showBacegroundBox(boxAry, canvas);
 
 		//畫掉落中的方塊
 		int [] xy = tetrisGame.getNowBoxXY();
 		int [][] box = tetrisGame.getNowBoxAry();
-		showDownBox(xy, box, buffImg);
+		showDownBox(xy, box, canvas);
 
 		//		畫右邊下次要出現的方塊
-		showBufferBox(boxBuffer, buffImg);
+		showBufferBox(boxBuffer, canvas);
 
 		//		畫陰影
-		shadow(xy,box, buffImg,tetrisGame.getDownY());
+		shadow(xy,box, canvas,tetrisGame.getDownY());
 
 		//顯示分數
-		showScore(score, buffImg);
+		showScore(score, canvas);
 
 		//將暫存的圖，畫到前景
-		g.drawImage(bufferImg,0,0,this);
-		buffImg.dispose();
+		g.drawImage(mCanvasBuffer,0,0,this);
 	}
 
 	//畫定住的方塊與其他背景格子
