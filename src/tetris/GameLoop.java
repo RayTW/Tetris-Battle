@@ -67,8 +67,7 @@ public class GameLoop implements Runnable, CleanLineI {
 					if (!gameBox.moveDown()) {// 方塊已到底停住,不能再往下移
 						isClean = true;
 					}
-					putDelegateCode("repaint", "");
-					// printAry(gameBox.getBoxAry());
+					putDelegateCode(GameEvent.REPAINT, "");
 				}
 				Thread.sleep((int) (1000 * (fastEnable ? fastSec : sec)));
 			} catch (InterruptedException e) {
@@ -335,7 +334,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @param code
 	 * @param data
 	 */
-	public void putDelegateCode(String code, String data) {
+	public void putDelegateCode(GameEvent code, String data) {
 		if (delegate != null) {
 			delegate.tetrisEvent(code, data);
 		}
@@ -383,8 +382,8 @@ public class GameLoop implements Runnable, CleanLineI {
 	@Override
 	public void cleanLine() {
 		gameBox.addBox();
-		putDelegateCode("repaint", "");
-		putDelegateCode("boxDown", "");
+		putDelegateCode(GameEvent.REPAINT, "");
+		putDelegateCode(GameEvent.BOX_DOWN, "");
 
 		// System.out.println("cleanLine----被執行-------");
 
@@ -392,22 +391,22 @@ public class GameLoop implements Runnable, CleanLineI {
 		String lineData = gameBox.getClearLine();
 
 		if (!lineData.equals("")) {
-			putDelegateCode("willCleanLine", lineData);
+			putDelegateCode(GameEvent.CLEANING_LINE, lineData);
 			gameBox.clearLine(lineData);// 實際將可消除的方塊行數移除
-			putDelegateCode("cleanLineOK", "");
+			putDelegateCode(GameEvent.CLEANED_LINE, "");
 		}
 
-		putDelegateCode("garbageBox", lineData);
+		putDelegateCode(GameEvent.BOX_GARBAGE, lineData);
 
 		boolean isOK = nextCreatBox();// 建立方塊
 		if (!isOK) {// 建立失敗
 			isGameOver = true;
-			putDelegateCode("repaint", "");
+			putDelegateCode(GameEvent.REPAINT, "");
 			// printAry(gameBox.getBoxAry());
-			putDelegateCode("gameOver", "");
+			putDelegateCode(GameEvent.GAME_OVER, "");
 		}
-		putDelegateCode("repaint", "");
-		putDelegateCode("creatBox", "");
+		putDelegateCode(GameEvent.REPAINT, "");
+		putDelegateCode(GameEvent.BOX_NEXT, "");
 		isClean = false;
 		checkCleanThread = new CheckCleanLineThread();
 		checkCleanThread.setObj(this);

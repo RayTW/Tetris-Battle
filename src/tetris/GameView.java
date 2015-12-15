@@ -82,7 +82,7 @@ public class GameView extends JComponent implements ViewDelegate {
 			switch (code) {
 			case KeyEvent.VK_UP:// 上,順轉方塊
 				tetrisGame.turnRight();
-				tetrisEvent("turn", null);
+				tetrisEvent(GameEvent.BOX_TURN, null);
 				break;
 			case KeyEvent.VK_DOWN:// 下,下移方塊
 				tetrisGame.moveDown();
@@ -262,19 +262,19 @@ public class GameView extends JComponent implements ViewDelegate {
 	 * 所有
 	 */
 	@Override
-	public void tetrisEvent(String code, String data) {
+	public void tetrisEvent(GameEvent code, String data) {
 		// 收到重畫自己畫面的陣列
-		if (code.equals("repaint")) {
+		if (GameEvent.REPAINT == code) {
 			repaint();
 			return;
 		}
-		if (code.equals("turn")) {
+		if (GameEvent.BOX_TURN == code) {
 			playAudio("sound/turn.wav", 1);
 
 			return;
 		}
 		// 方塊落到底
-		if (code.equals("boxDown")) {
+		if (GameEvent.BOX_DOWN == code) {
 			System.out.println("做方塊到底定位動畫 現在方塊高度["
 					+ tetrisGame.getNowBoxIndex() + "]");
 
@@ -284,12 +284,12 @@ public class GameView extends JComponent implements ViewDelegate {
 			return;
 		}
 		// 建立完下一個方塊
-		if (code.equals("creatBox")) {
+		if (GameEvent.BOX_NEXT == code) {
 			boxBuffer = getBufBox(tetrisGame, NEXT_BOX_COUNT);
 			return;
 		}
 		// 有方塊可清除,將要清除方塊,可取得要消去的方塊資料
-		if (code.equals("willCleanLine")) {
+		if (GameEvent.CLEANING_LINE == code) {
 			System.out.println("有方塊可清除,將要清除方塊,可取得要消去的方塊資料");
 			score += (tetrisGame.getNowBoxIndex() + 1) * 100;// 加分數
 			// System.out.println("垃圾方塊模式==>,index位置["+data+"],資料為["+tetrisGame.getLineList(data,false)+"]");
@@ -297,18 +297,18 @@ public class GameView extends JComponent implements ViewDelegate {
 			return;
 		}
 		// 方塊清除完成
-		if (code.equals("cleanLineOK")) {
+		if (GameEvent.CLEANED_LINE == code) {
 			System.out.println("方塊清除完成" + data);
 
 			return;
 		}
 		// 計算自己垃圾方塊數
-		if (code.equals("garbageBox")) {
+		if (GameEvent.BOX_GARBAGE == code) {
 
 			return;
 		}
 		// 方塊頂到最高處，遊戲結束
-		if (code.equals("gameOver")) {
+		if (GameEvent.GAME_OVER == code) {
 			System.out.println("秒後重新...");
 			try {
 				Thread.sleep(3000);
