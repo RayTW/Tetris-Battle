@@ -104,7 +104,6 @@ public class GameView extends JComponent implements ViewDelegate {
 		} else {
 			if (code == KeyEvent.VK_R) {// R鍵,回到遊戲繼續
 				tetrisGame.rusme();
-				;
 			}
 		}
 
