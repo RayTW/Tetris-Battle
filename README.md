@@ -1,5 +1,5 @@
 # TetrisGame
-![](https://db.tt/OmRQLO41)
+![](https://github.com/RayTW/TetrisGame/blob/master/245394101_o.jpg)
 
 ```code
 遊戲按鈕控制說明:
