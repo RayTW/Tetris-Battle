@@ -237,7 +237,7 @@ public class AudioPlayer {
 	 *            0~1,預設為0.5
 	 */
 	public void setVolume(float dB) {
-		float tempB = floor_pow(dB, 1);
+		float tempB = floorPow(dB, 1);
 		// System.out.println("目前音量+"+tempB);
 		gain = tempB;
 		resetVolume();
@@ -251,10 +251,9 @@ public class AudioPlayer {
 	 *            要捨去的位數
 	 * 
 	 */
-	private float floor_pow(float min, int Num) {
+	private float floorPow(float min, int Num) {
 		float n = (float) Math.pow(10, Num);
-		float tmp_Num = ((int) (min * n)) / n;
-		return tmp_Num;
+		return ((int) (min * n)) / n;
 	}
 
 	/**

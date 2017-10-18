@@ -77,12 +77,14 @@ public class GameView extends JComponent implements ViewDelegate {
 	}
 
 	public AudioPlayer playAudio(String path, int playCount) {
+		long time = System.currentTimeMillis();
 		AudioPlayer audio = new AudioPlayer();
 		path = "/" + path;
 		audio.loadAudio(path, this);
 
 		audio.setPlayCount(playCount);// 播放次數
 		audio.play();
+		System.out.println("播音樂耗時["+(System.currentTimeMillis() - time)+"]");
 		return audio;
 	}
 
