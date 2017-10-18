@@ -5,7 +5,7 @@ public class GameBox {
 	public int mBoxColumnCount = 10;// 橫的10個方塊
 	private int[][] mBoxes; // 整個可以放置方塊、移動方塊的大陣列
 
-	private Box nowBox; // 目前移動中的方塊
+	private Box mNowBox; // 目前移動中的方塊
 
 	public GameBox() {
 		initialize();
@@ -28,9 +28,9 @@ public class GameBox {
 		Box nb = new Box();
 		nb.setBoxData(style);
 		nb.setNowX((mBoxColumnCount / 2) - 1);
-		nowBox = nb;
+		mNowBox = nb;
 
-		if (hitTest(mBoxes, nowBox)) {// 方塊一建立就撞到
+		if (hitTest(mBoxes, mNowBox)) {// 方塊一建立就撞到
 			b = false;
 		}
 		return b;
@@ -48,7 +48,7 @@ public class GameBox {
 	 * @return
 	 */
 	public boolean moveDown() {
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 
 		// 判斷方塊撞到底部
 		int boxY = tempNowBox.getNowY() + tempNowBox.getNowTurnHeight();
@@ -76,7 +76,7 @@ public class GameBox {
 	 */
 	public boolean moveRight() {
 		boolean b = true;
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 		// 取得目前方塊右移後的x位置+上方塊的寬度
 		int x = tempNowBox.getNowX() + tempNowBox.getNowTurnWight() + 1;// 假設右移1格
 
@@ -100,7 +100,7 @@ public class GameBox {
 	 */
 	public boolean moveLeft() {
 		boolean b = true;
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 		int[][] nowturnBoxAry = tempNowBox.getNowturnBoxAry();
 		int x = tempNowBox.getNowX() - 1;
 
@@ -143,7 +143,7 @@ public class GameBox {
 	 * @return
 	 */
 	public boolean turnRight() {
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 		int rightTurn = tempNowBox.nextTurn(1);// 取出順轉1次後的方塊位置索引值
 		int turnW = tempNowBox.getWight(rightTurn);
 		int turnH = tempNowBox.getHeight(rightTurn);
@@ -201,7 +201,7 @@ public class GameBox {
 	 * @return
 	 */
 	public boolean turnLeft() {
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 		int leftTurn = tempNowBox.nextTurn(-1);// 取出逆轉1次後的方塊位置索引值
 		int turnH = tempNowBox.getHeight(leftTurn) + tempNowBox.getNowY();
 		int turnW = tempNowBox.getWight(leftTurn);
@@ -314,7 +314,7 @@ public class GameBox {
 	 * @return
 	 */
 	public String getClearLine() {
-		Box nb = nowBox;
+		Box nb = mNowBox;
 		StringBuffer lineList = new StringBuffer();
 		int ny = nb.getNowY();
 
@@ -426,7 +426,7 @@ public class GameBox {
 	 * @return
 	 */
 	public int[][] getNowBoxAry() {
-		return nowBox.getNowturnBoxAry();
+		return mNowBox.getNowturnBoxAry();
 	}
 
 	/**
@@ -435,7 +435,7 @@ public class GameBox {
 	 * @return
 	 */
 	public String getNowturnBoxStyleStr() {
-		return nowBox.getNowturnBoxStyleStr();
+		return mNowBox.getNowturnBoxStyleStr();
 	}
 
 	/**
@@ -444,7 +444,7 @@ public class GameBox {
 	 * @return
 	 */
 	public int[] getNowBoxXY() {
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 		int[] xy = new int[4];
 		xy[0] = tempNowBox.getNowX();
 		xy[1] = tempNowBox.getNowY();
@@ -460,7 +460,7 @@ public class GameBox {
 	 * @return
 	 */
 	public int getDownY() {
-		Box tempNowBox = nowBox;
+		Box tempNowBox = mNowBox;
 		int nx = tempNowBox.getNowX();
 		int ny = tempNowBox.getNowY();
 		int[][] nbAry = tempNowBox.getNowturnBoxAry();
@@ -489,7 +489,7 @@ public class GameBox {
 	 * @param y
 	 */
 	public void addBox() {
-		Box nb = nowBox;
+		Box nb = mNowBox;
 		int[][] tempBoxAry = mBoxes;
 		int x = nb.getNowX();
 		int y = nb.getNowY();
@@ -510,7 +510,7 @@ public class GameBox {
 	 * @return
 	 */
 	public String getLineList(String lineData, boolean isGap) {
-		Box nb = nowBox;
+		Box nb = mNowBox;
 		int[][] tempBoxAry = mBoxes;
 		StringBuffer lineListStr = new StringBuffer();
 		String[] lineAry = lineData.split("[,]");

@@ -27,20 +27,20 @@ public class Box {
 	private int mNowX; // 目前的x位置
 	private int mNowY; // 目前的y位置
 
-	private int nowturn; // 目前的轉向
-	private int style; // 此方塊種類代碼
-	private int[][][] boxAry; // 此方塊轉向後的值
-	private int[][] hw; // 此方塊轉向後的高、寬
+	private int mNowturn; // 目前的轉向
+	private int mStyle; // 此方塊種類代碼
+	private int[][][] mBoxAry; // 此方塊轉向後的值
+	private int[][] mHW; // 此方塊轉向後的高、寬
 
 	public Box() {
 		initialize();
 	}
 
 	public void initialize() {
-		nowturn = 0;
-		boxAry = new int[0][0][0];
-		style = 1;
-		hw = new int[0][0];
+		mNowturn = 0;
+		mBoxAry = new int[0][0][0];
+		mStyle = 1;
+		mHW = new int[0][0];
 	}
 
 	public void resetXY() {
@@ -57,7 +57,7 @@ public class Box {
 	 * 6.T型<BR>
 	 * 7.反閃電 <BR>
 	 * 
-	 * @param style
+	 * @param mStyle
 	 */
 	public void setBoxData(int s) {
 		if (s < 0 || s > STYLE_LIST.length) {
@@ -65,7 +65,7 @@ public class Box {
 			return;
 		}
 		String data = STYLE_LIST[s - 1];
-		style = s;
+		mStyle = s;
 		setStyleData(data);
 	}
 
@@ -79,8 +79,8 @@ public class Box {
 	 */
 	public void setStyleData(String data) {
 		String[] ary = data.split("[@]");
-		boxAry = new int[ary.length][][];
-		hw = new int[ary.length][2];
+		mBoxAry = new int[ary.length][][];
+		mHW = new int[ary.length][2];
 
 		for (int i = 0; i < ary.length; i++) {
 			String[] box = ary[i].split("[|]");
@@ -102,22 +102,22 @@ public class Box {
 			}
 			h++;
 			w++;
-			hw[i][0] = h;
-			hw[i][1] = w;
+			mHW[i][0] = h;
+			mHW[i][1] = w;
 
-			boxAry[i] = new int[h][w];
+			mBoxAry[i] = new int[h][w];
 
 			for (int j = 0; j < box.length; j++) {
 				String[] bAry = box[j].split("[,]");
 				int x = bAry[0].charAt(0) - '0';
 				int y = bAry[1].charAt(0) - '0';
-				boxAry[i][x][y] = style;
+				mBoxAry[i][x][y] = mStyle;
 			}
 		}
 	}
 
 	public int getStyle() {
-		return style;
+		return mStyle;
 	}
 
 	/**
@@ -135,7 +135,7 @@ public class Box {
 	 * @param n
 	 */
 	public void setTurn(int n) {
-		nowturn = n;
+		mNowturn = n;
 	}
 
 	/**
@@ -144,11 +144,11 @@ public class Box {
 	 * @return
 	 */
 	public int getTurn() {
-		return nowturn;
+		return mNowturn;
 	}
 
 	public int nextTurn(int n) {
-		int tmpTurn = nowturn;
+		int tmpTurn = mNowturn;
 
 		tmpTurn += n;
 		if (tmpTurn < 0) {
@@ -164,9 +164,9 @@ public class Box {
 	 * 逆時針轉向
 	 */
 	public void turnLeft() {
-		nowturn--;
-		if (nowturn < 0) {
-			nowturn = getTrunKind() - 1;
+		mNowturn--;
+		if (mNowturn < 0) {
+			mNowturn = getTrunKind() - 1;
 		}
 	}
 
@@ -175,8 +175,8 @@ public class Box {
 	 * 
 	 */
 	public void turnRight() {
-		nowturn++;
-		nowturn %= getTrunKind();
+		mNowturn++;
+		mNowturn %= getTrunKind();
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class Box {
 	 * @return
 	 */
 	public int getTrunKind() {
-		return boxAry.length;
+		return mBoxAry.length;
 	}
 
 	/**
@@ -195,8 +195,8 @@ public class Box {
 	 * @return
 	 */
 	public int getWight(int n) {
-		if (n >= 0 && n < hw.length) {
-			return hw[n][1];
+		if (n >= 0 && n < mHW.length) {
+			return mHW[n][1];
 		}
 		return 0;
 	}
@@ -207,7 +207,7 @@ public class Box {
 	 * @return
 	 */
 	public int getNowTurnWight() {
-		return getWight(nowturn);
+		return getWight(mNowturn);
 	}
 
 	/**
@@ -217,8 +217,8 @@ public class Box {
 	 * @return
 	 */
 	public int getHeight(int n) {
-		if (n >= 0 && n < hw.length) {
-			return hw[n][0];
+		if (n >= 0 && n < mHW.length) {
+			return mHW[n][0];
 		}
 		return 0;
 	}
@@ -229,7 +229,7 @@ public class Box {
 	 * @return
 	 */
 	public int getNowTurnHeight() {
-		return getHeight(nowturn);
+		return getHeight(mNowturn);
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class Box {
 	 * @return
 	 */
 	public int[][] getNowturnBoxAry() {
-		return getBoxAry(nowturn);
+		return getBoxAry(mNowturn);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class Box {
 	 * @return
 	 */
 	public String getNowturnBoxStyleStr() {
-		return getBoxStyleStr(nowturn);
+		return getBoxStyleStr(mNowturn);
 	}
 
 	/**
@@ -257,8 +257,8 @@ public class Box {
 	 * @return
 	 */
 	public int[][] getBoxAry(int index) {
-		if (index >= 0 && index < boxAry.length) {
-			return boxAry[index];
+		if (index >= 0 && index < mBoxAry.length) {
+			return mBoxAry[index];
 		}
 		return null;
 	}
@@ -270,8 +270,8 @@ public class Box {
 	 * @return
 	 */
 	public String getBoxStyleStr(int index) {
-		if (index >= 0 && index < boxAry.length) {
-			String data = STYLE_LIST[style - 1];
+		if (index >= 0 && index < mBoxAry.length) {
+			String data = STYLE_LIST[mStyle - 1];
 			String[] ary = data.split("[@]");
 			return ary[index];
 		}
