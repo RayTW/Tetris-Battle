@@ -11,7 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 播放音樂(支援WAV, AIFF, AU) 2011/10/09
  * 
  * 2012-12-08 增加播放結束時callback 2.修正bug: 無限次播放時，無法stop()
- * 2017-10-18 [bug]修正不斷播重建物件進行播放會造成卡頓
+ * 2017-10-18 
+ * 1.[bug]修正不斷播重建物件進行播放會造成卡頓
+ * 2.移除左、右聲道切換功能
  * 
  * @author Ray(吉他手)
  */
@@ -22,10 +24,6 @@ public class AudioPlayer {
 
 	private float mGain;
 	private FloatControl mGainControl;
-
-	// 控制聲道,-1.0f:只有左聲道, 0.0f:雙聲道,1.0f右聲道
-	private float mPan;
-	private FloatControl mPanControl;
 
 	// 控制靜音 開/關
 	private boolean mute;
@@ -48,8 +46,6 @@ public class AudioPlayer {
 		mClip = null;
 		mGain = 0.5f;
 		mGainControl = null;
-		mPan = 0.0f;
-		mPanControl = null;
 		mute = false;
 		mMuteControl = null;
 		mPlayCount = 0;
@@ -285,24 +281,6 @@ public class AudioPlayer {
 	}
 
 	/**
-	 * 設定聲道,-1.0f:只有左聲道, 0.0f:雙聲道,1.0f右聲道
-	 * 
-	 * @param p
-	 */
-	public void setPan(float p) {
-		mPan = p;
-		resetPan();
-	}
-
-	/**
-	 * 重設單雙道、雙聲道
-	 */
-	protected void resetPan() {
-		mPanControl = (FloatControl) mClip.getControl(FloatControl.Type.PAN);
-		mPanControl.setValue(this.mPan);
-	}
-
-	/**
 	 * 設定靜音狀態,true:靜音,false:不靜音
 	 * 
 	 * @param m
@@ -390,7 +368,6 @@ public class AudioPlayer {
 
 		mClip = null;
 		mGainControl = null;
-		mPanControl = null;
 		mMuteControl = null;
 		mCallbackTartet = null;
 		mCallbackObj = null;
