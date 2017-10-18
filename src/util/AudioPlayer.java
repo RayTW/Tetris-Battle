@@ -10,15 +10,19 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 播放音樂(支援WAV, AIFF, AU) 2011/10/09
  * 
- * 2012-12-08 增加播放結束時callback 2.修正bug: 無限次播放時，無法stop()
- * 2017-10-18 
- * 1.[bug]修正不斷播重建物件進行播放會造成卡頓
- * 2.移除左、右聲道切換功能
+ * 2012-12-08 <br>
+ * 1.增加播放結束時callback <br>
+ * 2.修正bug: 無限次播放時，無法stop()<br>
  * 
- * @author Ray(吉他手)
+ * 2017-10-18<br>
+ * 1.[bug]修正不斷播重建物件進行播放會造成卡頓<br>
+ * 2.移除左、右聲道切換功能<br>
+ * 3.移除close()關閉音檔功能<br>
+ * 
+ * @author Ray
  */
 public class AudioPlayer {
-	private static ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream,Clip>>> sCacheAudioClip = new ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream,Clip>>>();
+	private static ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream, Clip>>> sCacheAudioClip = new ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream, Clip>>>();
 
 	private Clip mClip;
 
@@ -353,23 +357,5 @@ public class AudioPlayer {
 	 */
 	public Clip getClip() {
 		return mClip;
-	}
-
-	/**
-	 * 關閉音檔
-	 */
-	public void close() {
-		try {
-			if (mClip != null)
-				mClip.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		mClip = null;
-		mGainControl = null;
-		mMuteControl = null;
-		mCallbackTartet = null;
-		mCallbackObj = null;
 	}
 }
