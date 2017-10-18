@@ -1,4 +1,4 @@
-package tetris;
+package tetris.view;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -6,6 +6,9 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import javax.swing.JComponent;
 
+import tetris.Config;
+import tetris.GameEvent;
+import tetris.GameLoop;
 import util.AudioPlayer;
 
 /**
@@ -17,33 +20,43 @@ import util.AudioPlayer;
 public class GameView extends JComponent implements ViewDelegate {
 	private int mNextBoxCount = 3; // 下次要出現的方塊可顯示個數
 	private int[][][] mBoxBuffer; // 下次要出現的方塊style
-	private int mScreenScale = 1; // 畫面比例
-	private int mBoxStartX = 62 * mScreenScale; // 掉落方塊的初始位置x
-	private int mBoxStartY = 79 * mScreenScale; // 掉落方塊的初始位置y
-	private int mGameScreenWidth = 350 * mScreenScale; // 遊戲畫面寬
-	private int mGameScreenHeight = 480 * mScreenScale; // 遊戲畫面高
-	private int mSingleBoxWidth = 19 * mScreenScale; // 每個方塊格寬
-	private int mSingleBoxHeight = 19 * mScreenScale; // 每個方塊格高
-	private int mShdowBoxAlpha = 125; // 陰影透明度0~250
-	private long mScore;
+	private int mBoxStartX; // 掉落方塊的初始位置x
+	private int mBoxStartY; // 掉落方塊的初始位置y
+	private int mGameScreenWidth; // 遊戲畫面寬
+	private int mGameScreenHeight; // 遊戲畫面高
+	private int mSingleBoxWidth; // 每個方塊格寬
+	private int mSingleBoxHeight; // 每個方塊格高
+	private int mRightNextBoxesX; //右側方塊的位置x
+	private int mRightNextBoxesHeightSpacing; //右側方塊的位置y間距
 	private Image mCanvasBuffer = null;
 	private Color[] mColor = { null, new Color(0, 255, 255, 250),
 			new Color(0, 0, 255, 250), new Color(0, 255, 0, 250),
 			new Color(255, 0, 0, 250), new Color(255, 255, 0, 250),
 			new Color(255, 0, 255, 250), new Color(50, 100, 150, 250) };
-	private Color[] mColorAlpha = { null, new Color(0, 255, 255, mShdowBoxAlpha),
-			new Color(0, 0, 255, mShdowBoxAlpha), new Color(0, 255, 0, mShdowBoxAlpha),
-			new Color(255, 0, 0, mShdowBoxAlpha), new Color(255, 255, 0, mShdowBoxAlpha),
-			new Color(255, 0, 255, mShdowBoxAlpha), new Color(50, 100, 150, mShdowBoxAlpha) };
+	private Color mShadowColor = new Color(0, 0, 0, 128);
 
 	private GameLoop mGameLoop; // 遊戲邏輯(無畫面)
 	private AudioPlayer mBackgroundMusic;//播放背景音樂
+	private InfoBar mInfoBar;
 
 	public GameView() {
 		mBackgroundMusic = playAudio("sound/music.wav", 0);
 	}
 
 	public void initialize() {
+		Config config = Config.get();
+		
+		mBoxStartX = config.convertValueViaScreenScale(62);
+		mBoxStartY = config.convertValueViaScreenScale(79);
+		mGameScreenWidth = config.convertValueViaScreenScale(350);
+		mGameScreenHeight = config.convertValueViaScreenScale(480);
+		mSingleBoxWidth = config.convertValueViaScreenScale(19);
+		mSingleBoxHeight = config.convertValueViaScreenScale(19);
+		mRightNextBoxesX = config.convertValueViaScreenScale(160);
+		mRightNextBoxesHeightSpacing = config.convertValueViaScreenScale(50);
+		
+		//分數、消除行數、等級
+		mInfoBar = new InfoBar();
 		// 建立遊戲邏輯
 		mGameLoop = new GameLoop();
 
@@ -86,6 +99,7 @@ public class GameView extends JComponent implements ViewDelegate {
 				break;
 			case KeyEvent.VK_DOWN:// 下,下移方塊
 				mGameLoop.moveDown();
+				addMoveDownScore();
 				break;
 			case KeyEvent.VK_LEFT:// 左,左移方塊
 				mGameLoop.moveLeft();
@@ -130,16 +144,18 @@ public class GameView extends JComponent implements ViewDelegate {
 		// 畫掉落中的方塊
 		int[] xy = mGameLoop.getNowBoxXY();
 		int[][] box = mGameLoop.getNowBoxAry();
+		
+		// 畫陰影
+		shadow(xy, box, canvas, mGameLoop.getDownY());
+		
 		showDownBox(xy, box, canvas);
 
 		// 畫右邊下次要出現的方塊
 		showBufferBox(mBoxBuffer, canvas);
-
-		// 畫陰影
-		shadow(xy, box, canvas, mGameLoop.getDownY());
+		
 
 		// 顯示分數
-		showScore(mScore, canvas);
+		showInfoBar(mInfoBar, canvas);
 
 		// 將暫存的圖，畫到前景
 		g.drawImage(mCanvasBuffer, 0, 0, this);
@@ -188,8 +204,8 @@ public class GameView extends JComponent implements ViewDelegate {
 						// buffImg.drawOval(160 + (BOX_IMG_W * (j + 5)),0 +
 						// (BOX_IMG_H * (i + 5)), BOX_IMG_W, BOX_IMG_H);
 						buffImg.setColor(mColor[style]);
-						buffImg.fill3DRect(160 + (mSingleBoxWidth * (j + 5)),
-								(n * 50) + (mSingleBoxHeight * (i + 5)), mSingleBoxWidth,
+						buffImg.fill3DRect(mRightNextBoxesX + (mSingleBoxWidth * (j + 5)),
+								(n * mRightNextBoxesHeightSpacing) + (mSingleBoxHeight * (i + 5)), mSingleBoxWidth,
 								mSingleBoxHeight, true);
 						// buffImg.setColor(Color.BLACK);
 						// buffImg.drawRect(160 + (BOX_IMG_W * (j + 5)),(n * 50)
@@ -209,7 +225,7 @@ public class GameView extends JComponent implements ViewDelegate {
 			for (int j = 0; j < box[i].length; j++) {
 				int style = box[i][j];
 				if (style > 0) {
-					buffImg.setColor(mColorAlpha[style]);
+					buffImg.setColor(mShadowColor);
 					buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * (j + boxX)),
 							mBoxStartY + (mSingleBoxHeight * (i + index)), mSingleBoxWidth,
 							mSingleBoxHeight, true);
@@ -218,9 +234,13 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 	}
 
-	private void showScore(long sc, Graphics buffImg) {
+	private void showInfoBar(InfoBar info, Graphics buffImg) {
 		buffImg.setColor(Color.RED);
-		buffImg.drawString("SCORE:" + sc, 50, 50);
+		buffImg.drawString("LEVEL:" + info.getLevel(), 2, 20);
+		buffImg.setColor(Color.BLACK);
+		buffImg.drawString("SCORE:" + info.getScore(), 2, 40);
+		buffImg.setColor(Color.BLUE);
+		buffImg.drawString("LINES:" + info.getCleanedCount(), 2, 60);
 	}
 
 	/**
@@ -290,15 +310,14 @@ public class GameView extends JComponent implements ViewDelegate {
 		// 有方塊可清除,將要清除方塊,可取得要消去的方塊資料
 		if (GameEvent.CLEANING_LINE == code) {
 			System.out.println("有方塊可清除,將要清除方塊,可取得要消去的方塊資料");
-			mScore += (mGameLoop.getNowBoxIndex() + 1) * 100;// 加分數
-			// System.out.println("垃圾方塊模式==>,index位置["+data+"],資料為["+tetrisGame.getLineList(data,false)+"]");
-			// System.out.println("凹陷方塊模式==>index位置["+data+"],資料為["+tetrisGame.getLineList(data,true)+"]");
 			return;
 		}
 		// 方塊清除完成
 		if (GameEvent.CLEANED_LINE == code) {
 			System.out.println("方塊清除完成" + data);
-
+			String [] lines = data.split("[,]", -1);
+			mInfoBar.addCleanedCount(lines.length);
+			mInfoBar.addScore(Config.get().getCleanLinesScore(lines.length));
 			return;
 		}
 		// 計算自己垃圾方塊數
@@ -315,7 +334,8 @@ public class GameView extends JComponent implements ViewDelegate {
 
 				e.printStackTrace();
 			}
-			mScore = 0;
+			//重置分數
+			mInfoBar.initialize();
 			// 清除全畫面方塊
 			mGameLoop.clearBox();
 
@@ -327,5 +347,11 @@ public class GameView extends JComponent implements ViewDelegate {
 
 	public void objEvent(String code, Object obj) {
 
+	}
+	
+	private void addMoveDownScore(){
+		if(mGameLoop.getDownY() > 0){
+			System.out.println("加分 :" + mGameLoop.getDownY());
+		}
 	}
 }

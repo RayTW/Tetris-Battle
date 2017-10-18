@@ -23,7 +23,7 @@ public class GameBox {
 	 * @param style
 	 * @return
 	 */
-	public boolean createBaseObj(int style) {
+	public boolean createNewBox(int style) {
 		boolean b = true;
 		Box nb = new Box();
 		nb.setBoxData(style);
@@ -263,7 +263,7 @@ public class GameBox {
 	 * @return
 	 */
 	public void clearLine(String lineData) {
-		if (!lineData.equals("")) {
+		if (!lineData.isEmpty()) {
 			String[] data = lineData.split("[,]");
 
 			for (int i = 0; i < data.length; i++) {

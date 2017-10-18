@@ -6,6 +6,7 @@ import tetris.box.Box;
 import tetris.box.CheckCleanLineThread;
 import tetris.box.CleanLineListener;
 import tetris.box.GameBox;
+import tetris.view.ViewDelegate;
 
 /**
  * 控制遊戲流程
@@ -14,7 +15,6 @@ import tetris.box.GameBox;
  * 
  */
 public class GameLoop implements Runnable, CleanLineListener {
-	private float mFastSec;// 快移的秒數
 	private float mSec;
 	private Random mRand;
 	private GameBox mGameBox;
@@ -38,7 +38,6 @@ public class GameLoop implements Runnable, CleanLineListener {
 		mFlag = 0;
 		mStyleAry = new String[0];
 		mSec = 0.2f;
-		mFastSec = 0.1f;
 		mGameBox = new GameBox();
 		mIsPause = false;
 		mIsGameOver = false;
@@ -81,7 +80,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 	 * @param boxList
 	 */
 	public void setBoxList(String boxList) {
-		if (!boxList.equals("")) {
+		if (!boxList.isEmpty()) {
 			mStyleAry = boxList.split("[|]");
 		}
 	}
@@ -326,7 +325,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 	 */
 	public boolean randCreatBox() {
 		int style = mRand.nextInt(Box.getStyleCount()) + 1;
-		return mGameBox.createBaseObj(style);
+		return mGameBox.createNewBox(style);
 	}
 
 	/**
@@ -336,7 +335,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 	 */
 	public boolean nextCreatBox() {
 		int style = nextBox();
-		return mGameBox.createBaseObj(style);
+		return mGameBox.createNewBox(style);
 	}
 
 	public int[][] createBox(int style) {
@@ -354,10 +353,10 @@ public class GameLoop implements Runnable, CleanLineListener {
 		// 取得可消除的行數
 		String lineData = mGameBox.getClearLine();
 
-		if (!lineData.equals("")) {
+		if (!lineData.isEmpty()) {
 			putDelegateCode(GameEvent.CLEANING_LINE, lineData);
 			mGameBox.clearLine(lineData);// 實際將可消除的方塊行數移除
-			putDelegateCode(GameEvent.CLEANED_LINE, "");
+			putDelegateCode(GameEvent.CLEANED_LINE, lineData);
 		}
 
 		putDelegateCode(GameEvent.BOX_GARBAGE, lineData);

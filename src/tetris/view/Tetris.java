@@ -1,9 +1,11 @@
-package tetris;
+package tetris.view;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
+
+import tetris.Config;
 
 /**
  * 俄羅斯方塊主程式,建立GameView並add之後執行
@@ -47,8 +49,8 @@ public class Tetris extends JFrame {
 	 */
 	public static void main(String[] args) {
 		Tetris tetris = new Tetris();
-		tetris.setTitle("俄羅斯方塊V1.3 by:吉他手");
-		tetris.setSize(350, 480 + 20);
+		tetris.setTitle("俄羅斯方塊V1.3");
+		tetris.setSize(Config.get().convertValueViaScreenScale(350) , Config.get().convertValueViaScreenScale(480) + 20);
 		tetris.setLocation(350, 50);
 		tetris.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		tetris.setResizable(false);// 視窗放大按鈕無效

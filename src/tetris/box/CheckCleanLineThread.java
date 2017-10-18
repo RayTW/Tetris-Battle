@@ -7,6 +7,7 @@ public class CheckCleanLineThread extends Thread {
 
 	public CheckCleanLineThread() {
 		mIsRun = true;
+		System.out.println("CheckCleanLineThread,new,hash["+hashCode()+"]");
 	}
 
 	public void setCleanLineListener(CleanLineListener o) {
@@ -24,6 +25,7 @@ public class CheckCleanLineThread extends Thread {
 	@Override
 	public void run() {
 		while (mIsRun) {
+//			System.out.println("CheckCleanLineThread,run,hash["+hashCode()+"]");
 			if (mListener != null) {
 				if (mListener.isClean()) {
 					mListener.cleanLine();
@@ -42,6 +44,7 @@ public class CheckCleanLineThread extends Thread {
 
 	public void close() {
 		// System.out.println("CheckCleanLineThread close;");
+		System.out.println("CheckCleanLineThread,close,hash["+hashCode()+"]");
 		mListener = null;
 	}
 
