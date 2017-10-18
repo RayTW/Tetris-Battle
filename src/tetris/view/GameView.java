@@ -128,8 +128,7 @@ public class GameView extends JComponent implements ViewDelegate {
 				tetrisEvent(GameEvent.BOX_TURN, null);
 				break;
 			case KeyEvent.VK_DOWN:// 下,下移方塊
-				mGameLoop.moveDown();
-				addMoveDownScore();
+				moveDown();
 				break;
 			case KeyEvent.VK_LEFT:// 左,左移方塊
 				mGameLoop.moveLeft();
@@ -138,7 +137,7 @@ public class GameView extends JComponent implements ViewDelegate {
 				mGameLoop.moveRight();
 				break;
 			case KeyEvent.VK_SPACE:// 空白鍵,快速掉落方塊
-				mGameLoop.quickDown();
+				quickDown();
 				break;
 			case KeyEvent.VK_S:// S鍵,暫停
 				mGameLoop.pause();
@@ -153,6 +152,24 @@ public class GameView extends JComponent implements ViewDelegate {
 
 		// 每次按了鍵盤就將畫面重繪
 		repaint();
+	}
+	
+	private void moveDown(){
+		if(mGameLoop.moveDown()){
+			mInfoBar.addScore(Config.get().getMoveDownScore());
+		}
+	}
+	
+	private void quickDown(){
+		int befor = mGameLoop.getNowBoxXY()[1];
+		mGameLoop.quickDown();
+		int after = mGameLoop.getNowBoxXY()[1];
+		//若方塊快速落到底，再另外加分數
+		int quickDownScore = after - befor;
+		
+		if(quickDownScore > 0){
+			mInfoBar.addScore(quickDownScore * Config.get().getQuickDownScore());
+		}
 	}
 
 	// 雙緩衝區繪圖
@@ -333,11 +350,8 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 方塊落到底
 		if (GameEvent.BOX_DOWN == code) {
-			Debug.get().println("做方塊到底定位動畫 現在方塊高度[" + mGameLoop.getNowBoxIndex() + "]");
-
-			// 做方塊到底定位動畫
+			//播放方塊掉落音效
 			playSound("sound/down.wav");
-
 			return;
 		}
 		// 建立完下一個方塊
@@ -413,11 +427,5 @@ public class GameView extends JComponent implements ViewDelegate {
 
 	public void objEvent(String code, Object obj) {
 
-	}
-
-	private void addMoveDownScore() {
-		if (mGameLoop.getDownY() > 0) {
-			Debug.get().println("加分 :" + mGameLoop.getDownY());
-		}
 	}
 }

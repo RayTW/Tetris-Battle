@@ -28,6 +28,12 @@ public class Config {
 
 	// 重用音效緩存的筆數
 	private int mSoundCacheCount = 20;
+	
+	//下移1格時可獲得的分數
+	private int mMoveDownScore = 5;
+	
+	//快速下移時可獲得的分數
+	private int mQuickDownScore = 10;
 
 	private Config() {
 	}
@@ -105,6 +111,22 @@ public class Config {
 	 * @return
 	 */
 	public int linesConvertLevel(int lines){
-		return lines / mLevelUpLines;
+		return (lines / mLevelUpLines);
+	}
+	
+	/**
+	 * 取得下移1格時可獲得的分數
+	 * @return
+	 */
+	public int getMoveDownScore(){
+		return mMoveDownScore;
+	}
+	
+	/**
+	 * 取得快速下速方塊可獲得的分數
+	 * @return
+	 */
+	public int getQuickDownScore(){
+		return mQuickDownScore;
 	}
 }
