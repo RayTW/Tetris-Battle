@@ -9,6 +9,7 @@ public class InfoBar {
 	private long mScore;// 遊戲分數
 	private int mLevel;// 遊戲等級
 	private int mCleanedCount;// 已消除的行數
+	private int mWaitNextRoundSecond;//遊戲結束後倒數秒數
 
 	public InfoBar() {
 		initialize();
@@ -18,6 +19,7 @@ public class InfoBar {
 		mScore = 0;
 		mLevel = 0;
 		mCleanedCount = 0;
+		mWaitNextRoundSecond = 0;
 	}
 
 	public long getScore() {
@@ -54,5 +56,17 @@ public class InfoBar {
 
 	public void addCleanedCount(int cleanedCount) {
 		mCleanedCount += cleanedCount;
+	}
+	
+	public void setWaitNextRoundSecond(int second){
+		mWaitNextRoundSecond = second;
+	}
+	
+	public int getWaitNextRoundSecond(){
+		return mWaitNextRoundSecond;
+	}
+	
+	public void addWaitNextRoundSecond(int second){
+		mWaitNextRoundSecond += second;
 	}
 }

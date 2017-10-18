@@ -7,6 +7,9 @@ package tetris;
  */
 public class Config {
 	private static Config sInstance = new Config();
+	
+	//遊戲版本
+	private String mVersion = "1.3";
 
 	// 消除方塊行數可獲得的分數
 	private int[] mCleanLinesScore = { 0, 100, 300, 500, 800 };
@@ -15,10 +18,10 @@ public class Config {
 	private float [] mBoxFallSpeed = { 2.0f, 1.5f, 1.0f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.08f };
 
 	// 畫面比例
-	private double mScreenScale = 1;
+	private double mScreenScale = 1.5;
 
 	// 重新開始等待秒數
-	private int mNextRoundDelaySecond = 3;
+	private int mNextRoundDelaySecond = 5;
 
 	// 重用音效緩存的筆數
 	private int mSoundCacheCount = 20;
@@ -28,6 +31,14 @@ public class Config {
 
 	public static Config get() {
 		return sInstance;
+	}
+	
+	/**
+	 * 取得遊戲版本
+	 * @return
+	 */
+	public String getVersion(){
+		return mVersion;
 	}
 
 	/**

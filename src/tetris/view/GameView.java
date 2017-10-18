@@ -32,6 +32,10 @@ public class GameView extends JComponent implements ViewDelegate {
 	private int mRightNextBoxesHeightSpacing; // 右側方塊的位置y間距
 	private int mScoreLocationY; // 分數顯示位置
 	private int mLevelLocationY; // 等級顯示位置
+	private int mGameOverLocationX; // 遊戲結束顯示位置x
+	private int mGameOverLocationY; // 遊戲結束顯示位置y
+	private int mNextRoundCountdownSecondLocationX; // 下局倒數秒數顯示位置x
+	private int mNextRoundCountdownSecondLocationY; // 下局倒數秒數顯示位置y
 	private int mLinesLocationY; // 方塊消除累計行數顯示位置
 	private Font mScoreFont;
 	private Image mCanvasBuffer = null;
@@ -65,10 +69,15 @@ public class GameView extends JComponent implements ViewDelegate {
 		mLevelLocationY = Config.get().convertValueViaScreenScale(20);
 		mLinesLocationY = Config.get().convertValueViaScreenScale(45);
 		mScoreLocationY = Config.get().convertValueViaScreenScale(70);
+		
+		//遊戲結束
+		mGameOverLocationX = Config.get().convertValueViaScreenScale(100);
+		mGameOverLocationY = Config.get().convertValueViaScreenScale(250);
+		mNextRoundCountdownSecondLocationX = Config.get().convertValueViaScreenScale(155);
+		mNextRoundCountdownSecondLocationY = Config.get().convertValueViaScreenScale(270);
 
 		// 分數、消除行數、等級
 		mInfoBar = new InfoBar();
-		mInfoBar.setLevel(99);
 		// 建立遊戲邏輯
 		mGameLoop = new GameLoop();
 
@@ -178,6 +187,9 @@ public class GameView extends JComponent implements ViewDelegate {
 
 		// 顯示分數
 		showInfoBar(mInfoBar, canvas);
+		
+		// 顯示遊戲結束，並倒數秒數
+		showGameOver(mInfoBar, canvas);
 
 		// 將暫存的圖，畫到前景
 		g.drawImage(mCanvasBuffer, 0, 0, this);
@@ -189,8 +201,6 @@ public class GameView extends JComponent implements ViewDelegate {
 			for (int j = 0; j < boxAry[i].length; j++) {
 				int style = boxAry[i][j];
 				if (style > 0) {// 畫定住的方塊
-					// buffImg.fillOval(BOX_START_X + (BOX_IMG_W *
-					// j),BOX_START_Y + (BOX_IMG_H * i),BOX_IMG_W,BOX_IMG_H);
 					drawBox(style, j, i, buffImg);
 				} else {// 畫其他背景格子
 					buffImg.drawRect(mBoxStartX + (mSingleBoxWidth * j), mBoxStartY + (mSingleBoxHeight * i),
@@ -265,6 +275,16 @@ public class GameView extends JComponent implements ViewDelegate {
 		buffImg.drawString("SCORE:" + info.getScore(), 2, mLinesLocationY);
 		buffImg.setColor(Color.BLUE);
 		buffImg.drawString("LINES:" + info.getCleanedCount(), 2, mScoreLocationY);
+	}
+	
+	private void showGameOver(InfoBar info, Graphics buffImg){
+		if(mGameLoop.isGameOver()){
+			buffImg.setColor(Color.DARK_GRAY);
+			buffImg.drawString("GAME OVER", mGameOverLocationX, mGameOverLocationY);
+			
+			buffImg.drawString(String.valueOf(info.getWaitNextRoundSecond() + 1), mNextRoundCountdownSecondLocationX, mNextRoundCountdownSecondLocationY);
+			
+		}
 	}
 
 	/**
@@ -355,12 +375,18 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 方塊頂到最高處，遊戲結束
 		if (GameEvent.GAME_OVER == code) {
-			Debug.get().println(Config.get().getNextRoundDelaySecond() + "秒後重新...");
-			try {
-				Thread.sleep(Config.get().getNextRoundDelaySecond() * 1000);
-			} catch (InterruptedException e) {
+			mInfoBar.setWaitNextRoundSecond(Config.get().getNextRoundDelaySecond());
+			
+			while(mInfoBar.getWaitNextRoundSecond() > 0){
+				repaint();
+				Debug.get().println(mInfoBar.getWaitNextRoundSecond() + "秒後開始新局...");
+				mInfoBar.addWaitNextRoundSecond(-1);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
 
-				e.printStackTrace();
+					e.printStackTrace();
+				}	
 			}
 			// 重置分數
 			mInfoBar.initialize();
