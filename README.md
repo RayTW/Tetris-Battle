@@ -1,5 +1,5 @@
 # TetrisGame
-![](https://github.com/RayTW/TetrisGame/blob/master/245394101_o.jpg)
+![](https://github.com/RayTW/TetrisGame/blob/master/privies-v1.4.png)
 
 ```code
 遊戲按鈕控制說明:
