@@ -50,7 +50,7 @@ public class Tetris extends JFrame {
 	public static void main(String[] args) {
 		Tetris tetris = new Tetris();
 		tetris.setTitle("俄羅斯方塊V1.3");
-		tetris.setSize(Config.get().convertValueViaScreenScale(350) , Config.get().convertValueViaScreenScale(480) + 20);
+		tetris.setSize(Config.get().convertValueViaScreenScale(350), Config.get().convertValueViaScreenScale(480) + 20);
 		tetris.setLocation(350, 50);
 		tetris.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		tetris.setResizable(false);// 視窗放大按鈕無效

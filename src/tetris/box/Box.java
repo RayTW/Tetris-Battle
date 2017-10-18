@@ -22,8 +22,7 @@ public class Box {
 	/** 7.反閃電 */
 	public final static String STYLE7 = "0,0|0,1|1,1|1,2@0,1|1,0|1,1|2,0";
 
-	private final static String[] STYLE_LIST = { STYLE1, STYLE2, STYLE3,
-			STYLE4, STYLE5, STYLE6, STYLE7 };
+	private final static String[] STYLE_LIST = { STYLE1, STYLE2, STYLE3, STYLE4, STYLE5, STYLE6, STYLE7 };
 
 	private int mNowX; // 目前的x位置
 	private int mNowY; // 目前的y位置
@@ -290,16 +289,16 @@ public class Box {
 		mNowY += y;
 		mNowX += x;
 	}
-	
-	public void setNowX(int x){
+
+	public void setNowX(int x) {
 		mNowX = x;
 	}
-	
-	public int getNowX(){
+
+	public int getNowX() {
 		return mNowX;
 	}
-	
-	public int getNowY(){
+
+	public int getNowY() {
 		return mNowY;
 	}
 

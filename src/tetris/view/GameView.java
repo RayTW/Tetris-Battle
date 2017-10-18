@@ -14,7 +14,7 @@ import util.AudioPlayer;
 /**
  * 此類別只做畫面處理，不做方塊移動運算，所有GameLoop類別所觸發的事件會通知此類別的tetrisEvent() method
  * 
- * @author 吉他手 Ray
+ * @author  Ray
  * 
  */
 public class GameView extends JComponent implements ViewDelegate {
@@ -26,17 +26,16 @@ public class GameView extends JComponent implements ViewDelegate {
 	private int mGameScreenHeight; // 遊戲畫面高
 	private int mSingleBoxWidth; // 每個方塊格寬
 	private int mSingleBoxHeight; // 每個方塊格高
-	private int mRightNextBoxesX; //右側方塊的位置x
-	private int mRightNextBoxesHeightSpacing; //右側方塊的位置y間距
+	private int mRightNextBoxesX; // 右側方塊的位置x
+	private int mRightNextBoxesHeightSpacing; // 右側方塊的位置y間距
 	private Image mCanvasBuffer = null;
-	private Color[] mColor = { null, new Color(0, 255, 255, 250),
-			new Color(0, 0, 255, 250), new Color(0, 255, 0, 250),
-			new Color(255, 0, 0, 250), new Color(255, 255, 0, 250),
-			new Color(255, 0, 255, 250), new Color(50, 100, 150, 250) };
+	private Color[] mColor = { null, new Color(0, 255, 255, 250), new Color(0, 0, 255, 250), new Color(0, 255, 0, 250),
+			new Color(255, 0, 0, 250), new Color(255, 255, 0, 250), new Color(255, 0, 255, 250),
+			new Color(50, 100, 150, 250) };
 	private Color mShadowColor = new Color(0, 0, 0, 128);
 
 	private GameLoop mGameLoop; // 遊戲邏輯(無畫面)
-	private AudioPlayer mBackgroundMusic;//播放背景音樂
+	private AudioPlayer mBackgroundMusic;// 播放背景音樂
 	private InfoBar mInfoBar;
 
 	public GameView() {
@@ -45,7 +44,7 @@ public class GameView extends JComponent implements ViewDelegate {
 
 	public void initialize() {
 		Config config = Config.get();
-		
+
 		mBoxStartX = config.convertValueViaScreenScale(62);
 		mBoxStartY = config.convertValueViaScreenScale(79);
 		mGameScreenWidth = config.convertValueViaScreenScale(350);
@@ -54,8 +53,8 @@ public class GameView extends JComponent implements ViewDelegate {
 		mSingleBoxHeight = config.convertValueViaScreenScale(19);
 		mRightNextBoxesX = config.convertValueViaScreenScale(160);
 		mRightNextBoxesHeightSpacing = config.convertValueViaScreenScale(50);
-		
-		//分數、消除行數、等級
+
+		// 分數、消除行數、等級
 		mInfoBar = new InfoBar();
 		// 建立遊戲邏輯
 		mGameLoop = new GameLoop();
@@ -84,7 +83,7 @@ public class GameView extends JComponent implements ViewDelegate {
 
 		audio.setPlayCount(playCount);// 播放次數
 		audio.play();
-		System.out.println("播音樂["+path+"],耗時["+(System.currentTimeMillis() - time)+"]");
+		System.out.println("播音樂[" + path + "],耗時[" + (System.currentTimeMillis() - time) + "]");
 		return audio;
 	}
 
@@ -146,15 +145,14 @@ public class GameView extends JComponent implements ViewDelegate {
 		// 畫掉落中的方塊
 		int[] xy = mGameLoop.getNowBoxXY();
 		int[][] box = mGameLoop.getNowBoxAry();
-		
+
 		// 畫陰影
 		shadow(xy, box, canvas, mGameLoop.getDownY());
-		
+
 		showDownBox(xy, box, canvas);
 
 		// 畫右邊下次要出現的方塊
 		showBufferBox(mBoxBuffer, canvas);
-		
 
 		// 顯示分數
 		showInfoBar(mInfoBar, canvas);
@@ -173,8 +171,8 @@ public class GameView extends JComponent implements ViewDelegate {
 					// j),BOX_START_Y + (BOX_IMG_H * i),BOX_IMG_W,BOX_IMG_H);
 					drawBox(style, j, i, buffImg);
 				} else {// 畫其他背景格子
-					buffImg.drawRect(mBoxStartX + (mSingleBoxWidth * j), mBoxStartY
-							+ (mSingleBoxHeight * i), mSingleBoxWidth, mSingleBoxHeight);
+					buffImg.drawRect(mBoxStartX + (mSingleBoxWidth * j), mBoxStartY + (mSingleBoxHeight * i),
+							mSingleBoxWidth, mSingleBoxHeight);
 				}
 			}
 		}
@@ -229,8 +227,7 @@ public class GameView extends JComponent implements ViewDelegate {
 				if (style > 0) {
 					buffImg.setColor(mShadowColor);
 					buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * (j + boxX)),
-							mBoxStartY + (mSingleBoxHeight * (i + index)), mSingleBoxWidth,
-							mSingleBoxHeight, true);
+							mBoxStartY + (mSingleBoxHeight * (i + index)), mSingleBoxWidth, mSingleBoxHeight, true);
 				}
 			}
 		}
@@ -256,8 +253,8 @@ public class GameView extends JComponent implements ViewDelegate {
 	public void drawBox(int style, int x, int y, Graphics buffImg) {
 		// buffImg.fill3DRect(arg0, arg1, arg2, arg3, arg4)
 		buffImg.setColor(mColor[style]);
-		buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * x), mBoxStartY
-				+ (mSingleBoxHeight * y), mSingleBoxWidth, mSingleBoxHeight, true);
+		buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * x), mBoxStartY + (mSingleBoxHeight * y), mSingleBoxWidth,
+				mSingleBoxHeight, true);
 		buffImg.setColor(Color.BLACK);
 		// buffImg.drawRect(BOX_START_X + (BOX_IMG_W * x),BOX_START_Y +
 		// (BOX_IMG_H * y),BOX_IMG_W,BOX_IMG_H);
@@ -296,8 +293,7 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 方塊落到底
 		if (GameEvent.BOX_DOWN == code) {
-			System.out.println("做方塊到底定位動畫 現在方塊高度["
-					+ mGameLoop.getNowBoxIndex() + "]");
+			System.out.println("做方塊到底定位動畫 現在方塊高度[" + mGameLoop.getNowBoxIndex() + "]");
 
 			// 做方塊到底定位動畫
 			playAudio("sound/down.wav", 1);
@@ -317,7 +313,7 @@ public class GameView extends JComponent implements ViewDelegate {
 		// 方塊清除完成
 		if (GameEvent.CLEANED_LINE == code) {
 			System.out.println("方塊清除完成" + data);
-			String [] lines = data.split("[,]", -1);
+			String[] lines = data.split("[,]", -1);
 			mInfoBar.addCleanedCount(lines.length);
 			mInfoBar.addScore(Config.get().getCleanLinesScore(lines.length));
 			return;
@@ -329,14 +325,14 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 方塊頂到最高處，遊戲結束
 		if (GameEvent.GAME_OVER == code) {
-			System.out.println(Config.get().getNextRoundDelaySecond() +"秒後重新...");
+			System.out.println(Config.get().getNextRoundDelaySecond() + "秒後重新...");
 			try {
 				Thread.sleep(Config.get().getNextRoundDelaySecond() * 1000);
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();
 			}
-			//重置分數
+			// 重置分數
 			mInfoBar.initialize();
 			// 清除全畫面方塊
 			mGameLoop.clearBox();
@@ -350,9 +346,9 @@ public class GameView extends JComponent implements ViewDelegate {
 	public void objEvent(String code, Object obj) {
 
 	}
-	
-	private void addMoveDownScore(){
-		if(mGameLoop.getDownY() > 0){
+
+	private void addMoveDownScore() {
+		if (mGameLoop.getDownY() > 0) {
 			System.out.println("加分 :" + mGameLoop.getDownY());
 		}
 	}

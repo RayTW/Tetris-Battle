@@ -1,8 +1,8 @@
 package tetris.box;
 
 public class GameBox {
-	public int mBoxRowCount = 20;//直的20個方塊
-	public int mBoxColumnCount = 10;//橫的10個方塊
+	public int mBoxRowCount = 20;// 直的20個方塊
+	public int mBoxColumnCount = 10;// 橫的10個方塊
 	private int[][] mBoxes; // 整個可以放置方塊、移動方塊的大陣列
 
 	private Box nowBox; // 目前移動中的方塊
@@ -83,8 +83,7 @@ public class GameBox {
 		if (x > mBoxColumnCount) {// 判斷方塊位置是否會超過boxAry的寬度
 			b = false;
 		} else {// 沒超過牆，判斷是否撞到其他方塊
-			if (hitTest(mBoxes, tempNowBox.getNowturnBoxAry(),
-					tempNowBox.getNowX() + 1, tempNowBox.getNowY())) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, tempNowBox.getNowturnBoxAry(), tempNowBox.getNowX() + 1, tempNowBox.getNowY())) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				b = false;
 			} else {
 				tempNowBox.move(1, 0);
@@ -117,8 +116,7 @@ public class GameBox {
 		if (x < -1) {
 			b = false;
 		} else {
-			if (hitTest(mBoxes, nowturnBoxAry, tempNowBox.getNowX() - 1,
-					tempNowBox.getNowY())) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, nowturnBoxAry, tempNowBox.getNowX() - 1, tempNowBox.getNowY())) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				b = false;
 			} else {
 				tempNowBox.move(-1, 0);
@@ -593,8 +591,7 @@ public class GameBox {
 	 *            方塊目前的y位置
 	 * @return
 	 */
-	protected boolean hitTest(int[][] tempBoxAry, int[][] boxBaseAry, int nx,
-			int ny) {
+	protected boolean hitTest(int[][] tempBoxAry, int[][] boxBaseAry, int nx, int ny) {
 		for (int i = 0; i < boxBaseAry.length; i++) {
 			for (int j = 0; j < boxBaseAry[i].length; j++) {
 				// System.out.println("方塊點["+i+"]["+j+"],碰撞點["+(i+ny)+"]["+(j+nx)+"]");
