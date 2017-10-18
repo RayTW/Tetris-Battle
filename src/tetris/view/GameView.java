@@ -84,7 +84,7 @@ public class GameView extends JComponent implements ViewDelegate {
 
 		audio.setPlayCount(playCount);// 播放次數
 		audio.play();
-		System.out.println("播音樂耗時["+(System.currentTimeMillis() - time)+"]");
+		System.out.println("播音樂["+path+"],耗時["+(System.currentTimeMillis() - time)+"]");
 		return audio;
 	}
 
@@ -329,9 +329,9 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 方塊頂到最高處，遊戲結束
 		if (GameEvent.GAME_OVER == code) {
-			System.out.println("秒後重新...");
+			System.out.println(Config.get().getNextRoundDelaySecond() +"秒後重新...");
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(Config.get().getNextRoundDelaySecond() * 1000);
 			} catch (InterruptedException e) {
 
 				e.printStackTrace();

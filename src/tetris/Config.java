@@ -13,7 +13,10 @@ public class Config {
 	private int [] mCleanLinesScore = {0,100,300,500,800};
 	
 	// 畫面比例
-	private double mScreenScale = 1.8;
+	private double mScreenScale = 0.6;
+	
+	//重新開始等待秒數
+	private int mNextRoundDelaySecond = 3;
 
 	private Config() {
 	}
@@ -46,5 +49,13 @@ public class Config {
 	 */
 	public int convertValueViaScreenScale(int value){
 		return (int)((double)value * mScreenScale);
+	}
+	
+	/**
+	 * 重新開始等待秒數
+	 * @return
+	 */
+	public int getNextRoundDelaySecond(){
+		return mNextRoundDelaySecond;
 	}
 }
