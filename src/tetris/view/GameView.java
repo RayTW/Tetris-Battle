@@ -106,7 +106,6 @@ public class GameView extends JComponent implements ViewDelegate {
 	}
 
 	private AudioPlayer playAudio(String path, int playCount, int cacheCount) {
-		Debug.get().println("playAudio,path---begin");
 		AudioPlayer audio = new AudioPlayer();
 		path = "/" + path;
 		audio.loadAudio(path, this);
@@ -114,7 +113,6 @@ public class GameView extends JComponent implements ViewDelegate {
 
 		audio.setPlayCount(playCount);// 播放次數
 		audio.play();
-		Debug.get().println("playAudio,path---end");
 		return audio;
 	}
 
@@ -319,14 +317,6 @@ public class GameView extends JComponent implements ViewDelegate {
 	}
 	
 	/**
-	 * 提升等級1級，並重設方塊掉落速度
-	 */
-	private void levelUp(){
-		mInfoBar.addLevel(1);
-		mGameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
-	}
-
-	/**
 	 * 所有
 	 */
 	@Override
@@ -366,6 +356,10 @@ public class GameView extends JComponent implements ViewDelegate {
 			String[] lines = data.split("[,]", -1);
 			mInfoBar.addCleanedCount(lines.length);
 			mInfoBar.addScore(Config.get().getCleanLinesScore(lines.length));
+			
+			if(tryLevelUp()){
+				Debug.get().println("提升等級!!");
+			}
 			return;
 		}
 		// 計算自己垃圾方塊數
@@ -400,6 +394,21 @@ public class GameView extends JComponent implements ViewDelegate {
 			mGameLoop.setGameOver(false);
 		}
 		return;
+	}
+	
+	/**
+	 * 試著計算是否提升等級1級，並重設方塊掉落速度
+	 */
+	private boolean tryLevelUp(){
+		int currentLevel = mInfoBar.getLevel();
+		int newLevel = Config.get().linesConvertLevel(mInfoBar.getCleanedCount());
+		
+		if(currentLevel != newLevel){
+			mInfoBar.setLevel(newLevel);
+			mGameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+			return true;
+		}
+		return false;
 	}
 
 	public void objEvent(String code, Object obj) {

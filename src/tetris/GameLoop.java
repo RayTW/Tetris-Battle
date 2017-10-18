@@ -7,7 +7,6 @@ import tetris.box.CheckCleanLineThread;
 import tetris.box.CleanLineListener;
 import tetris.box.GameBox;
 import tetris.view.ViewDelegate;
-import util.Debug;
 
 /**
  * 控制遊戲流程

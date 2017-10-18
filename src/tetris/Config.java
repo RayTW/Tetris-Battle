@@ -12,13 +12,16 @@ public class Config {
 	private String mVersion = "1.3";
 
 	// 消除方塊行數可獲得的分數
-	private int[] mCleanLinesScore = { 0, 100, 300, 500, 800 };
+	private int [] mCleanLinesScore = { 0, 100, 300, 500, 800 };
 	
 	//方塊掉落速度(秒)
 	private float [] mBoxFallSpeed = { 2.0f, 1.5f, 1.0f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.08f };
 
+	//每個等級升下一級所需的行數
+	private int mLevelUpLines = 10;
+	
 	// 畫面比例
-	private double mScreenScale = 1.5;
+	private double mScreenScale = 1;
 
 	// 重新開始等待秒數
 	private int mNextRoundDelaySecond = 5;
@@ -93,5 +96,15 @@ public class Config {
 			return mBoxFallSpeed[level];
 		}
 		return mBoxFallSpeed[mBoxFallSpeed.length - 1];
+	}
+	
+	/**
+	 * 已消除的方塊行數轉換為對應的等級
+	 * 
+	 * @param lines
+	 * @return
+	 */
+	public int linesConvertLevel(int lines){
+		return lines / mLevelUpLines;
 	}
 }
