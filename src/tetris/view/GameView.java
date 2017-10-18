@@ -68,14 +68,15 @@ public class GameView extends JComponent implements ViewDelegate {
 
 		// 分數、消除行數、等級
 		mInfoBar = new InfoBar();
+		mInfoBar.setLevel(99);
 		// 建立遊戲邏輯
 		mGameLoop = new GameLoop();
 
 		// 設定使用GameView代理遊戲邏輯進行畫面的繪圖
 		mGameLoop.setDelegate(this);
 
-		// 設定方塊掉落秒數為0.5秒
-		mGameLoop.setSec(0.5f);
+		// 設定方塊掉落秒數為
+		mGameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
 
 		// 設定下次要出現的方塊style個數為顯示3個
 		mBoxBuffer = getBufBox(mGameLoop, mNextBoxCount);
@@ -296,6 +297,14 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		return ary;
 	}
+	
+	/**
+	 * 提升等級1級，並重設方塊掉落速度
+	 */
+	private void levelUp(){
+		mInfoBar.addLevel(1);
+		mGameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+	}
 
 	/**
 	 * 所有
@@ -357,6 +366,9 @@ public class GameView extends JComponent implements ViewDelegate {
 			mInfoBar.initialize();
 			// 清除全畫面方塊
 			mGameLoop.clearBox();
+			
+			// 設定方塊掉落秒數
+			mGameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
 
 			// 當方塊到頂時，會自動將GameOver設為true,因此下次要開始時需設定遊戲為false表示可進行遊戲
 			mGameLoop.setGameOver(false);

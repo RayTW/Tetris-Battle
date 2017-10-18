@@ -10,6 +10,9 @@ public class Config {
 
 	// 消除方塊行數可獲得的分數
 	private int[] mCleanLinesScore = { 0, 100, 300, 500, 800 };
+	
+	//方塊掉落速度(秒)
+	private float [] mBoxFallSpeed = { 2.0f, 1.5f, 1.0f, 0.5f, 0.4f, 0.3f, 0.2f, 0.1f, 0.08f };
 
 	// 畫面比例
 	private double mScreenScale = 1;
@@ -67,5 +70,17 @@ public class Config {
 	 */
 	public int getSoundCacheCount() {
 		return mSoundCacheCount;
+	}
+	
+	/**
+	 * 用等級取得方塊掉落速度
+	 * @param level
+	 * @return
+	 */
+	public float getBoxFallSpeed(int level){
+		if(level >= 0 && level < mBoxFallSpeed.length){
+			return mBoxFallSpeed[level];
+		}
+		return mBoxFallSpeed[mBoxFallSpeed.length - 1];
 	}
 }

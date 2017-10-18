@@ -7,7 +7,7 @@ package tetris.view;
  */
 public class InfoBar {
 	private long mScore;// 遊戲分數
-	private short mLevel;// 遊戲等級
+	private int mLevel;// 遊戲等級
 	private int mCleanedCount;// 已消除的行數
 
 	public InfoBar() {
@@ -32,15 +32,15 @@ public class InfoBar {
 		mScore += score;
 	}
 
-	public short getLevel() {
+	public int getLevel() {
 		return mLevel;
 	}
 
-	public void setLevel(short level) {
+	public void setLevel(int level) {
 		mLevel = level;
 	}
 
-	public void addLevel(short level) {
+	public void addLevel(int level) {
 		mLevel += level;
 	}
 
