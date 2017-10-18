@@ -4,6 +4,7 @@ import javax.sound.sampled.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 播放音樂(支援WAV, AIFF, AU) 2011/10/09
@@ -14,49 +15,47 @@ import java.net.*;
  * @author Ray(吉他手)
  */
 public class AudioPlayer {
-	private AudioInputStream currentSound;
+	private static ConcurrentHashMap<String, AudioInputStream> sCacheAudioStreams = new ConcurrentHashMap<String, AudioInputStream>();
 
-	private Clip clip;
+	private Clip mClip;
 
-	private float gain;
-	private FloatControl gainControl;
+	private float mGain;
+	private FloatControl mGainControl;
 
 	// 控制聲道,-1.0f:只有左聲道, 0.0f:雙聲道,1.0f右聲道
-	private float pan;
-	private FloatControl panControl;
+	private float mPan;
+	private FloatControl mPanControl;
 
 	// 控制靜音 開/關
 	private boolean mute;
-	private BooleanControl muteControl;
+	private BooleanControl mMuteControl;
 
 	// 播放次數,小於等於0:無限次播放,大於0:播放次數
-	private int playCount;
+	private int mPlayCount;
 
-	private DataLine.Info dlInfo;
-	private Object loadReference;
-	private AudioFormat format;
+	private DataLine.Info mDlInfo;
+	private AudioFormat mFormat;
 
 	// 音樂播放完畢時，若有設定回call的對象，則會通知此對象
-	private AudioPlayerCallback callbackTartet;
-	private Object callbackObj;
-	private boolean isPause;
+	private AudioPlayerCallback mCallbackTartet;
+	private Object mCallbackObj;
+	private boolean mIsPause;
 
 	public AudioPlayer() {
-		AudioPlayerInit();
+		initialize();
 	}
 
-	public void AudioPlayerInit() {
-		currentSound = null;
-		clip = null;
-		gain = 0.5f;
-		gainControl = null;
-		pan = 0.0f;
-		panControl = null;
+	public void initialize() {
+		mClip = null;
+		mGain = 0.5f;
+		mGainControl = null;
+		mPan = 0.0f;
+		mPanControl = null;
 		mute = false;
-		muteControl = null;
-		playCount = 0;
-		dlInfo = null;
-		isPause = false;
+		mMuteControl = null;
+		mPlayCount = 0;
+		mDlInfo = null;
+		mIsPause = false;
 	}
 
 	/**
@@ -68,8 +67,8 @@ public class AudioPlayer {
 	 *            callback回來的物件
 	 */
 	public void setCallbackTartet(AudioPlayerCallback cb, Object obj) {
-		callbackTartet = cb;
-		callbackObj = obj;
+		mCallbackTartet = cb;
+		mCallbackObj = obj;
 	}
 
 	/**
@@ -81,7 +80,7 @@ public class AudioPlayer {
 		if (c < -1) {
 			c = -1;
 		}
-		playCount = c - 1;
+		mPlayCount = c - 1;
 	}
 
 	/**
@@ -112,7 +111,7 @@ public class AudioPlayer {
 	public boolean loadAudio(String filePath, Object obj) {
 		try {
 			if (obj != null) {
-				loadAudio(obj.getClass().getResourceAsStream(filePath));
+				loadAudio(obj.getClass().getResourceAsStream(filePath), filePath);
 			} else {
 				loadAudio(new File(filePath));
 			}
@@ -127,9 +126,7 @@ public class AudioPlayer {
 	 * 從遠端讀取音檔
 	 */
 	public void loadAudio(URL url) throws Exception {
-		loadReference = url;
-		currentSound = AudioSystem.getAudioInputStream(url);
-		finishLoadingAudio();
+		finishLoadingAudio(getCacheAudioInputStream(url, url.toString()));
 	}
 
 	/**
@@ -139,46 +136,48 @@ public class AudioPlayer {
 	 * @throws Exception
 	 */
 	public void loadAudio(File file) throws Exception {
-		loadReference = file;
-		currentSound = AudioSystem.getAudioInputStream(file);
-		finishLoadingAudio();
+		finishLoadingAudio(getCacheAudioInputStream(file, file.getPath()));
 	}
 
 	/**
 	 * 從串流讀取音檔
 	 * 
 	 * @param iStream
+	 * @param cacheName
 	 * @throws Exception
 	 */
-	public void loadAudio(InputStream iStream) throws Exception {
-		loadReference = iStream;
-		// System.out.println("stream:" + iStream);
-
-		if (iStream instanceof AudioInputStream) {
-			currentSound = (AudioInputStream) iStream;
-		} else {
-			InputStream bufferedIn = new BufferedInputStream(iStream);
-			currentSound = AudioSystem.getAudioInputStream(bufferedIn);
+	public void loadAudio(InputStream iStream, String cacheName) throws Exception {
+		finishLoadingAudio(getCacheAudioInputStream(iStream, cacheName));
+	}
+	
+	private <T> AudioInputStream getCacheAudioInputStream(T obj, String key){
+		System.out.println("getCacheAudioInputStream"+key);
+		AudioInputStream audio = sCacheAudioStreams.get(key);
+		
+		if(audio == null){
+			audio = getAudioInputStream(obj);
+			sCacheAudioStreams.put(key, audio);
 		}
-		finishLoadingAudio();
+		System.out.println("audio==>" + audio.hashCode());
+		return audio;
 	}
 
 	/**
 	 * load完音檔後，進行播放設定
 	 */
-	protected void finishLoadingAudio() throws Exception {
-		format = currentSound.getFormat();
-		dlInfo = new DataLine.Info(Clip.class, format,
-				((int) currentSound.getFrameLength() * format.getFrameSize()));
-		clip = (Clip) AudioSystem.getLine(dlInfo);
-		clip.open(currentSound);
-		clip.addLineListener(new LineListener() {
+	protected void finishLoadingAudio(AudioInputStream audio) throws Exception {
+		mFormat = audio.getFormat();
+		mDlInfo = new DataLine.Info(Clip.class, mFormat,
+				((int) audio.getFrameLength() * mFormat.getFrameSize()));
+		mClip = (Clip) AudioSystem.getLine(mDlInfo);
+		mClip.open(audio);
+		mClip.addLineListener(new LineListener() {
 			@Override
 			public void update(LineEvent event) {
 				if (event.getType().equals(LineEvent.Type.STOP)) {
-					if (!isPause) {
-						if (callbackTartet != null) {
-							callbackTartet.audioPlayEnd(callbackObj);
+					if (!mIsPause) {
+						if (mCallbackTartet != null) {
+							mCallbackTartet.audioPlayEnd(mCallbackObj);
 						}
 						close();
 					}
@@ -191,9 +190,9 @@ public class AudioPlayer {
 	 * 播放音檔
 	 */
 	public void play() {
-		if (clip != null) {
-			clip.setFramePosition(0);
-			clip.loop(playCount);
+		if (mClip != null) {
+			mClip.setFramePosition(0);
+			mClip.loop(mPlayCount);
 		}
 	}
 
@@ -202,11 +201,11 @@ public class AudioPlayer {
 	 * 
 	 */
 	public void resume() {
-		isPause = false;
+		mIsPause = false;
 
-		if (clip != null) {
-			clip.setFramePosition(clip.getFramePosition());
-			clip.loop(playCount);
+		if (mClip != null) {
+			mClip.setFramePosition(mClip.getFramePosition());
+			mClip.loop(mPlayCount);
 		}
 
 	}
@@ -215,9 +214,9 @@ public class AudioPlayer {
 	 * 暫停播放音檔
 	 */
 	public void pause() {
-		isPause = true;
-		if (clip != null) {
-			clip.stop();
+		mIsPause = true;
+		if (mClip != null) {
+			mClip.stop();
 		}
 	}
 
@@ -225,8 +224,8 @@ public class AudioPlayer {
 	 * 停止播放音檔,且將音檔播放位置移回開始處
 	 */
 	public void stop() {
-		if (clip != null) {
-			clip.stop();
+		if (mClip != null) {
+			mClip.stop();
 		}
 	}
 
@@ -239,7 +238,7 @@ public class AudioPlayer {
 	public void setVolume(float dB) {
 		float tempB = floorPow(dB, 1);
 		// System.out.println("目前音量+"+tempB);
-		gain = tempB;
+		mGain = tempB;
 		resetVolume();
 
 	}
@@ -260,11 +259,11 @@ public class AudioPlayer {
 	 * 重設音量
 	 */
 	protected void resetVolume() {
-		gainControl = (FloatControl) clip
+		mGainControl = (FloatControl) mClip
 				.getControl(FloatControl.Type.MASTER_GAIN);
 		// double gain = .5D; // number between 0 and 1 (loudest)
-		float dB = (float) (Math.log(gain) / Math.log(10.0) * 20.0);
-		gainControl.setValue(dB);
+		float dB = (float) (Math.log(mGain) / Math.log(10.0) * 20.0);
+		mGainControl.setValue(dB);
 	}
 
 	/**
@@ -273,7 +272,7 @@ public class AudioPlayer {
 	 * @param p
 	 */
 	public void setPan(float p) {
-		pan = p;
+		mPan = p;
 		resetPan();
 	}
 
@@ -281,8 +280,8 @@ public class AudioPlayer {
 	 * 重設單雙道、雙聲道
 	 */
 	protected void resetPan() {
-		panControl = (FloatControl) clip.getControl(FloatControl.Type.PAN);
-		panControl.setValue(this.pan);
+		mPanControl = (FloatControl) mClip.getControl(FloatControl.Type.PAN);
+		mPanControl.setValue(this.mPan);
 	}
 
 	/**
@@ -300,9 +299,9 @@ public class AudioPlayer {
 	 * 
 	 */
 	protected void resetMute() {
-		muteControl = (BooleanControl) clip
+		mMuteControl = (BooleanControl) mClip
 				.getControl(BooleanControl.Type.MUTE);
-		muteControl.setValue(mute);
+		mMuteControl.setValue(mute);
 	}
 
 	/**
@@ -311,7 +310,7 @@ public class AudioPlayer {
 	 */
 	public int getFramePosition() {
 		try {
-			return clip.getFramePosition();
+			return mClip.getFramePosition();
 		} catch (Exception e) {
 			return -1;
 		}
@@ -323,7 +322,7 @@ public class AudioPlayer {
 	 * @return
 	 */
 	public AudioFormat getCurrentFormat() {
-		return format;
+		return mFormat;
 	}
 
 	/**
@@ -331,7 +330,7 @@ public class AudioPlayer {
 	 * 
 	 * @return
 	 */
-	public AudioInputStream getAudioInputStream() {
+	public AudioInputStream getAudioInputStream(Object loadReference) {
 		try {
 			AudioInputStream aiStream;
 
@@ -362,21 +361,12 @@ public class AudioPlayer {
 	}
 
 	/**
-	 * 目前音檔是否已存在
-	 * 
-	 * @return
-	 */
-	public boolean isAudioLoaded() {
-		return loadReference != null;
-	}
-
-	/**
 	 * 取得剪輯音檔
 	 * 
 	 * @return
 	 */
 	public Clip getClip() {
-		return clip;
+		return mClip;
 	}
 
 	/**
@@ -384,24 +374,22 @@ public class AudioPlayer {
 	 */
 	public void close() {
 		try {
-			if (clip != null)
-				clip.close();
-			if (currentSound != null)
-				currentSound.close();
-			loadReference = null;
+			if (mClip != null)
+				mClip.close();
+//			if (currentSound != null)
+//				currentSound.close();
 		} catch (Exception e) {
 			// System.out.println("unloadAudio: " + e);
 			e.printStackTrace();
 		}
 
-		currentSound = null;
-		clip = null;
-		gainControl = null;
-		panControl = null;
-		dlInfo = null;
-		loadReference = null;
-		muteControl = null;
-		callbackTartet = null;
-		callbackObj = null;
+//		currentSound = null;
+		mClip = null;
+		mGainControl = null;
+		mPanControl = null;
+		mDlInfo = null;
+		mMuteControl = null;
+		mCallbackTartet = null;
+		mCallbackObj = null;
 	}
 }
