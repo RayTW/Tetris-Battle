@@ -119,11 +119,11 @@ public class AudioPlayer {
 	public boolean loadAudio(final String filePath, final Object obj) {
 		try {
 			if (obj != null) {
-				doLoadingAudio(filePath, new Callable<InputStream>() {
+				doLoadingAudio(filePath, new Callable<URL>() {
 
 					@Override
-					public InputStream call() throws Exception {
-						return obj.getClass().getResourceAsStream(filePath);
+					public URL call() throws Exception {
+						return obj.getClass().getResource(filePath);
 					}
 				});
 			} else {
