@@ -268,11 +268,11 @@ public class GameView extends JComponent implements ViewDelegate {
 		buffImg.setFont(mScoreFont);
 
 		buffImg.setColor(Color.RED);
-		buffImg.drawString("LEVEL:" + info.getLevel(), 2, mLevelLocationY);
+		buffImg.drawString("LEVEL : " + info.getLevel(), 2, mLevelLocationY);
 		buffImg.setColor(Color.BLACK);
-		buffImg.drawString("SCORE:" + info.getScore(), 2, mLinesLocationY);
+		buffImg.drawString("SCORE : " + info.getScore(), 2, mLinesLocationY);
 		buffImg.setColor(Color.BLUE);
-		buffImg.drawString("LINES:" + info.getCleanedCount(), 2, mScoreLocationY);
+		buffImg.drawString("LINES : " + info.getCleanedCount(), 2, mScoreLocationY);
 	}
 	
 	private void showGameOver(InfoBar info, Graphics buffImg){
