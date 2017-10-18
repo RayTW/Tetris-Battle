@@ -348,8 +348,6 @@ public class GameLoop implements Runnable, CleanLineListener {
 		putDelegateCode(GameEvent.REPAINT, "");
 		putDelegateCode(GameEvent.BOX_DOWN, "");
 
-		// System.out.println("cleanLine----被執行-------");
-
 		// 取得可消除的行數
 		String lineData = mGameBox.getClearLine();
 
@@ -442,16 +440,5 @@ public class GameLoop implements Runnable, CleanLineListener {
 	public String getLineList(String lineData, boolean isGap) {
 		return mGameBox.getLineList(lineData, isGap);
 	}
-
-	// 印出陣列
-	/*
-	 * public void printAry(int [][] tmp){ //String digit = "０１２３４５６７８９";
-	 * System.out.println("=================="); for(int i = 0; i < tmp.length;
-	 * i++){ System.out.print("|"); for(int j = 0; j < tmp[i].length; j++){
-	 * if(tmp[i][j] > 0){ System.out.print("口");
-	 * //System.out.print(digit.charAt(tmp[i][j])); }else{
-	 * System.out.print("　"); } } System.out.println("|"); }
-	 * System.out.println("=================="); }
-	 */
 
 }

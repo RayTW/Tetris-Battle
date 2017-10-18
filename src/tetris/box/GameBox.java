@@ -277,7 +277,6 @@ public class GameBox {
 	public void clearBoxAry() {
 		for (int i = 0; i < mBoxes.length; i++) {
 			for (int j = 0; j < mBoxes[i].length; j++) {
-				// System.out.println("清方塊"+boxAry[i][j]);
 				mBoxes[i][j] = 0;
 			}
 		}
@@ -318,7 +317,6 @@ public class GameBox {
 		Box nb = nowBox;
 		StringBuffer lineList = new StringBuffer();
 		int ny = nb.getNowY();
-		// System.out.println("從第["+ny+"]行開始找方塊可消"+nb.getNowX());
 
 		for (int i = ny; i < mBoxes.length; i++) {
 			int BW = mBoxes[i].length;
@@ -332,7 +330,6 @@ public class GameBox {
 							lineList.append(",");
 						}
 						lineList.append(i);
-						// System.out.println("可消掉第["+i+"]行");
 					}
 				}
 			}
@@ -525,7 +522,6 @@ public class GameBox {
 			for (int i = 0; i < downBox.length; i++) {
 				for (int j = 0; j < downBox[i].length; j++) {
 					if (downBox[i][j] > 0) {
-						// System.out.println("清空["+(i+oy)+"]["+(j+ox)+"]");
 						for (int k = 0; k < lineAry.length; k++) {
 							if (lineAry[k].equals(String.valueOf(i + ny))) {
 								tempBoxAry[i + ny][j + nx] = 0;
@@ -594,7 +590,6 @@ public class GameBox {
 	protected boolean hitTest(int[][] tempBoxAry, int[][] boxBaseAry, int nx, int ny) {
 		for (int i = 0; i < boxBaseAry.length; i++) {
 			for (int j = 0; j < boxBaseAry[i].length; j++) {
-				// System.out.println("方塊點["+i+"]["+j+"],碰撞點["+(i+ny)+"]["+(j+nx)+"]");
 				int nbNum = boxBaseAry[i][j];
 				if (nbNum > 0) {
 					int byNum = tempBoxAry[i + ny][j + nx];

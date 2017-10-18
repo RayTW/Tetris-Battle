@@ -259,7 +259,6 @@ public class AudioPlayer {
 	 */
 	public void setVolume(float dB) {
 		float tempB = floorPow(dB, 1);
-		// System.out.println("目前音量+"+tempB);
 		mGain = tempB;
 		resetVolume();
 

@@ -1,6 +1,7 @@
 package tetris.view;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -10,11 +11,12 @@ import tetris.Config;
 import tetris.GameEvent;
 import tetris.GameLoop;
 import util.AudioPlayer;
+import util.Debug;
 
 /**
  * 此類別只做畫面處理，不做方塊移動運算，所有GameLoop類別所觸發的事件會通知此類別的tetrisEvent() method
  * 
- * @author  Ray
+ * @author Ray
  * 
  */
 public class GameView extends JComponent implements ViewDelegate {
@@ -28,6 +30,10 @@ public class GameView extends JComponent implements ViewDelegate {
 	private int mSingleBoxHeight; // 每個方塊格高
 	private int mRightNextBoxesX; // 右側方塊的位置x
 	private int mRightNextBoxesHeightSpacing; // 右側方塊的位置y間距
+	private int mScoreLocationY; // 分數顯示位置
+	private int mLevelLocationY; // 等級顯示位置
+	private int mLinesLocationY; // 方塊消除累計行數顯示位置
+	private Font mScoreFont;
 	private Image mCanvasBuffer = null;
 	private Color[] mColor = { null, new Color(0, 255, 255, 250), new Color(0, 0, 255, 250), new Color(0, 255, 0, 250),
 			new Color(255, 0, 0, 250), new Color(255, 255, 0, 250), new Color(255, 0, 255, 250),
@@ -39,10 +45,11 @@ public class GameView extends JComponent implements ViewDelegate {
 	private InfoBar mInfoBar;
 
 	public GameView() {
-		mBackgroundMusic = playAudio("sound/music.wav", 0);
+		mBackgroundMusic = playMusic("sound/music.wav");
 	}
 
 	public void initialize() {
+		mScoreFont = null;
 		Config config = Config.get();
 
 		mBoxStartX = config.convertValueViaScreenScale(62);
@@ -53,6 +60,11 @@ public class GameView extends JComponent implements ViewDelegate {
 		mSingleBoxHeight = config.convertValueViaScreenScale(19);
 		mRightNextBoxesX = config.convertValueViaScreenScale(160);
 		mRightNextBoxesHeightSpacing = config.convertValueViaScreenScale(50);
+
+		// 分數位置
+		mLevelLocationY = Config.get().convertValueViaScreenScale(20);
+		mLinesLocationY = Config.get().convertValueViaScreenScale(45);
+		mScoreLocationY = Config.get().convertValueViaScreenScale(70);
 
 		// 分數、消除行數、等級
 		mInfoBar = new InfoBar();
@@ -75,15 +87,24 @@ public class GameView extends JComponent implements ViewDelegate {
 		setSize(mGameScreenWidth, mGameScreenHeight);
 	}
 
-	public AudioPlayer playAudio(String path, int playCount) {
-		long time = System.currentTimeMillis();
+	private AudioPlayer playMusic(String path) {
+		return playAudio(path, 0, 1);
+	}
+
+	private AudioPlayer playSound(String path) {
+		return playAudio(path, 1, Config.get().getSoundCacheCount());
+	}
+
+	private AudioPlayer playAudio(String path, int playCount, int cacheCount) {
+		Debug.get().println("playAudio,path---begin");
 		AudioPlayer audio = new AudioPlayer();
 		path = "/" + path;
 		audio.loadAudio(path, this);
+		audio.setCacheCount(cacheCount);
 
 		audio.setPlayCount(playCount);// 播放次數
 		audio.play();
-		System.out.println("播音樂[" + path + "],耗時[" + (System.currentTimeMillis() - time) + "]");
+		Debug.get().println("playAudio,path---end");
 		return audio;
 	}
 
@@ -201,15 +222,10 @@ public class GameView extends JComponent implements ViewDelegate {
 				for (int j = 0; j < ary[i].length; j++) {
 					int style = ary[i][j];
 					if (style > 0) {
-						// buffImg.drawOval(160 + (BOX_IMG_W * (j + 5)),0 +
-						// (BOX_IMG_H * (i + 5)), BOX_IMG_W, BOX_IMG_H);
 						buffImg.setColor(mColor[style]);
 						buffImg.fill3DRect(mRightNextBoxesX + (mSingleBoxWidth * (j + 5)),
 								(n * mRightNextBoxesHeightSpacing) + (mSingleBoxHeight * (i + 5)), mSingleBoxWidth,
 								mSingleBoxHeight, true);
-						// buffImg.setColor(Color.BLACK);
-						// buffImg.drawRect(160 + (BOX_IMG_W * (j + 5)),(n * 50)
-						// + (BOX_IMG_H * (i + 5)), BOX_IMG_W, BOX_IMG_H);
 					}
 				}
 			}
@@ -234,12 +250,20 @@ public class GameView extends JComponent implements ViewDelegate {
 	}
 
 	private void showInfoBar(InfoBar info, Graphics buffImg) {
+		if (mScoreFont == null) {
+			Font currentFont = buffImg.getFont();
+			Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().convertValueViaScreenScale(20));
+			mScoreFont = newFont;
+		}
+		// 調整分數字型
+		buffImg.setFont(mScoreFont);
+
 		buffImg.setColor(Color.RED);
-		buffImg.drawString("LEVEL:" + info.getLevel(), 2, 20);
+		buffImg.drawString("LEVEL:" + info.getLevel(), 2, mLevelLocationY);
 		buffImg.setColor(Color.BLACK);
-		buffImg.drawString("SCORE:" + info.getScore(), 2, 40);
+		buffImg.drawString("SCORE:" + info.getScore(), 2, mLinesLocationY);
 		buffImg.setColor(Color.BLUE);
-		buffImg.drawString("LINES:" + info.getCleanedCount(), 2, 60);
+		buffImg.drawString("LINES:" + info.getCleanedCount(), 2, mScoreLocationY);
 	}
 
 	/**
@@ -251,13 +275,10 @@ public class GameView extends JComponent implements ViewDelegate {
 	 * @param buffImg
 	 */
 	public void drawBox(int style, int x, int y, Graphics buffImg) {
-		// buffImg.fill3DRect(arg0, arg1, arg2, arg3, arg4)
 		buffImg.setColor(mColor[style]);
 		buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * x), mBoxStartY + (mSingleBoxHeight * y), mSingleBoxWidth,
 				mSingleBoxHeight, true);
 		buffImg.setColor(Color.BLACK);
-		// buffImg.drawRect(BOX_START_X + (BOX_IMG_W * x),BOX_START_Y +
-		// (BOX_IMG_H * y),BOX_IMG_W,BOX_IMG_H);
 	}
 
 	/**
@@ -287,16 +308,16 @@ public class GameView extends JComponent implements ViewDelegate {
 			return;
 		}
 		if (GameEvent.BOX_TURN == code) {
-			playAudio("sound/turn.wav", 1);
+			playSound("sound/turn.wav");
 
 			return;
 		}
 		// 方塊落到底
 		if (GameEvent.BOX_DOWN == code) {
-			System.out.println("做方塊到底定位動畫 現在方塊高度[" + mGameLoop.getNowBoxIndex() + "]");
+			Debug.get().println("做方塊到底定位動畫 現在方塊高度[" + mGameLoop.getNowBoxIndex() + "]");
 
 			// 做方塊到底定位動畫
-			playAudio("sound/down.wav", 1);
+			playSound("sound/down.wav");
 
 			return;
 		}
@@ -307,12 +328,12 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 有方塊可清除,將要清除方塊,可取得要消去的方塊資料
 		if (GameEvent.CLEANING_LINE == code) {
-			System.out.println("有方塊可清除,將要清除方塊,可取得要消去的方塊資料");
+			Debug.get().println("有方塊可清除,將要清除方塊,可取得要消去的方塊資料");
 			return;
 		}
 		// 方塊清除完成
 		if (GameEvent.CLEANED_LINE == code) {
-			System.out.println("方塊清除完成" + data);
+			Debug.get().println("方塊清除完成" + data);
 			String[] lines = data.split("[,]", -1);
 			mInfoBar.addCleanedCount(lines.length);
 			mInfoBar.addScore(Config.get().getCleanLinesScore(lines.length));
@@ -325,7 +346,7 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 方塊頂到最高處，遊戲結束
 		if (GameEvent.GAME_OVER == code) {
-			System.out.println(Config.get().getNextRoundDelaySecond() + "秒後重新...");
+			Debug.get().println(Config.get().getNextRoundDelaySecond() + "秒後重新...");
 			try {
 				Thread.sleep(Config.get().getNextRoundDelaySecond() * 1000);
 			} catch (InterruptedException e) {
@@ -349,7 +370,7 @@ public class GameView extends JComponent implements ViewDelegate {
 
 	private void addMoveDownScore() {
 		if (mGameLoop.getDownY() > 0) {
-			System.out.println("加分 :" + mGameLoop.getDownY());
+			Debug.get().println("加分 :" + mGameLoop.getDownY());
 		}
 	}
 }

@@ -17,6 +17,9 @@ public class Config {
 	// 重新開始等待秒數
 	private int mNextRoundDelaySecond = 3;
 
+	// 重用音效緩存的筆數
+	private int mSoundCacheCount = 20;
+
 	private Config() {
 	}
 
@@ -55,5 +58,14 @@ public class Config {
 	 */
 	public int getNextRoundDelaySecond() {
 		return mNextRoundDelaySecond;
+	}
+
+	/**
+	 * 重用音效緩存的筆數
+	 * 
+	 * @return
+	 */
+	public int getSoundCacheCount() {
+		return mSoundCacheCount;
 	}
 }

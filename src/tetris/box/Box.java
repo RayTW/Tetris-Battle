@@ -270,7 +270,6 @@ public class Box {
 	 * @return
 	 */
 	public String getBoxStyleStr(int index) {
-		// System.out.println("目前轉向"+index);
 		if (index >= 0 && index < boxAry.length) {
 			String data = STYLE_LIST[style - 1];
 			String[] ary = data.split("[@]");
@@ -301,45 +300,4 @@ public class Box {
 	public int getNowY() {
 		return mNowY;
 	}
-
-	/**
-	 * 印出指定轉向的圖
-	 * 
-	 * @param index
-	 */
-	public void printBox(int index) {
-		int tmp[][] = boxAry[index];
-
-		for (int i = 0; i < tmp.length; i++) {
-			for (int j = 0; j < tmp[i].length; j++) {
-				if (tmp[i][j] > 0) {
-					System.out.print("口");
-				} else {
-					System.out.print("　");
-				}
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-	public void printNowturnBox() {
-		printBox(nowturn);
-	}
-
-	// 測試用，印出陣列
-	public static void printAry(int[][] tmp) {
-		for (int i = 0; i < tmp.length; i++) {
-			for (int j = 0; j < tmp[i].length; j++) {
-				if (tmp[i][j] == 1) {
-					System.out.print("口");
-				} else {
-					System.out.print("　");
-				}
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
 }
