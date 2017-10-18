@@ -12,16 +12,16 @@ import javax.swing.JFrame;
  * 
  */
 public class Tetris extends JFrame {
-	private GameView game;
+	private GameView mGameView;
 
 	public Tetris() {
-		TetrisInit();
+		initialize();
 	}
 
-	public void TetrisInit() {
-		game = new GameView();
-		game.GameViewInit();
-		getContentPane().add(game);
+	public void initialize() {
+		mGameView = new GameView();
+		mGameView.initialize();
+		getContentPane().add(mGameView);
 
 		// 鍵盤事件處理
 		addKeyListener(new KeyListener() {
@@ -31,8 +31,8 @@ public class Tetris extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (game != null) {
-					game.keyCode(e.getKeyCode());
+				if (mGameView != null) {
+					mGameView.keyCode(e.getKeyCode());
 				}
 			}
 

@@ -15,52 +15,52 @@ import util.AudioPlayer;
  * 
  */
 public class GameView extends JComponent implements ViewDelegate {
-	private int NEXT_BOX_COUNT = 3; // 下次要出現的方塊可顯示個數
-	private int[][][] boxBuffer; // 下次要出現的方塊style
-	private int VIEW_MODE = 1; // 畫面比例
-	private int BOX_START_X = 62 * VIEW_MODE; // 掉落方塊的初始位置x
-	private int BOX_START_Y = 79 * VIEW_MODE; // 掉落方塊的初始位置y
-	private int FRAME_W = 350 * VIEW_MODE; // 遊戲畫面寬
-	private int FRAME_H = 480 * VIEW_MODE; // 遊戲畫面高
-	private int BOX_IMG_W = 19 * VIEW_MODE; // 每個方塊格寬
-	private int BOX_IMG_H = 19 * VIEW_MODE; // 每個方塊格高
-	private int ALPHA = 125; // 陰影透明度0~250
-	private long score;
+	private int mNextBoxCount = 3; // 下次要出現的方塊可顯示個數
+	private int[][][] mBoxBuffer; // 下次要出現的方塊style
+	private int mScreenScale = 1; // 畫面比例
+	private int mBoxStartX = 62 * mScreenScale; // 掉落方塊的初始位置x
+	private int mBoxStartY = 79 * mScreenScale; // 掉落方塊的初始位置y
+	private int mGameScreenWidth = 350 * mScreenScale; // 遊戲畫面寬
+	private int mGameScreenHeight = 480 * mScreenScale; // 遊戲畫面高
+	private int mSingleBoxWidth = 19 * mScreenScale; // 每個方塊格寬
+	private int mSingleBoxHeight = 19 * mScreenScale; // 每個方塊格高
+	private int mShdowBoxAlpha = 125; // 陰影透明度0~250
+	private long mScore;
 	private Image mCanvasBuffer = null;
-	private Color[] color = { null, new Color(0, 255, 255, 250),
+	private Color[] mColor = { null, new Color(0, 255, 255, 250),
 			new Color(0, 0, 255, 250), new Color(0, 255, 0, 250),
 			new Color(255, 0, 0, 250), new Color(255, 255, 0, 250),
 			new Color(255, 0, 255, 250), new Color(50, 100, 150, 250) };
-	private Color[] colorAlpha = { null, new Color(0, 255, 255, ALPHA),
-			new Color(0, 0, 255, ALPHA), new Color(0, 255, 0, ALPHA),
-			new Color(255, 0, 0, ALPHA), new Color(255, 255, 0, ALPHA),
-			new Color(255, 0, 255, ALPHA), new Color(50, 100, 150, ALPHA) };
+	private Color[] mColorAlpha = { null, new Color(0, 255, 255, mShdowBoxAlpha),
+			new Color(0, 0, 255, mShdowBoxAlpha), new Color(0, 255, 0, mShdowBoxAlpha),
+			new Color(255, 0, 0, mShdowBoxAlpha), new Color(255, 255, 0, mShdowBoxAlpha),
+			new Color(255, 0, 255, mShdowBoxAlpha), new Color(50, 100, 150, mShdowBoxAlpha) };
 
-	private GameLoop tetrisGame; // 遊戲邏輯(無畫面)
-	private AudioPlayer backgroundMusic;
+	private GameLoop mGameLoop; // 遊戲邏輯(無畫面)
+	private AudioPlayer mBackgroundMusic;//播放背景音樂
 
 	public GameView() {
-		backgroundMusic = playAudio("sound/music.wav", 0);
+		mBackgroundMusic = playAudio("sound/music.wav", 0);
 	}
 
-	public void GameViewInit() {
+	public void initialize() {
 		// 建立遊戲邏輯
-		tetrisGame = new GameLoop();
+		mGameLoop = new GameLoop();
 
 		// 設定使用GameView代理遊戲邏輯進行畫面的繪圖
-		tetrisGame.setDelegate(this);
+		mGameLoop.setDelegate(this);
 
 		// 設定方塊掉落秒數為0.5秒
-		tetrisGame.setSec(0.5f);
+		mGameLoop.setSec(0.5f);
 
 		// 設定下次要出現的方塊style個數為顯示3個
-		boxBuffer = getBufBox(tetrisGame, NEXT_BOX_COUNT);
+		mBoxBuffer = getBufBox(mGameLoop, mNextBoxCount);
 
 		// 啟動遊戲邏輯執行緒
-		tetrisGame.startGame();
+		mGameLoop.startGame();
 
 		// 設定畫面大小
-		setSize(FRAME_W, FRAME_H);
+		setSize(mGameScreenWidth, mGameScreenHeight);
 	}
 
 	public AudioPlayer playAudio(String path, int playCount) {
@@ -75,35 +75,35 @@ public class GameView extends JComponent implements ViewDelegate {
 
 	// 接收鍵盤事件
 	public void keyCode(int code) {
-		if (tetrisGame.isGameOver()) {
+		if (mGameLoop.isGameOver()) {
 			return;
 		}
-		if (!tetrisGame.isPause()) {
+		if (!mGameLoop.isPause()) {
 			switch (code) {
 			case KeyEvent.VK_UP:// 上,順轉方塊
-				tetrisGame.turnRight();
+				mGameLoop.turnRight();
 				tetrisEvent(GameEvent.BOX_TURN, null);
 				break;
 			case KeyEvent.VK_DOWN:// 下,下移方塊
-				tetrisGame.moveDown();
+				mGameLoop.moveDown();
 				break;
 			case KeyEvent.VK_LEFT:// 左,左移方塊
-				tetrisGame.moveLeft();
+				mGameLoop.moveLeft();
 				break;
 			case KeyEvent.VK_RIGHT:// 右,右移方塊
-				tetrisGame.moveRight();
+				mGameLoop.moveRight();
 				break;
 			case KeyEvent.VK_SPACE:// 空白鍵,快速掉落方塊
-				tetrisGame.quickDown();
+				mGameLoop.quickDown();
 				break;
 			case KeyEvent.VK_S:// S鍵,暫停
-				tetrisGame.pause();
+				mGameLoop.pause();
 				break;
 			default:
 			}
 		} else {
 			if (code == KeyEvent.VK_R) {// R鍵,回到遊戲繼續
-				tetrisGame.rusme();
+				mGameLoop.rusme();
 			}
 		}
 
@@ -117,29 +117,29 @@ public class GameView extends JComponent implements ViewDelegate {
 		Graphics canvas = null;
 
 		if (mCanvasBuffer == null) {
-			mCanvasBuffer = createImage(FRAME_W, FRAME_H);// 新建一張image的圖
+			mCanvasBuffer = createImage(mGameScreenWidth, mGameScreenHeight);// 新建一張image的圖
 		} else {
-			mCanvasBuffer.getGraphics().clearRect(0, 0, FRAME_W, FRAME_H);
+			mCanvasBuffer.getGraphics().clearRect(0, 0, mGameScreenWidth, mGameScreenHeight);
 		}
 		canvas = mCanvasBuffer.getGraphics();
 
 		// 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
-		int[][] boxAry = tetrisGame.getBoxAry();
+		int[][] boxAry = mGameLoop.getBoxAry();
 		showBacegroundBox(boxAry, canvas);
 
 		// 畫掉落中的方塊
-		int[] xy = tetrisGame.getNowBoxXY();
-		int[][] box = tetrisGame.getNowBoxAry();
+		int[] xy = mGameLoop.getNowBoxXY();
+		int[][] box = mGameLoop.getNowBoxAry();
 		showDownBox(xy, box, canvas);
 
 		// 畫右邊下次要出現的方塊
-		showBufferBox(boxBuffer, canvas);
+		showBufferBox(mBoxBuffer, canvas);
 
 		// 畫陰影
-		shadow(xy, box, canvas, tetrisGame.getDownY());
+		shadow(xy, box, canvas, mGameLoop.getDownY());
 
 		// 顯示分數
-		showScore(score, canvas);
+		showScore(mScore, canvas);
 
 		// 將暫存的圖，畫到前景
 		g.drawImage(mCanvasBuffer, 0, 0, this);
@@ -155,8 +155,8 @@ public class GameView extends JComponent implements ViewDelegate {
 					// j),BOX_START_Y + (BOX_IMG_H * i),BOX_IMG_W,BOX_IMG_H);
 					drawBox(style, j, i, buffImg);
 				} else {// 畫其他背景格子
-					buffImg.drawRect(BOX_START_X + (BOX_IMG_W * j), BOX_START_Y
-							+ (BOX_IMG_H * i), BOX_IMG_W, BOX_IMG_H);
+					buffImg.drawRect(mBoxStartX + (mSingleBoxWidth * j), mBoxStartY
+							+ (mSingleBoxHeight * i), mSingleBoxWidth, mSingleBoxHeight);
 				}
 			}
 		}
@@ -187,10 +187,10 @@ public class GameView extends JComponent implements ViewDelegate {
 					if (style > 0) {
 						// buffImg.drawOval(160 + (BOX_IMG_W * (j + 5)),0 +
 						// (BOX_IMG_H * (i + 5)), BOX_IMG_W, BOX_IMG_H);
-						buffImg.setColor(color[style]);
-						buffImg.fill3DRect(160 + (BOX_IMG_W * (j + 5)),
-								(n * 50) + (BOX_IMG_H * (i + 5)), BOX_IMG_W,
-								BOX_IMG_H, true);
+						buffImg.setColor(mColor[style]);
+						buffImg.fill3DRect(160 + (mSingleBoxWidth * (j + 5)),
+								(n * 50) + (mSingleBoxHeight * (i + 5)), mSingleBoxWidth,
+								mSingleBoxHeight, true);
 						// buffImg.setColor(Color.BLACK);
 						// buffImg.drawRect(160 + (BOX_IMG_W * (j + 5)),(n * 50)
 						// + (BOX_IMG_H * (i + 5)), BOX_IMG_W, BOX_IMG_H);
@@ -209,10 +209,10 @@ public class GameView extends JComponent implements ViewDelegate {
 			for (int j = 0; j < box[i].length; j++) {
 				int style = box[i][j];
 				if (style > 0) {
-					buffImg.setColor(colorAlpha[style]);
-					buffImg.fill3DRect(BOX_START_X + (BOX_IMG_W * (j + boxX)),
-							BOX_START_Y + (BOX_IMG_H * (i + index)), BOX_IMG_W,
-							BOX_IMG_H, true);
+					buffImg.setColor(mColorAlpha[style]);
+					buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * (j + boxX)),
+							mBoxStartY + (mSingleBoxHeight * (i + index)), mSingleBoxWidth,
+							mSingleBoxHeight, true);
 				}
 			}
 		}
@@ -233,9 +233,9 @@ public class GameView extends JComponent implements ViewDelegate {
 	 */
 	public void drawBox(int style, int x, int y, Graphics buffImg) {
 		// buffImg.fill3DRect(arg0, arg1, arg2, arg3, arg4)
-		buffImg.setColor(color[style]);
-		buffImg.fill3DRect(BOX_START_X + (BOX_IMG_W * x), BOX_START_Y
-				+ (BOX_IMG_H * y), BOX_IMG_W, BOX_IMG_H, true);
+		buffImg.setColor(mColor[style]);
+		buffImg.fill3DRect(mBoxStartX + (mSingleBoxWidth * x), mBoxStartY
+				+ (mSingleBoxHeight * y), mSingleBoxWidth, mSingleBoxHeight, true);
 		buffImg.setColor(Color.BLACK);
 		// buffImg.drawRect(BOX_START_X + (BOX_IMG_W * x),BOX_START_Y +
 		// (BOX_IMG_H * y),BOX_IMG_W,BOX_IMG_H);
@@ -249,7 +249,7 @@ public class GameView extends JComponent implements ViewDelegate {
 	 * @return
 	 */
 	public int[][][] getBufBox(GameLoop tetris, int cnt) {
-		String[] bufbox = tetris.getN_box(cnt);
+		String[] bufbox = tetris.getAnyCountBox(cnt);
 		int[][][] ary = new int[bufbox.length][][];
 		for (int i = 0; i < bufbox.length; i++) {
 			ary[i] = tetris.createBox(Integer.parseInt(bufbox[i]));
@@ -275,7 +275,7 @@ public class GameView extends JComponent implements ViewDelegate {
 		// 方塊落到底
 		if (GameEvent.BOX_DOWN == code) {
 			System.out.println("做方塊到底定位動畫 現在方塊高度["
-					+ tetrisGame.getNowBoxIndex() + "]");
+					+ mGameLoop.getNowBoxIndex() + "]");
 
 			// 做方塊到底定位動畫
 			playAudio("sound/down.wav", 1);
@@ -284,13 +284,13 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		// 建立完下一個方塊
 		if (GameEvent.BOX_NEXT == code) {
-			boxBuffer = getBufBox(tetrisGame, NEXT_BOX_COUNT);
+			mBoxBuffer = getBufBox(mGameLoop, mNextBoxCount);
 			return;
 		}
 		// 有方塊可清除,將要清除方塊,可取得要消去的方塊資料
 		if (GameEvent.CLEANING_LINE == code) {
 			System.out.println("有方塊可清除,將要清除方塊,可取得要消去的方塊資料");
-			score += (tetrisGame.getNowBoxIndex() + 1) * 100;// 加分數
+			mScore += (mGameLoop.getNowBoxIndex() + 1) * 100;// 加分數
 			// System.out.println("垃圾方塊模式==>,index位置["+data+"],資料為["+tetrisGame.getLineList(data,false)+"]");
 			// System.out.println("凹陷方塊模式==>index位置["+data+"],資料為["+tetrisGame.getLineList(data,true)+"]");
 			return;
@@ -315,12 +315,12 @@ public class GameView extends JComponent implements ViewDelegate {
 
 				e.printStackTrace();
 			}
-			score = 0;
+			mScore = 0;
 			// 清除全畫面方塊
-			tetrisGame.clearBox();
+			mGameLoop.clearBox();
 
 			// 當方塊到頂時，會自動將GameOver設為true,因此下次要開始時需設定遊戲為false表示可進行遊戲
-			tetrisGame.setGameOver(false);
+			mGameLoop.setGameOver(false);
 		}
 		return;
 	}

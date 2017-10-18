@@ -4,7 +4,7 @@ import java.util.Random;
 
 import tetris.box.Box;
 import tetris.box.CheckCleanLineThread;
-import tetris.box.CleanLineI;
+import tetris.box.CleanLineListener;
 import tetris.box.GameBox;
 
 /**
@@ -13,40 +13,38 @@ import tetris.box.GameBox;
  * @author Ray
  * 
  */
-public class GameLoop implements Runnable, CleanLineI {
-	private float fastSec;// 快移的秒數
-	private float sec;
-	private Random rand;
-	private GameBox gameBox;
-	private boolean isRun;
-	private boolean isPause;
-	private boolean isGameOver; // 是否遊戲結束
-	private boolean isClean; // 目前是否有方塊到底
-	private boolean fastEnable;// true :啟用快移
-	private ViewDelegate delegate;
-	private CheckCleanLineThread checkCleanThread;
+public class GameLoop implements Runnable, CleanLineListener {
+	private float mFastSec;// 快移的秒數
+	private float mSec;
+	private Random mRand;
+	private GameBox mGameBox;
+	private boolean mIsRun;
+	private boolean mIsPause;
+	private boolean mIsGameOver; // 是否遊戲結束
+	private boolean mIsClean; // 目前是否有方塊到底
+	private ViewDelegate mDelegate;
+	private CheckCleanLineThread mCheckCleanThread;
 
-	private int flag; // 目前使用的方塊位置
-	private String[] styleAry;// 預戴方塊buffer區
+	private int mFlag; // 目前使用的方塊位置
+	private String[] mStyleAry;// 預戴方塊buffer區
 
 	public GameLoop() {
-		isRun = true;
-		rand = new Random();
-		GameLoopInit();
+		mIsRun = true;
+		mRand = new Random();
+		initialize();
 	}
 
-	public void GameLoopInit() {
-		flag = 0;
-		styleAry = new String[0];
-		sec = 0.2f;
-		fastSec = 0.1f;
-		gameBox = new GameBox();
-		fastEnable = false;
-		isPause = false;
-		isGameOver = false;
-		checkCleanThread = new CheckCleanLineThread();
-		checkCleanThread.setObj(this);
-		checkCleanThread.startThread();
+	public void initialize() {
+		mFlag = 0;
+		mStyleAry = new String[0];
+		mSec = 0.2f;
+		mFastSec = 0.1f;
+		mGameBox = new GameBox();
+		mIsPause = false;
+		mIsGameOver = false;
+		mCheckCleanThread = new CheckCleanLineThread();
+		mCheckCleanThread.setCleanLineListener(this);
+		mCheckCleanThread.startThread();
 		setBoxList(getRandBox(5));// 設定使用5組亂數排列方塊進行遊戲
 		nextCreatBox();
 	}
@@ -56,20 +54,20 @@ public class GameLoop implements Runnable, CleanLineI {
 	}
 
 	public void stopGame() {
-		isRun = false;
+		mIsRun = false;
 	}
 
 	@Override
 	public void run() {
-		while (isRun) {
+		while (mIsRun) {
 			try {
-				if (!isPause && !isGameOver) {// 沒有按暫停才可玩
-					if (!gameBox.moveDown()) {// 方塊已到底停住,不能再往下移
-						isClean = true;
+				if (!mIsPause && !mIsGameOver) {// 沒有按暫停才可玩
+					if (!mGameBox.moveDown()) {// 方塊已到底停住,不能再往下移
+						mIsClean = true;
 					}
 					putDelegateCode(GameEvent.REPAINT, "");
 				}
-				Thread.sleep((int) (1000 * (fastEnable ? fastSec : sec)));
+				Thread.sleep((int) (1000 * mSec));
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -84,7 +82,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 */
 	public void setBoxList(String boxList) {
 		if (!boxList.equals("")) {
-			styleAry = boxList.split("[|]");
+			mStyleAry = boxList.split("[|]");
 		}
 	}
 
@@ -125,7 +123,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 */
 	private int[] randBoxAry(int[] ary) {
 		for (int i = 0; i < ary.length; i++) {
-			int tmpIndex = rand.nextInt(ary.length);
+			int tmpIndex = mRand.nextInt(ary.length);
 			int style = ary[tmpIndex];
 			ary[tmpIndex] = ary[i];
 			ary[i] = style;
@@ -140,11 +138,11 @@ public class GameLoop implements Runnable, CleanLineI {
 	 */
 	public int nextBox() {
 		int style = 0;
-		if (flag > styleAry.length - 1) {
-			flag = 0;
+		if (mFlag > mStyleAry.length - 1) {
+			mFlag = 0;
 		}
-		style = Integer.parseInt(styleAry[flag]);
-		flag++;
+		style = Integer.parseInt(mStyleAry[mFlag]);
+		mFlag++;
 		return style;
 	}
 
@@ -154,15 +152,15 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @param n
 	 * @return
 	 */
-	public String[] getN_box(int n) {
+	public String[] getAnyCountBox(int n) {
 		String[] nBox = new String[n];
-		int tmpFlag = flag;
+		int tmpFlag = mFlag;
 
 		for (int i = 0; i < n; i++) {
-			if (tmpFlag > styleAry.length - 1) {
+			if (tmpFlag > mStyleAry.length - 1) {
 				tmpFlag = 0;
 			}
-			nBox[i] = styleAry[tmpFlag];
+			nBox[i] = mStyleAry[tmpFlag];
 			tmpFlag++;
 		}
 		return nBox;
@@ -172,98 +170,64 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * 控制方塊下移1格
 	 */
 	public boolean moveDown() {
-		return gameBox.moveDown();
+		return mGameBox.moveDown();
 	}
 
 	/**
 	 * 控制方塊左移1格
 	 */
 	public boolean moveLeft() {
-		if (isClean)
+		if (mIsClean)
 			return false;
 
-		return gameBox.moveLeft();
+		return mGameBox.moveLeft();
 	}
 
 	/**
 	 * 控制方塊右移1格
 	 */
 	public boolean moveRight() {
-		if (isClean)
+		if (mIsClean)
 			return false;
 
-		return gameBox.moveRight();
+		return mGameBox.moveRight();
 	}
 
 	/**
 	 * 控制方塊順轉1次
 	 */
 	public boolean turnLeft() {
-		if (isClean)
+		if (mIsClean)
 			return false;
 
-		return gameBox.turnLeft();
+		return mGameBox.turnLeft();
 	}
 
 	/**
 	 * 控制方塊逆轉1次
 	 */
 	public boolean turnRight() {
-		if (isClean)
+		if (mIsClean)
 			return false;
 
-		return gameBox.turnRight();
+		return mGameBox.turnRight();
 	}
 
 	/**
 	 * 方塊直接掉落到定位
 	 */
 	public void quickDown() {
-		if (isClean)
+		if (mIsClean)
 			return;
-		gameBox.quickDown();
-		isClean = true;
-	}
-
-	/**
-	 * 新增垃圾方塊,一次新增一排,同一種style
-	 * 
-	 * @param style
-	 *            新增的方塊style
-	 * @param lineCount
-	 *            要新增幾行垃圾方塊
-	 */
-	public void addGarbageBox(int style, int lineCount) {
-		for (int i = 0; i < lineCount; i++) {
-			gameBox.addGarbageBox_oneLine(style);
-		}
-	}
-
-	/**
-	 * 新增垃圾方塊,一次新增一排,同一種style
-	 * 
-	 * @param styleList
-	 *            新增的方塊style列表，格式為"1|2|3|4|5|6|0|0|2|3"
-	 */
-	public void addGarbageBox_oneLine(String styleList) {
-		gameBox.addGarbageBox_oneLine(styleList);
-	}
-
-	/**
-	 * 快速下降移動
-	 * 
-	 * @param b
-	 *            true:啟用快移,false:關閉快移
-	 */
-	public void fastDown(boolean b) {
-		fastEnable = b;
+		mGameBox.quickDown();
+		mIsClean = true;
 	}
 
 	/**
 	 * 遊戲暫停
 	 */
 	public void pause() {
-		isPause = true;
+		mIsPause = true;
 	}
 
 	/**
@@ -272,14 +236,14 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public boolean isPause() {
-		return isPause;
+		return mIsPause;
 	}
 
 	/**
 	 * 繼續遊戲(有按暫停之後使用)
 	 */
 	public void rusme() {
-		isPause = false;
+		mIsPause = false;
 	}
 
 	/**
@@ -289,7 +253,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public void setGameOver(boolean b) {
-		isGameOver = b;
+		mIsGameOver = b;
 	}
 
 	/**
@@ -298,7 +262,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public boolean isGameOver() {
-		return isGameOver;
+		return mIsGameOver;
 	}
 
 	/**
@@ -307,7 +271,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @param o
 	 */
 	public void setDelegate(ViewDelegate o) {
-		delegate = o;
+		mDelegate = o;
 	}
 
 	/**
@@ -316,7 +280,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @param s
 	 */
 	public void setSec(float s) {
-		sec = s;
+		mSec = s;
 	}
 
 	/**
@@ -325,7 +289,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public float getSec() {
-		return sec;
+		return mSec;
 	}
 
 	/**
@@ -335,8 +299,8 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @param data
 	 */
 	public void putDelegateCode(GameEvent code, String data) {
-		if (delegate != null) {
-			delegate.tetrisEvent(code, data);
+		if (mDelegate != null) {
+			mDelegate.tetrisEvent(code, data);
 		}
 	}
 
@@ -347,22 +311,22 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public int getNowBoxIndex() {
-		return gameBox.getNowBoxIndex();
+		return mGameBox.getNowBoxIndex();
 	}
 
 	/**
 	 * 取得目前的整個遊戲畫面可移動方塊區域的二維陣列
 	 */
 	public int[][] getBoxAry() {
-		return gameBox.getBoxAry();
+		return mGameBox.getBoxAry();
 	}
 
 	/**
 	 * 亂數產生方塊
 	 */
 	public boolean randCreatBox() {
-		int style = rand.nextInt(Box.getStyleCount()) + 1;
-		return gameBox.createBaseObj(style);
+		int style = mRand.nextInt(Box.getStyleCount()) + 1;
+		return mGameBox.createBaseObj(style);
 	}
 
 	/**
@@ -372,27 +336,27 @@ public class GameLoop implements Runnable, CleanLineI {
 	 */
 	public boolean nextCreatBox() {
 		int style = nextBox();
-		return gameBox.createBaseObj(style);
+		return mGameBox.createBaseObj(style);
 	}
 
 	public int[][] createBox(int style) {
-		return gameBox.createBox(style);
+		return mGameBox.createBox(style);
 	}
 
 	@Override
 	public void cleanLine() {
-		gameBox.addBox();
+		mGameBox.addBox();
 		putDelegateCode(GameEvent.REPAINT, "");
 		putDelegateCode(GameEvent.BOX_DOWN, "");
 
 		// System.out.println("cleanLine----被執行-------");
 
 		// 取得可消除的行數
-		String lineData = gameBox.getClearLine();
+		String lineData = mGameBox.getClearLine();
 
 		if (!lineData.equals("")) {
 			putDelegateCode(GameEvent.CLEANING_LINE, lineData);
-			gameBox.clearLine(lineData);// 實際將可消除的方塊行數移除
+			mGameBox.clearLine(lineData);// 實際將可消除的方塊行數移除
 			putDelegateCode(GameEvent.CLEANED_LINE, "");
 		}
 
@@ -400,17 +364,17 @@ public class GameLoop implements Runnable, CleanLineI {
 
 		boolean isOK = nextCreatBox();// 建立方塊
 		if (!isOK) {// 建立失敗
-			isGameOver = true;
+			mIsGameOver = true;
 			putDelegateCode(GameEvent.REPAINT, "");
 			// printAry(gameBox.getBoxAry());
 			putDelegateCode(GameEvent.GAME_OVER, "");
 		}
 		putDelegateCode(GameEvent.REPAINT, "");
 		putDelegateCode(GameEvent.BOX_NEXT, "");
-		isClean = false;
-		checkCleanThread = new CheckCleanLineThread();
-		checkCleanThread.setObj(this);
-		checkCleanThread.startThread();
+		mIsClean = false;
+		mCheckCleanThread = new CheckCleanLineThread();
+		mCheckCleanThread.setCleanLineListener(this);
+		mCheckCleanThread.startThread();
 	}
 
 	/**
@@ -418,25 +382,14 @@ public class GameLoop implements Runnable, CleanLineI {
 	 */
 	@Override
 	public boolean isClean() {
-		return isClean;
+		return mIsClean;
 	}
 
 	/**
 	 * 清空整個畫面所有方塊
 	 */
 	public void clearBox() {
-		gameBox.clearBoxAry();
-	}
-
-	/**
-	 * 拿自己這次清掉的方塊行數去移除垃圾方塊，回傳自己還剩幾行方塊可扣掉炸彈<BR>
-	 * 此method僅能消掉style為9的垃圾方塊
-	 * 
-	 * @param count
-	 * @return
-	 */
-	public int removeGarbageBox_oneLine(int count) {
-		return gameBox.removeGarbageBox_oneLine(count);
+		mGameBox.clearBoxAry();
 	}
 
 	/**
@@ -445,7 +398,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public int[][] getNowBoxAry() {
-		return gameBox.getNowBoxAry();
+		return mGameBox.getNowBoxAry();
 	}
 
 	/**
@@ -454,7 +407,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public int[] getNowBoxXY() {
-		return gameBox.getNowBoxXY();
+		return mGameBox.getNowBoxXY();
 	}
 
 	/**
@@ -463,16 +416,16 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public int getDownY() {
-		return gameBox.getDownY();
+		return mGameBox.getDownY();
 	}
 
 	public void close() {
-		checkCleanThread.stopThread();
-		delegate = null;
-		rand = null;
-		checkCleanThread = null;
-		gameBox = null;
-		styleAry = null;
+		mCheckCleanThread.stopThread();
+		mDelegate = null;
+		mRand = null;
+		mCheckCleanThread = null;
+		mGameBox = null;
+		mStyleAry = null;
 	}
 
 	/**
@@ -488,7 +441,7 @@ public class GameLoop implements Runnable, CleanLineI {
 	 * @return
 	 */
 	public String getLineList(String lineData, boolean isGap) {
-		return gameBox.getLineList(lineData, isGap);
+		return mGameBox.getLineList(lineData, isGap);
 	}
 
 	// 印出陣列

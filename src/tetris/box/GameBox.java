@@ -1,19 +1,18 @@
 package tetris.box;
 
 public class GameBox {
-	public int BOX_H = 20;
-	public int BOX_W = 10;
-	private int[][] boxAry; // 整個可以放置方塊、移動方塊的大陣列
+	public int mBoxRowCount = 20;//直的20個方塊
+	public int mBoxColumnCount = 10;//橫的10個方塊
+	private int[][] mBoxes; // 整個可以放置方塊、移動方塊的大陣列
 
 	private Box nowBox; // 目前移動中的方塊
 
 	public GameBox() {
-		GameBoxInit();
-		// defaultMap();
+		initialize();
 	}
 
-	public void GameBoxInit() {
-		boxAry = new int[BOX_H][BOX_W];
+	public void initialize() {
+		mBoxes = new int[mBoxRowCount][mBoxColumnCount];
 	}
 
 	// ----------------------------public
@@ -28,10 +27,10 @@ public class GameBox {
 		boolean b = true;
 		Box nb = new Box();
 		nb.setBoxData(style);
-		nb.nowX = (BOX_W / 2) - 1;
+		nb.setNowX((mBoxColumnCount / 2) - 1);
 		nowBox = nb;
 
-		if (hitTest(boxAry, nowBox)) {// 方塊一建立就撞到
+		if (hitTest(mBoxes, nowBox)) {// 方塊一建立就撞到
 			b = false;
 		}
 		return b;
@@ -52,17 +51,17 @@ public class GameBox {
 		Box tempNowBox = nowBox;
 
 		// 判斷方塊撞到底部
-		int boxY = tempNowBox.nowY + tempNowBox.getNowTurnHeight();
-		if (boxY >= BOX_H) {
+		int boxY = tempNowBox.getNowY() + tempNowBox.getNowTurnHeight();
+		if (boxY >= mBoxRowCount) {
 			return false;
 		}
 
 		boolean b = true;
 		int[][] nbAry = tempNowBox.getNowturnBoxAry();
-		int nx = tempNowBox.nowX;
-		int ny = tempNowBox.nowY;
+		int nx = tempNowBox.getNowX();
+		int ny = tempNowBox.getNowY();
 
-		if (hitTest(boxAry, nbAry, nx, ny + 1)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+		if (hitTest(mBoxes, nbAry, nx, ny + 1)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 			b = false;
 		} else {// 方塊沒碰撞到其他方塊，可下移
 			tempNowBox.move(0, 1);
@@ -79,13 +78,13 @@ public class GameBox {
 		boolean b = true;
 		Box tempNowBox = nowBox;
 		// 取得目前方塊右移後的x位置+上方塊的寬度
-		int x = tempNowBox.nowX + tempNowBox.getNowTurnWight() + 1;// 假設右移1格
+		int x = tempNowBox.getNowX() + tempNowBox.getNowTurnWight() + 1;// 假設右移1格
 
-		if (x > BOX_W) {// 判斷方塊位置是否會超過boxAry的寬度
+		if (x > mBoxColumnCount) {// 判斷方塊位置是否會超過boxAry的寬度
 			b = false;
 		} else {// 沒超過牆，判斷是否撞到其他方塊
-			if (hitTest(boxAry, tempNowBox.getNowturnBoxAry(),
-					tempNowBox.nowX + 1, tempNowBox.nowY)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, tempNowBox.getNowturnBoxAry(),
+					tempNowBox.getNowX() + 1, tempNowBox.getNowY())) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				b = false;
 			} else {
 				tempNowBox.move(1, 0);
@@ -104,7 +103,7 @@ public class GameBox {
 		boolean b = true;
 		Box tempNowBox = nowBox;
 		int[][] nowturnBoxAry = tempNowBox.getNowturnBoxAry();
-		int x = tempNowBox.nowX - 1;
+		int x = tempNowBox.getNowX() - 1;
 
 		// 判斷當方塊移到最左邊格子時，方塊本身是否可再左移
 		if (x == -1) {
@@ -118,8 +117,8 @@ public class GameBox {
 		if (x < -1) {
 			b = false;
 		} else {
-			if (hitTest(boxAry, nowturnBoxAry, tempNowBox.nowX - 1,
-					tempNowBox.nowY)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, nowturnBoxAry, tempNowBox.getNowX() - 1,
+					tempNowBox.getNowY())) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				b = false;
 			} else {
 				tempNowBox.move(-1, 0);
@@ -150,46 +149,46 @@ public class GameBox {
 		int rightTurn = tempNowBox.nextTurn(1);// 取出順轉1次後的方塊位置索引值
 		int turnW = tempNowBox.getWight(rightTurn);
 		int turnH = tempNowBox.getHeight(rightTurn);
-		int h = tempNowBox.nowY + turnH;
-		int ny = tempNowBox.nowY;
-		int nx = tempNowBox.nowX;
-		int w = tempNowBox.nowX + turnW;
+		int h = tempNowBox.getNowY() + turnH;
+		int ny = tempNowBox.getNowY();
+		int nx = tempNowBox.getNowX();
+		int w = tempNowBox.getNowX() + turnW;
 		int[][] turnAry = tempNowBox.getBoxAry(rightTurn);
 
-		if (h > BOX_H) {// 判斷順轉後的方塊位置是否會超過boxAry的寬度或底部
+		if (h > mBoxRowCount) {// 判斷順轉後的方塊位置是否會超過boxAry的寬度或底部
 			return false;
 		}
 		if (nx == -1) {
 			// if(w > BOX_W){//判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
 			int tmpX = 1;
 
-			if (hitTest(boxAry, turnAry, nx + tmpX, ny)) {
+			if (hitTest(mBoxes, turnAry, nx + tmpX, ny)) {
 				return false;
 			} else {
 				tempNowBox.move(tmpX, 0);
-				nx = tempNowBox.nowX;
+				nx = tempNowBox.getNowX();
 			}
 			// }
 
-			if (hitTest(boxAry, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				return false;
 			} else {
 				tempNowBox.turnRight();
 				return true;
 			}
 		} else {
-			if (w > BOX_W) {// 判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
-				int tmpX = w - BOX_W;
+			if (w > mBoxColumnCount) {// 判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
+				int tmpX = w - mBoxColumnCount;
 
-				if (hitTest(boxAry, turnAry, nx + (-tmpX), ny)) {
+				if (hitTest(mBoxes, turnAry, nx + (-tmpX), ny)) {
 					return false;
 				} else {
 					tempNowBox.move(-tmpX, 0);
-					nx = tempNowBox.nowX;
+					nx = tempNowBox.getNowX();
 				}
 			}
 
-			if (hitTest(boxAry, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				return false;
 			} else {
 				tempNowBox.turnRight();
@@ -206,47 +205,47 @@ public class GameBox {
 	public boolean turnLeft() {
 		Box tempNowBox = nowBox;
 		int leftTurn = tempNowBox.nextTurn(-1);// 取出逆轉1次後的方塊位置索引值
-		int turnH = tempNowBox.getHeight(leftTurn) + tempNowBox.nowY;
+		int turnH = tempNowBox.getHeight(leftTurn) + tempNowBox.getNowY();
 		int turnW = tempNowBox.getWight(leftTurn);
-		int w = tempNowBox.nowX + turnW;
-		int nx = tempNowBox.nowX;
-		int ny = tempNowBox.nowY;
+		int w = tempNowBox.getNowX() + turnW;
+		int nx = tempNowBox.getNowX();
+		int ny = tempNowBox.getNowY();
 		int[][] turnAry = tempNowBox.getBoxAry(leftTurn);
 
-		if (turnH > BOX_H) {// 判斷轉向是否超出高度
+		if (turnH > mBoxRowCount) {// 判斷轉向是否超出高度
 			return false;
 		}
 		if (nx == -1) {
 			// if(w > BOX_W){//判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
 			int tmpX = 1;
 
-			if (hitTest(boxAry, turnAry, nx + tmpX, ny)) {
+			if (hitTest(mBoxes, turnAry, nx + tmpX, ny)) {
 				return false;
 			} else {
 				tempNowBox.move(tmpX, 0);
-				nx = tempNowBox.nowX;
+				nx = tempNowBox.getNowX();
 			}
 			// }
 
-			if (hitTest(boxAry, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				return false;
 			} else {
 				tempNowBox.turnRight();
 				return true;
 			}
 		} else {// 沒超過高度
-			if (w > BOX_W) {// 判斷是否超過寬度
-				int tmpX = w - BOX_W;
+			if (w > mBoxColumnCount) {// 判斷是否超過寬度
+				int tmpX = w - mBoxColumnCount;
 
-				if (hitTest(boxAry, turnAry, nx + (-tmpX), ny)) {// 判斷轉向後是否撞到其他方塊
+				if (hitTest(mBoxes, turnAry, nx + (-tmpX), ny)) {// 判斷轉向後是否撞到其他方塊
 					return false;
 				} else {// 方塊轉向後超出寬度，因此將方塊左移tmpX格
 					tempNowBox.move(-tmpX, 0);
-					nx = tempNowBox.nowX;
+					nx = tempNowBox.getNowX();
 				}
 			}
 
-			if (hitTest(boxAry, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+			if (hitTest(mBoxes, turnAry, nx, ny)) {// 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
 				return false;
 			} else {// 方塊可逆轉
 				tempNowBox.turnLeft();
@@ -269,7 +268,7 @@ public class GameBox {
 
 			for (int i = 0; i < data.length; i++) {
 				int line = Integer.parseInt(data[i]);
-				moveLine(boxAry, 0, line);
+				moveLine(mBoxes, 0, line);
 			}
 		}
 	}
@@ -278,10 +277,10 @@ public class GameBox {
 	 * 清空整個可移動方塊區域的二維陣列
 	 */
 	public void clearBoxAry() {
-		for (int i = 0; i < boxAry.length; i++) {
-			for (int j = 0; j < boxAry[i].length; j++) {
+		for (int i = 0; i < mBoxes.length; i++) {
+			for (int j = 0; j < mBoxes[i].length; j++) {
 				// System.out.println("清方塊"+boxAry[i][j]);
-				boxAry[i][j] = 0;
+				mBoxes[i][j] = 0;
 			}
 		}
 	}
@@ -290,7 +289,7 @@ public class GameBox {
 	 * 取得目前的整個遊戲畫面可移動方塊區域的二維陣列
 	 */
 	public int[][] getBoxAry() {
-		return boxAry;
+		return mBoxes;
 	}
 
 	/**
@@ -300,11 +299,11 @@ public class GameBox {
 	 * @return
 	 */
 	public int getNowBoxIndex() {
-		int index = boxAry.length + 1;
-		for (int i = 0; i < boxAry.length; i++) {
+		int index = mBoxes.length + 1;
+		for (int i = 0; i < mBoxes.length; i++) {
 			index--;
-			for (int j = 0; j < boxAry[i].length; j++) {
-				if (boxAry[i][j] > 0) {
+			for (int j = 0; j < mBoxes[i].length; j++) {
+				if (mBoxes[i][j] > 0) {
 					return index;
 				}
 			}
@@ -320,14 +319,14 @@ public class GameBox {
 	public String getClearLine() {
 		Box nb = nowBox;
 		StringBuffer lineList = new StringBuffer();
-		int ny = nb.nowY;
-		// System.out.println("從第["+ny+"]行開始找方塊可消"+nb.nowX);
+		int ny = nb.getNowY();
+		// System.out.println("從第["+ny+"]行開始找方塊可消"+nb.getNowX());
 
-		for (int i = ny; i < boxAry.length; i++) {
-			int BW = boxAry[i].length;
+		for (int i = ny; i < mBoxes.length; i++) {
+			int BW = mBoxes[i].length;
 			int checkCnt = 0;
 			for (int j = 0; j < BW; j++) {
-				int boxStyle = boxAry[i][j];
+				int boxStyle = mBoxes[i][j];
 				if (boxStyle > 0 && boxStyle != 9) {
 					checkCnt++;
 					if (checkCnt == BW) {
@@ -349,8 +348,8 @@ public class GameBox {
 	 * @param style
 	 *            新增的方塊style
 	 */
-	public void addGarbageBox_oneLine(int style) {
-		int[][] tmpAry = boxAry;
+	public void addGarbageBoxOneLine(int style) {
+		int[][] tmpAry = mBoxes;
 		int[] tmp = tmpAry[0];
 
 		int i = 0;
@@ -371,9 +370,9 @@ public class GameBox {
 	 * @param styleList
 	 *            新增的方塊style列表，格式為"1|2|3|4|5|6|0|0|2|3"
 	 */
-	public void addGarbageBox_oneLine(String styleList) {
+	public void addGarbageBoxOneLine(String styleList) {
 		String[] styleAry = styleList.split("[|]");
-		int[][] tmpAry = boxAry;
+		int[][] tmpAry = mBoxes;
 		int[] tmp = tmpAry[0];
 
 		int i = 0;
@@ -399,7 +398,7 @@ public class GameBox {
 	 * @param count
 	 * @return
 	 */
-	public int removeGarbageBox_oneLine(int count) {
+	public int removeGarbageBoxOneLine(int count) {
 		if (count == 0) {
 			return 0;
 		}
@@ -408,8 +407,8 @@ public class GameBox {
 		int garbageCount = 0;// 自己目前的垃圾方塊數
 
 		// 計算自己有幾行不能消掉的垃圾方塊
-		for (int i = boxAry.length - 1; i >= 0; i--) {
-			int style = boxAry[i][0];
+		for (int i = mBoxes.length - 1; i >= 0; i--) {
+			int style = mBoxes[i][0];
 			if (style == 9) {
 				garbageCount++;
 			}
@@ -418,7 +417,7 @@ public class GameBox {
 		// 以自己消除的行數去清除垃圾方塊行數
 		for (int i = count - 1; i >= 0 && garbageCount > 0; i--) {
 			// int line = Integer.parseInt(data[i]);
-			moveLine(boxAry, 0, boxAry.length - 1);
+			moveLine(mBoxes, 0, mBoxes.length - 1);
 			garbageCount--;
 			lineCount--;
 		}
@@ -452,8 +451,8 @@ public class GameBox {
 	public int[] getNowBoxXY() {
 		Box tempNowBox = nowBox;
 		int[] xy = new int[4];
-		xy[0] = tempNowBox.nowX;
-		xy[1] = tempNowBox.nowY;
+		xy[0] = tempNowBox.getNowX();
+		xy[1] = tempNowBox.getNowY();
 		xy[2] = tempNowBox.getNowTurnWight();
 		xy[3] = tempNowBox.getNowTurnHeight();
 
@@ -467,18 +466,18 @@ public class GameBox {
 	 */
 	public int getDownY() {
 		Box tempNowBox = nowBox;
-		int nx = tempNowBox.nowX;
-		int ny = tempNowBox.nowY;
+		int nx = tempNowBox.getNowX();
+		int ny = tempNowBox.getNowY();
 		int[][] nbAry = tempNowBox.getNowturnBoxAry();
 
 		while (true) {
 			// 判斷方塊撞到底部
 			int boxY = ny + tempNowBox.getNowTurnHeight();
-			if (boxY >= BOX_H) {
+			if (boxY >= mBoxRowCount) {
 				return ny;
 			}
 
-			if (hitTest(boxAry, nbAry, nx, ny + 1)) {// 方塊沒碰撞到其他方塊，可下移
+			if (hitTest(mBoxes, nbAry, nx, ny + 1)) {// 方塊沒碰撞到其他方塊，可下移
 				break;
 			} else {
 				ny++;
@@ -496,9 +495,9 @@ public class GameBox {
 	 */
 	public void addBox() {
 		Box nb = nowBox;
-		int[][] tempBoxAry = boxAry;
-		int x = nb.nowX;
-		int y = nb.nowY;
+		int[][] tempBoxAry = mBoxes;
+		int x = nb.getNowX();
+		int y = nb.getNowY();
 		int[][] b = nb.getNowturnBoxAry();
 
 		for (int i = 0; i < b.length; i++) {
@@ -517,14 +516,14 @@ public class GameBox {
 	 */
 	public String getLineList(String lineData, boolean isGap) {
 		Box nb = nowBox;
-		int[][] tempBoxAry = boxAry;
+		int[][] tempBoxAry = mBoxes;
 		StringBuffer lineListStr = new StringBuffer();
 		String[] lineAry = lineData.split("[,]");
 
 		if (isGap) {
 			int[][] downBox = nb.getNowturnBoxAry();
-			int nx = nb.nowX;
-			int ny = nb.nowY;
+			int nx = nb.getNowX();
+			int ny = nb.getNowY();
 			for (int i = 0; i < downBox.length; i++) {
 				for (int j = 0; j < downBox[i].length; j++) {
 					if (downBox[i][j] > 0) {
@@ -544,7 +543,7 @@ public class GameBox {
 		for (int i = 0; i < lineAry.length; i++) {
 			int line = Integer.parseInt(lineAry[i]);
 
-			int[] box = boxAry[line];
+			int[] box = mBoxes[line];
 			StringBuffer lineStr = new StringBuffer();
 			for (int j = 0; j < box.length; j++) {
 				if (lineStr.length() > 0) {
@@ -575,8 +574,8 @@ public class GameBox {
 	 */
 	protected boolean hitTest(int[][] tempBoxAry, Box nb) {
 		int[][] newBox = nb.getNowturnBoxAry();
-		int ny = nb.nowY;
-		int nx = nb.nowX;
+		int ny = nb.getNowY();
+		int nx = nb.getNowX();
 
 		return hitTest(tempBoxAry, newBox, nx, ny);
 	}
@@ -640,14 +639,14 @@ public class GameBox {
 	 * 一開始時的預設地圖
 	 */
 	public void defaultMap() {
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
-		addGarbageBox_oneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
+		addGarbageBoxOneLine(9);
 	}
 
 	// 測試用---------------------end-----------------

@@ -25,19 +25,19 @@ public class Box {
 	private final static String[] STYLE_LIST = { STYLE1, STYLE2, STYLE3,
 			STYLE4, STYLE5, STYLE6, STYLE7 };
 
-	public int nowX; // 目前的x位置
-	public int nowY; // 目前的y位置
+	private int mNowX; // 目前的x位置
+	private int mNowY; // 目前的y位置
 
-	protected int nowturn; // 目前的轉向
-	protected int style; // 此方塊種類代碼
-	protected int[][][] boxAry; // 此方塊轉向後的值
-	protected int[][] hw; // 此方塊轉向後的高、寬
+	private int nowturn; // 目前的轉向
+	private int style; // 此方塊種類代碼
+	private int[][][] boxAry; // 此方塊轉向後的值
+	private int[][] hw; // 此方塊轉向後的高、寬
 
 	public Box() {
-		BoxBaseInit();
+		initialize();
 	}
 
-	public void BoxBaseInit() {
+	public void initialize() {
 		nowturn = 0;
 		boxAry = new int[0][0][0];
 		style = 1;
@@ -45,8 +45,8 @@ public class Box {
 	}
 
 	public void resetXY() {
-		nowX = 0;
-		nowY = 0;
+		mNowX = 0;
+		mNowY = 0;
 	}
 
 	/**
@@ -287,8 +287,20 @@ public class Box {
 	 * @param y
 	 */
 	public void move(int x, int y) {
-		nowY += y;
-		nowX += x;
+		mNowY += y;
+		mNowX += x;
+	}
+	
+	public void setNowX(int x){
+		mNowX = x;
+	}
+	
+	public int getNowX(){
+		return mNowX;
+	}
+	
+	public int getNowY(){
+		return mNowY;
 	}
 
 	/**

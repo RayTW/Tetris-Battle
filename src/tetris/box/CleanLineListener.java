@@ -1,6 +1,6 @@
 package tetris.box;
 
-public interface CleanLineI {
+public interface CleanLineListener {
 
 	public abstract boolean isClean();
 
