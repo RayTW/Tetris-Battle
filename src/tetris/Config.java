@@ -13,7 +13,7 @@ public class Config {
 	private int [] mCleanLinesScore = {0,100,300,500,800};
 	
 	// 畫面比例
-	private double mScreenScale = 0.6;
+	private double mScreenScale = 1;
 	
 	//重新開始等待秒數
 	private int mNextRoundDelaySecond = 3;

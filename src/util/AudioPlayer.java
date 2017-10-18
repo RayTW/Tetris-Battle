@@ -4,18 +4,19 @@ import javax.sound.sampled.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 播放音樂(支援WAV, AIFF, AU) 2011/10/09
  * 
- * 2012/12/08 1.增加播放結束時callback 2.修正bug: 無限次播放時，無法stop()
+ * 2012-12-08 增加播放結束時callback 2.修正bug: 無限次播放時，無法stop()
+ * 2017-10-18 [bug]修正不斷播重建物件進行播放會造成卡頓
  * 
- * @version 2
  * @author Ray(吉他手)
  */
 public class AudioPlayer {
-	private static ConcurrentHashMap<String, AudioInputStream> sCacheAudioStreams = new ConcurrentHashMap<String, AudioInputStream>();
+	private static ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream,Clip>>> sCacheAudioClip = new ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream,Clip>>>();
 
 	private Clip mClip;
 
@@ -32,9 +33,7 @@ public class AudioPlayer {
 
 	// 播放次數,小於等於0:無限次播放,大於0:播放次數
 	private int mPlayCount;
-
-	private DataLine.Info mDlInfo;
-	private AudioFormat mFormat;
+	private int mCacheCount;
 
 	// 音樂播放完畢時，若有設定回call的對象，則會通知此對象
 	private AudioPlayerCallback mCallbackTartet;
@@ -54,10 +53,17 @@ public class AudioPlayer {
 		mute = false;
 		mMuteControl = null;
 		mPlayCount = 0;
-		mDlInfo = null;
+		mCacheCount = 20;
 		mIsPause = false;
 	}
-
+	
+	/**
+	 * 設定每個音檔cache的數量，若過少又要reuse聲音的話會發生播音馬上被停止
+	 * @param count
+	 */
+	public void setCacheCount(int count){
+		mCacheCount = count;
+	}
 	/**
 	 * 設定要接收音樂播放完時事件的對象
 	 * 
@@ -108,10 +114,16 @@ public class AudioPlayer {
 	 *            目前物件放置的package路徑
 	 * @return 回傳true:播放成功,false:播放失敗
 	 */
-	public boolean loadAudio(String filePath, Object obj) {
+	public boolean loadAudio(final String filePath, final Object obj) {
 		try {
 			if (obj != null) {
-				loadAudio(obj.getClass().getResourceAsStream(filePath), filePath);
+				doLoadingAudio(filePath, new Callable<InputStream>(){
+
+					@Override
+					public InputStream call() throws Exception {
+						return obj.getClass().getResourceAsStream(filePath);
+					}
+				});
 			} else {
 				loadAudio(new File(filePath));
 			}
@@ -125,8 +137,14 @@ public class AudioPlayer {
 	/**
 	 * 從遠端讀取音檔
 	 */
-	public void loadAudio(URL url) throws Exception {
-		finishLoadingAudio(getCacheAudioInputStream(url, url.toString()));
+	public void loadAudio(final URL url) throws Exception {
+		doLoadingAudio(url.toString(), new Callable<URL>(){
+
+			@Override
+			public URL call() throws Exception {
+				return url;
+			}
+		});
 	}
 
 	/**
@@ -135,55 +153,55 @@ public class AudioPlayer {
 	 * @param file
 	 * @throws Exception
 	 */
-	public void loadAudio(File file) throws Exception {
-		finishLoadingAudio(getCacheAudioInputStream(file, file.getPath()));
-	}
+	public void loadAudio(final File file) throws Exception {
+		doLoadingAudio(file.getPath(), new Callable<File>(){
 
-	/**
-	 * 從串流讀取音檔
-	 * 
-	 * @param iStream
-	 * @param cacheName
-	 * @throws Exception
-	 */
-	public void loadAudio(InputStream iStream, String cacheName) throws Exception {
-		finishLoadingAudio(getCacheAudioInputStream(iStream, cacheName));
-	}
-	
-	private <T> AudioInputStream getCacheAudioInputStream(T obj, String key){
-		System.out.println("getCacheAudioInputStream"+key);
-		AudioInputStream audio = sCacheAudioStreams.get(key);
-		
-		if(audio == null){
-			audio = getAudioInputStream(obj);
-			sCacheAudioStreams.put(key, audio);
-		}
-		System.out.println("audio==>" + audio.hashCode());
-		return audio;
+			@Override
+			public File call() throws Exception {
+				return file;
+			}
+		});
 	}
 
 	/**
 	 * load完音檔後，進行播放設定
 	 */
-	protected void finishLoadingAudio(AudioInputStream audio) throws Exception {
-		mFormat = audio.getFormat();
-		mDlInfo = new DataLine.Info(Clip.class, mFormat,
-				((int) audio.getFrameLength() * mFormat.getFrameSize()));
-		mClip = (Clip) AudioSystem.getLine(mDlInfo);
-		mClip.open(audio);
-		mClip.addLineListener(new LineListener() {
-			@Override
-			public void update(LineEvent event) {
-				if (event.getType().equals(LineEvent.Type.STOP)) {
-					if (!mIsPause) {
-						if (mCallbackTartet != null) {
-							mCallbackTartet.audioPlayEnd(mCallbackObj);
-						}
-						close();
-					}
-				}
-			}
-		});
+	private <T> void doLoadingAudio(String key, final Callable<T> callable) throws Exception {
+		CacheReuseList<Pair<AudioInputStream,Clip>> audioClipList = sCacheAudioClip.get(key);
+
+		if(audioClipList == null){
+			audioClipList = new CacheReuseList<Pair<AudioInputStream,Clip>>(mCacheCount, new Callable<Pair<AudioInputStream,Clip>>(){
+				@Override
+				public Pair<AudioInputStream,Clip> call() throws Exception {
+					//載入音檔來源轉為串流
+					AudioInputStream audio = getAudioInputStream(callable.call());
+					AudioFormat audioFormat = audio.getFormat();
+					DataLine.Info dlInfo = new DataLine.Info(Clip.class, audioFormat,
+							((int) audio.getFrameLength() * audioFormat.getFrameSize()));
+					
+					//開啟串流轉換為Clip
+					Clip clip = (Clip) AudioSystem.getLine(dlInfo);
+					clip.open(audio);
+					clip.addLineListener(new LineListener() {
+			            @Override
+			            public void update(LineEvent event) {
+			                if (event.getType().equals(LineEvent.Type.STOP)) {
+			                    if (!mIsPause) {
+			                        if (mCallbackTartet != null) {
+			                            mCallbackTartet.audioPlayEnd(mCallbackObj);
+			                        }
+			                    }
+			                }
+			            }
+			        });
+					return new Pair<AudioInputStream,Clip>(audio, clip);
+				}});
+			sCacheAudioClip.put(key, audioClipList);
+			
+			mClip = audioClipList.next().getSecond();
+		}else{
+			mClip = audioClipList.next().getSecond();
+		}
 	}
 
 	/**
@@ -317,15 +335,6 @@ public class AudioPlayer {
 	}
 
 	/**
-	 * 取得音檔格式
-	 * 
-	 * @return
-	 */
-	public AudioFormat getCurrentFormat() {
-		return mFormat;
-	}
-
-	/**
 	 * 取得音檔的串流
 	 * 
 	 * @return
@@ -333,7 +342,6 @@ public class AudioPlayer {
 	public AudioInputStream getAudioInputStream(Object loadReference) {
 		try {
 			AudioInputStream aiStream;
-
 			if (loadReference == null) {
 				return null;
 			} else if (loadReference instanceof URL) {
@@ -352,7 +360,7 @@ public class AudioPlayer {
 				InputStream inputStream = (InputStream) loadReference;
 				aiStream = AudioSystem.getAudioInputStream(inputStream);
 			}
-
+			
 			return aiStream;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -376,18 +384,13 @@ public class AudioPlayer {
 		try {
 			if (mClip != null)
 				mClip.close();
-//			if (currentSound != null)
-//				currentSound.close();
 		} catch (Exception e) {
-			// System.out.println("unloadAudio: " + e);
 			e.printStackTrace();
 		}
 
-//		currentSound = null;
 		mClip = null;
 		mGainControl = null;
 		mPanControl = null;
-		mDlInfo = null;
 		mMuteControl = null;
 		mCallbackTartet = null;
 		mCallbackObj = null;
