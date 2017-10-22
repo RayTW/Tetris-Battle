@@ -1,12 +1,12 @@
 package tetris;
 
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 
 import tetris.box.Box;
-import tetris.box.CheckCleanLineThread;
-import tetris.box.CleanLineListener;
 import tetris.box.GameBox;
 import tetris.view.ViewDelegate;
+import util.Debug;
 
 /**
  * 控制遊戲流程
@@ -14,7 +14,7 @@ import tetris.view.ViewDelegate;
  * @author Ray
  * 
  */
-public class GameLoop implements Runnable, CleanLineListener {
+public class GameLoop implements Runnable {
 	private float mSec;
 	private Random mRand;
 	private GameBox mGameBox;
@@ -23,7 +23,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 	private boolean mIsGameOver; // 是否遊戲結束
 	private boolean mIsClean; // 目前是否有方塊到底
 	private ViewDelegate mDelegate;
-	private CheckCleanLineThread mCheckCleanThread;
+	private CountDownLatch mCheckClean;
 
 	private int mFlag; // 目前使用的方塊位置
 	private String[] mStyleAry;// 預戴方塊buffer區
@@ -41,9 +41,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 		mGameBox = new GameBox();
 		mIsPause = false;
 		mIsGameOver = false;
-		mCheckCleanThread = new CheckCleanLineThread();
-		mCheckCleanThread.setCleanLineListener(this);
-		mCheckCleanThread.startThread();
+		newCheckLine();
 		setBoxList(getRandBox(5));// 設定使用5組亂數排列方塊進行遊戲
 		nextCreatBox();
 	}
@@ -55,6 +53,20 @@ public class GameLoop implements Runnable, CleanLineListener {
 	public void stopGame() {
 		mIsRun = false;
 	}
+	
+	private void newCheckLine(){
+		mCheckClean = new CountDownLatch(1);
+		new Thread(){
+			public void run(){
+					try {
+						mCheckClean.await();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					cleanLine();
+			}
+		}.start();
+	}
 
 	@Override
 	public void run() {
@@ -63,6 +75,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 				if (!mIsPause && !mIsGameOver) {// 沒有按暫停才可玩
 					if (!mGameBox.moveDown()) {// 方塊已到底停住,不能再往下移
 						mIsClean = true;
+						tryCheckClean();
 					}
 					putDelegateCode(GameEvent.REPAINT, "");
 				}
@@ -169,7 +182,11 @@ public class GameLoop implements Runnable, CleanLineListener {
 	 * 控制方塊下移1格
 	 */
 	public boolean moveDown() {
-		return mGameBox.moveDown();
+		if(!mGameBox.moveDown()){
+			tryCheckClean();
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -219,6 +236,7 @@ public class GameLoop implements Runnable, CleanLineListener {
 		if (mIsClean)
 			return;
 		mGameBox.quickDown();
+		tryCheckClean();
 		mIsClean = true;
 	}
 
@@ -341,9 +359,17 @@ public class GameLoop implements Runnable, CleanLineListener {
 	public int[][] createBox(int style) {
 		return mGameBox.createBox(style);
 	}
+	
+	private void tryCheckClean(){
+		Debug.get().println("tryCheckClean");
+		mCheckClean.countDown();
+	}
 
-	@Override
-	public void cleanLine() {
+	private void cleanLine() {
+		Debug.get().println("cleanLinel");
+		if(isGameOver()){
+			return;
+		}
 		mGameBox.addBox();
 		putDelegateCode(GameEvent.REPAINT, "");
 		putDelegateCode(GameEvent.BOX_DOWN, "");
@@ -369,15 +395,12 @@ public class GameLoop implements Runnable, CleanLineListener {
 		putDelegateCode(GameEvent.REPAINT, "");
 		putDelegateCode(GameEvent.BOX_NEXT, "");
 		mIsClean = false;
-		mCheckCleanThread = new CheckCleanLineThread();
-		mCheckCleanThread.setCleanLineListener(this);
-		mCheckCleanThread.startThread();
+		newCheckLine();
 	}
 
 	/**
 	 * 目前掉落方塊已定格中，進行檢查可消方塊
 	 */
-	@Override
 	public boolean isClean() {
 		return mIsClean;
 	}
@@ -417,10 +440,9 @@ public class GameLoop implements Runnable, CleanLineListener {
 	}
 
 	public void close() {
-		mCheckCleanThread.stopThread();
+		mCheckClean.countDown();
 		mDelegate = null;
 		mRand = null;
-		mCheckCleanThread = null;
 		mGameBox = null;
 		mStyleAry = null;
 	}
