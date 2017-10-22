@@ -21,7 +21,7 @@ public class Config {
 	private int mLevelUpLines = 10;
 	
 	// 畫面比例
-	private double mScreenScale = 1;
+	private double mScreenScale = 1.3;
 
 	// 重新開始等待秒數
 	private int mNextRoundDelaySecond = 5;
