@@ -6,7 +6,6 @@ import java.util.concurrent.CountDownLatch;
 import tetris.box.Box;
 import tetris.box.GameBox;
 import tetris.view.ViewDelegate;
-import util.Debug;
 
 /**
  * 控制遊戲流程
@@ -361,12 +360,10 @@ public class GameLoop implements Runnable {
 	}
 	
 	private void tryCheckClean(){
-		Debug.get().println("tryCheckClean");
 		mCheckClean.countDown();
 	}
 
 	private void cleanLine() {
-		Debug.get().println("cleanLinel");
 		if(isGameOver()){
 			return;
 		}
