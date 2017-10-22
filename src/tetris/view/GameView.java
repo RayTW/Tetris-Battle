@@ -20,7 +20,7 @@ import util.Debug;
  * 
  */
 public class GameView extends JComponent implements ViewDelegate {
-	private int mNextBoxCount = 3; // 下次要出現的方塊可顯示個數
+	private int mNextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
 	private int[][][] mBoxBuffer; // 下次要出現的方塊style
 	private int mBoxStartX; // 掉落方塊的初始位置x
 	private int mBoxStartY; // 掉落方塊的初始位置y

@@ -34,6 +34,9 @@ public class Config {
 	
 	//快速下移時可獲得的分數
 	private int mQuickDownScore = 10;
+	
+	//可顯示將要的掉落方塊個數(畫面右側)
+	private int mNextBoxs = 3;
 
 	private Config() {
 	}
@@ -128,5 +131,13 @@ public class Config {
 	 */
 	public int getQuickDownScore(){
 		return mQuickDownScore;
+	}
+	
+	/**
+	 * 可顯示將要的掉落方塊個數(畫面右側)
+	 * @return
+	 */
+	public int getNextBoxs(){
+		return mNextBoxs;
 	}
 }
