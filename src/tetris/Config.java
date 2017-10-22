@@ -9,7 +9,7 @@ public class Config {
 	private static Config sInstance = new Config();
 	
 	//遊戲版本
-	private String mVersion = "1.4.2";
+	private String mVersion = "1.4.3";
 
 	// 消除方塊行數可獲得的分數
 	private int [] mCleanLinesScore = { 0, 100, 300, 500, 800 };
@@ -34,6 +34,9 @@ public class Config {
 	
 	//快速下移時可獲得的分數
 	private int mQuickDownScore = 10;
+	
+	//可顯示將要的掉落方塊個數(畫面右側)
+	private int mNextBoxs = 3;
 
 	private Config() {
 	}
@@ -128,5 +131,13 @@ public class Config {
 	 */
 	public int getQuickDownScore(){
 		return mQuickDownScore;
+	}
+	
+	/**
+	 * 可顯示將要的掉落方塊個數(畫面右側)
+	 * @return
+	 */
+	public int getNextBoxs(){
+		return mNextBoxs;
 	}
 }
