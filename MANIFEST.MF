@@ -1,5 +1,5 @@
 Manifest-Version: 1.0.0
-Bundle-Version: 1.4.1
+Bundle-Version: 1.4.2
 Build-Jdk: 1.6.0
 Main-Class: tetris.view.Tetris
 
