@@ -424,8 +424,4 @@ public class GameView extends JComponent implements ViewDelegate {
 		}
 		return false;
 	}
-
-	public void objEvent(String code, Object obj) {
-
-	}
 }
