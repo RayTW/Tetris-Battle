@@ -271,8 +271,8 @@ public class AudioPlayer {
 	 *            要捨去的位數
 	 * 
 	 */
-	private float floorPow(float min, int Num) {
-		float n = (float) Math.pow(10, Num);
+	private float floorPow(float min, int num) {
+		float n = (float) Math.pow(10, num);
 		return ((int) (min * n)) / n;
 	}
 
