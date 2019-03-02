@@ -9,7 +9,7 @@ public class Config {
 	private static Config sInstance = new Config();
 
 	// 遊戲版本
-	private String mVersion = "1.4.3";
+	private String mVersion = "1.4.4";
 
 	// 消除方塊行數可獲得的分數
 	private int[] mCleanLinesScore = { 0, 40, 100, 300, 1200 };
