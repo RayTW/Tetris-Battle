@@ -18,7 +18,7 @@ import util.Debug;
  *
  * @author Ray
  */
-public class GameView extends JComponent implements ViewDelegate {
+public class GameView extends JComponent implements EventListener {
   private static final long serialVersionUID = 1L;
   private int nextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
   private int[][][] boxBuffer; // 下次要出現的方塊style
@@ -89,10 +89,10 @@ public class GameView extends JComponent implements ViewDelegate {
     gameLoop = new GameLoop();
 
     // 設定使用GameView代理遊戲邏輯進行畫面的繪圖
-    gameLoop.setDelegate(this);
+    gameLoop.setEventListener(this);
 
     // 設定方塊掉落秒數為
-    gameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+    gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
 
     // 設定下次要出現的方塊style個數為顯示3個
     boxBuffer = getBufBox(gameLoop, nextBoxCount);
@@ -132,7 +132,7 @@ public class GameView extends JComponent implements ViewDelegate {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
           gameLoop.turnRight();
-          tetrisEvent(GameEvent.BOX_TURN, null);
+          onEvent(GameEvent.BOX_TURN, null);
           break;
         case KeyEvent.VK_DOWN: // 下,下移方塊
           moveDown();
@@ -358,7 +358,7 @@ public class GameView extends JComponent implements ViewDelegate {
 
   /** 所有 */
   @Override
-  public void tetrisEvent(GameEvent code, String data) {
+  public void onEvent(GameEvent code, String data) {
     // 收到重畫自己畫面的陣列
     if (GameEvent.REPAINT == code) {
       repaint();
@@ -423,7 +423,7 @@ public class GameView extends JComponent implements ViewDelegate {
       gameLoop.clearBox();
 
       // 設定方塊掉落秒數
-      gameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+      gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
 
       // 當方塊到頂時，會自動將GameOver設為true,因此下次要開始時需設定遊戲為false表示可進行遊戲
       gameLoop.setGameOver(false);
@@ -438,7 +438,7 @@ public class GameView extends JComponent implements ViewDelegate {
 
     if (currentLevel != newLevel) {
       mInfoBar.setLevel(newLevel);
-      gameLoop.setSec(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+      gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
       return true;
     }
     return false;

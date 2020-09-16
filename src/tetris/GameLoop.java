@@ -5,7 +5,7 @@ import java.util.concurrent.CountDownLatch;
 
 import tetris.box.Box;
 import tetris.box.GameBox;
-import tetris.view.ViewDelegate;
+import tetris.view.EventListener;
 
 /**
  * 控制遊戲流程
@@ -20,7 +20,7 @@ public class GameLoop implements Runnable {
   private boolean isPause;
   private boolean isGameOver; // 是否遊戲結束
   private boolean isClean; // 目前是否有方塊到底
-  private ViewDelegate delegate;
+  private EventListener eventListener;
   private CountDownLatch checkClean;
 
   private int mFlag; // 目前使用的方塊位置
@@ -76,7 +76,7 @@ public class GameLoop implements Runnable {
             isClean = true;
             tryCheckClean();
           }
-          putDelegateCode(GameEvent.REPAINT, "");
+          publishEvent(GameEvent.REPAINT, "");
         }
         Thread.sleep((int) (1000 * sec));
       } catch (InterruptedException e) {
@@ -261,12 +261,12 @@ public class GameLoop implements Runnable {
   }
 
   /**
-   * 設定代理者
+   * 設定遊戲事件傾聽者
    *
    * @param o
    */
-  public void setDelegate(ViewDelegate o) {
-    delegate = o;
+  public void setEventListener(EventListener listener) {
+    eventListener = listener;
   }
 
   /**
@@ -274,7 +274,7 @@ public class GameLoop implements Runnable {
    *
    * @param s
    */
-  public void setSec(float s) {
+  public void setSecond(float s) {
     sec = s;
   }
 
@@ -288,14 +288,14 @@ public class GameLoop implements Runnable {
   }
 
   /**
-   * 發送資料給代理者
+   * 發出事件
    *
    * @param code
    * @param data
    */
-  public void putDelegateCode(GameEvent code, String data) {
-    if (delegate != null) {
-      delegate.tetrisEvent(code, data);
+  public void publishEvent(GameEvent code, String data) {
+    if (eventListener != null) {
+      eventListener.onEvent(code, data);
     }
   }
 
@@ -343,29 +343,28 @@ public class GameLoop implements Runnable {
       return;
     }
     gameBox.addBox();
-    putDelegateCode(GameEvent.REPAINT, "");
-    putDelegateCode(GameEvent.BOX_DOWN, "");
+    publishEvent(GameEvent.REPAINT, "");
+    publishEvent(GameEvent.BOX_DOWN, "");
 
     // 取得可消除的行數
     String lineData = gameBox.getClearLine();
 
     if (!lineData.isEmpty()) {
-      putDelegateCode(GameEvent.CLEANING_LINE, lineData);
+      publishEvent(GameEvent.CLEANING_LINE, lineData);
       gameBox.clearLine(lineData); // 實際將可消除的方塊行數移除
-      putDelegateCode(GameEvent.CLEANED_LINE, lineData);
+      publishEvent(GameEvent.CLEANED_LINE, lineData);
     }
 
-    putDelegateCode(GameEvent.BOX_GARBAGE, lineData);
+    publishEvent(GameEvent.BOX_GARBAGE, lineData);
 
     boolean isOK = nextCreatBox(); // 建立方塊
     if (!isOK) { // 建立失敗
       isGameOver = true;
-      putDelegateCode(GameEvent.REPAINT, "");
-      // printAry(gameBox.getBoxAry());
-      putDelegateCode(GameEvent.GAME_OVER, "");
+      publishEvent(GameEvent.REPAINT, "");
+      publishEvent(GameEvent.GAME_OVER, "");
     }
-    putDelegateCode(GameEvent.REPAINT, "");
-    putDelegateCode(GameEvent.BOX_NEXT, "");
+    publishEvent(GameEvent.REPAINT, "");
+    publishEvent(GameEvent.BOX_NEXT, "");
     isClean = false;
     newCheckLine();
   }
@@ -409,7 +408,7 @@ public class GameLoop implements Runnable {
 
   public void close() {
     checkClean.countDown();
-    delegate = null;
+    eventListener = null;
     rand = null;
     gameBox = null;
     mStyleAry = null;
