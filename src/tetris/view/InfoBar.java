@@ -2,98 +2,98 @@ package tetris.view;
 
 /**
  * 分數、消除行數、遊戲等級等等資訊
- * 
+ *
  * @author Ray Lee Created on 2017/10/18
  */
 public class InfoBar {
-	private long mScoreMax = 999999999;
-	private long mScore;// 遊戲分數
-	private int mLevelMax = 99;
-	private int mLevel;// 遊戲等級
-	private int mCleanedCountMax = 999;
-	private int mCleanedCount;// 已消除的行數
-	private int mWaitNextRoundSecond;//遊戲結束後倒數秒數
+  private long scoreMax = 999999999;
+  private long score; // 遊戲分數
+  private int levelMax = 99;
+  private int level; // 遊戲等級
+  private int cleanedCountMax = 999;
+  private int cleanedCount; // 已消除的行數
+  private int waitNextRoundSecond; // 遊戲結束後倒數秒數
 
-	public InfoBar() {
-		initialize();
-	}
+  public InfoBar() {
+    initialize();
+  }
 
-	public void initialize() {
-		mScore = 0;
-		mLevel = 0;
-		mCleanedCount = 0;
-		mWaitNextRoundSecond = 0;
-	}
+  public void initialize() {
+    score = 0;
+    level = 0;
+    cleanedCount = 0;
+    waitNextRoundSecond = 0;
+  }
 
-	public long getScore() {
-		return mScore;
-	}
+  public long getScore() {
+    return score;
+  }
 
-	public void setScore(int score) {
-		if(score > mScoreMax){
-			mScore = mScoreMax;
-		}else{
-			mScore = score;
-		}
-	}
+  public void setScore(int score) {
+    if (score > scoreMax) {
+      this.score = scoreMax;
+    } else {
+      this.score = score;
+    }
+  }
 
-	public void addScore(int score) {
-		if((mScore + score) > mScoreMax){
-			mScore = mScoreMax;
-		}else{
-			mScore += score;
-		}
-	}
+  public void addScore(int score) {
+    if ((score + score) > scoreMax) {
+      this.score = scoreMax;
+    } else {
+      this.score += score;
+    }
+  }
 
-	public int getLevel() {
-		return mLevel;
-	}
+  public int getLevel() {
+    return level;
+  }
 
-	public void setLevel(int level) {
-		if(level > mLevelMax){
-			mLevel = mLevelMax;
-		}else{
-			mLevel = level;
-		}
-	}
+  public void setLevel(int level) {
+    if (level > levelMax) {
+      this.level = levelMax;
+    } else {
+      this.level = level;
+    }
+  }
 
-	public void addLevel(int level) {
-		if((mLevel + level) > mLevelMax){
-			mLevel = mLevelMax;
-		}else{
-			mLevel += level;
-		}
-	}
+  public void addLevel(int level) {
+    if ((level + level) > levelMax) {
+      level = levelMax;
+    } else {
+      level += level;
+    }
+  }
 
-	public int getCleanedCount() {
-		return mCleanedCount;
-	}
+  public int getCleanedCount() {
+    return cleanedCount;
+  }
 
-	public void setCleanedCount(int cleanedCount) {
-		if(cleanedCount > mCleanedCountMax){
-			mCleanedCount = mCleanedCountMax;
-		}else{
-			mCleanedCount = cleanedCount;
-		}
-	}
+  public void setCleanedCount(int cleanedCount) {
+    if (cleanedCount > cleanedCountMax) {
+      this.cleanedCount = cleanedCountMax;
+    } else {
+      this.cleanedCount = cleanedCount;
+    }
+  }
 
-	public void addCleanedCount(int cleanedCount) {
-		if((mCleanedCount + cleanedCount) > mCleanedCountMax){
-			mCleanedCount = mCleanedCountMax;
-		}else{
-			mCleanedCount += cleanedCount; 
-		}
-	}
-	
-	public void setWaitNextRoundSecond(int second){
-		mWaitNextRoundSecond = second;
-	}
-	
-	public int getWaitNextRoundSecond(){
-		return mWaitNextRoundSecond;
-	}
-	
-	public void addWaitNextRoundSecond(int second){
-		mWaitNextRoundSecond += second;
-	}
+  public void addCleanedCount(int cleanedCount) {
+    if ((cleanedCount + cleanedCount) > cleanedCountMax) {
+      cleanedCount = cleanedCountMax;
+    } else {
+      cleanedCount += cleanedCount;
+    }
+  }
+
+  public void setWaitNextRoundSecond(int second) {
+    waitNextRoundSecond = second;
+  }
+
+  public int getWaitNextRoundSecond() {
+    return waitNextRoundSecond;
+  }
+
+  public void addWaitNextRoundSecond(int second) {
+    waitNextRoundSecond += second;
+  }
 }
