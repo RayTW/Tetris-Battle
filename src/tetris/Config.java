@@ -69,12 +69,12 @@ public class Config {
   }
 
   /**
-   * 將傳入的數值加乘畫面縮放比率後回傳
+   * 遊戲畫面縮放，將傳入的數值加乘畫面縮放比率後回傳
    *
    * @param value
    * @return
    */
-  public int convertValueViaScreenScale(int value) {
+  public int zoom(int value) {
     return (int) (value * screenScale);
   }
 

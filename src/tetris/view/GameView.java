@@ -3,13 +3,13 @@ package tetris.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.event.KeyEvent;
-import javax.swing.JComponent;
+import java.awt.event.MouseEvent;
 
 import tetris.Config;
-import tetris.GameEvent;
-import tetris.GameLoop;
+import tetris.game.GameEvent;
+import tetris.game.GameLoop;
+import tetris.listener.GameEventListener;
 import util.AudioPlayer;
 import util.Debug;
 
@@ -18,14 +18,12 @@ import util.Debug;
  *
  * @author Ray
  */
-public class GameView extends JComponent implements EventListener {
+public class GameView extends ControlView implements GameEventListener {
   private static final long serialVersionUID = 1L;
   private int nextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
   private int[][][] boxBuffer; // 下次要出現的方塊style
   private int boxStartX; // 掉落方塊的初始位置x
   private int boxStartY; // 掉落方塊的初始位置y
-  private int gameScreenWidth; // 遊戲畫面寬
-  private int gameScreenHeight; // 遊戲畫面高
   private int singleBoxWidth; // 每個方塊格寬
   private int singleBoxHeight; // 每個方塊格高
   private int rightNextBoxesX; // 右側方塊的位置x
@@ -38,7 +36,6 @@ public class GameView extends JComponent implements EventListener {
   private int nextRoundCountdownSecondLocationY; // 下局倒數秒數顯示位置y
   private int linesLocationY; // 方塊消除累計行數顯示位置
   private Font scoreFont;
-  private Image canvasBuffer = null;
   private Color[] color = {
     null,
     new Color(0, 255, 255, 250),
@@ -55,33 +52,34 @@ public class GameView extends JComponent implements EventListener {
   private AudioPlayer backgroundMusic; // 播放背景音樂
   private InfoBar mInfoBar;
 
-  public GameView() {
+  public GameView(int width, int height) {
+    super(width, height);
     backgroundMusic = playMusic("sound/music.wav");
+    initialize();
   }
 
+  @Override
   public void initialize() {
     scoreFont = null;
     Config config = Config.get();
 
-    boxStartX = config.convertValueViaScreenScale(62);
-    boxStartY = config.convertValueViaScreenScale(79);
-    gameScreenWidth = config.convertValueViaScreenScale(350);
-    gameScreenHeight = config.convertValueViaScreenScale(480);
-    singleBoxWidth = config.convertValueViaScreenScale(19);
-    singleBoxHeight = config.convertValueViaScreenScale(19);
-    rightNextBoxesX = config.convertValueViaScreenScale(160);
-    rightNextBoxesHeightSpacing = config.convertValueViaScreenScale(50);
+    boxStartX = config.zoom(62);
+    boxStartY = config.zoom(79);
+    singleBoxWidth = config.zoom(19);
+    singleBoxHeight = config.zoom(19);
+    rightNextBoxesX = config.zoom(160);
+    rightNextBoxesHeightSpacing = config.zoom(50);
 
     // 分數位置
-    levelLocationY = Config.get().convertValueViaScreenScale(20);
-    linesLocationY = Config.get().convertValueViaScreenScale(45);
-    scoreLocationY = Config.get().convertValueViaScreenScale(70);
+    levelLocationY = Config.get().zoom(20);
+    linesLocationY = Config.get().zoom(45);
+    scoreLocationY = Config.get().zoom(70);
 
     // 遊戲結束
-    gameOverLocationX = Config.get().convertValueViaScreenScale(100);
-    gameOverLocationY = Config.get().convertValueViaScreenScale(250);
-    nextRoundCountdownSecondLocationX = Config.get().convertValueViaScreenScale(155);
-    nextRoundCountdownSecondLocationY = Config.get().convertValueViaScreenScale(270);
+    gameOverLocationX = Config.get().zoom(100);
+    gameOverLocationY = Config.get().zoom(250);
+    nextRoundCountdownSecondLocationX = Config.get().zoom(155);
+    nextRoundCountdownSecondLocationY = Config.get().zoom(270);
 
     // 分數、消除行數、等級
     mInfoBar = new InfoBar();
@@ -99,9 +97,6 @@ public class GameView extends JComponent implements EventListener {
 
     // 啟動遊戲邏輯執行緒
     gameLoop.startGame();
-
-    // 設定畫面大小
-    setSize(gameScreenWidth, gameScreenHeight);
   }
 
   private AudioPlayer playMusic(String path) {
@@ -123,8 +118,12 @@ public class GameView extends JComponent implements EventListener {
     return audio;
   }
 
+  @Override
+  public void onMouseClicked(MouseEvent e) {}
+
   // 接收鍵盤事件
-  public void keyCode(int code) {
+  @Override
+  public void onKeyCode(int code) {
     if (gameLoop.isGameOver()) {
       return;
     }
@@ -181,16 +180,7 @@ public class GameView extends JComponent implements EventListener {
 
   // 雙緩衝區繪圖
   @Override
-  public void paintComponent(Graphics g) {
-    Graphics canvas = null;
-
-    if (canvasBuffer == null) {
-      canvasBuffer = createImage(gameScreenWidth, gameScreenHeight); // 新建一張image的圖
-    } else {
-      canvasBuffer.getGraphics().clearRect(0, 0, gameScreenWidth, gameScreenHeight);
-    }
-    canvas = canvasBuffer.getGraphics();
-
+  public void onPaintComponent(Graphics canvas) {
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
     int[][] boxAry = gameLoop.getBoxAry();
     showBacegroundBox(boxAry, canvas);
@@ -212,9 +202,6 @@ public class GameView extends JComponent implements EventListener {
 
     // 顯示遊戲結束，並倒數秒數
     showGameOver(mInfoBar, canvas);
-
-    // 將暫存的圖，畫到前景
-    g.drawImage(canvasBuffer, 0, 0, this);
   }
 
   // 畫定住的方塊與其他背景格子
@@ -295,7 +282,7 @@ public class GameView extends JComponent implements EventListener {
   private void showInfoBar(InfoBar info, Graphics buffImg) {
     if (scoreFont == null) {
       Font currentFont = buffImg.getFont();
-      Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().convertValueViaScreenScale(20));
+      Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().zoom(20));
       scoreFont = newFont;
     }
     // 調整分數字型

@@ -1,4 +1,4 @@
-package tetris;
+package tetris.game;
 
 /**
  * 定議遊戲中事件，用來處理什流程中播放音效、動畫等等...
