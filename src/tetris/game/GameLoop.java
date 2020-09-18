@@ -405,6 +405,10 @@ public class GameLoop implements Runnable {
     return gameBox.getNowBoxXY();
   }
 
+  public int getNowBoxStyle() {
+    return gameBox.getCurrentCubeStyle();
+  }
+
   /**
    * 取得到第Y個位置會撞到方塊
    *

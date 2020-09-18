@@ -434,8 +434,12 @@ public class CubeMatrix {
    *
    * @return
    */
-  public String getNowturnBoxStyleStr() {
+  public String getCurrentCubeStyleString() {
     return currentCube.getNowturnBoxStyleStr();
+  }
+
+  public int getCurrentCubeStyle() {
+    return currentCube.getStyle();
   }
 
   /**

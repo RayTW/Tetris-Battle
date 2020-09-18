@@ -9,7 +9,6 @@ import java.awt.event.MouseEvent;
 import tetris.Config;
 import tetris.game.GameEvent;
 import tetris.game.GameLoop;
-import tetris.view.component.AdversaryTetris;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
 import util.AudioPlayer;
@@ -84,7 +83,9 @@ public class BattleView extends RepaintView implements GameEventListener {
     nextRoundCountdownSecondLocationY = Config.get().zoom(270);
 
     adversaryTetris = new AdversaryTetris(value -> (int) (value * 0.5));
-    adversaryTetris.setLocation(310, 362);
+    adversaryTetris.setWidth(Config.get().zoom(15));
+    adversaryTetris.setHeight(Config.get().zoom(15));
+    adversaryTetris.setLocation(Config.get().zoom(230), Config.get().zoom(250));
     add(adversaryTetris);
 
     // 分數、消除行數、等級
@@ -188,7 +189,9 @@ public class BattleView extends RepaintView implements GameEventListener {
   @Override
   public void onPaintComponent(Graphics canvas) {
     super.onPaintComponent(canvas);
-
+    
+    canvas.setColor(Color.BLACK);
+    
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
     int[][] boxAry = gameLoop.getBoxAry();
     showBacegroundBox(boxAry, canvas);
@@ -269,13 +272,12 @@ public class BattleView extends RepaintView implements GameEventListener {
   // 畫陰影
   private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
     int boxX = xy[0];
-    // int boxY = xy[1];
-
+    buffImg.setColor(mShadowColor);
+    
     for (int i = 0; i < box.length; i++) {
       for (int j = 0; j < box[i].length; j++) {
         int style = box[i][j];
         if (style > 0) {
-          buffImg.setColor(mShadowColor);
           buffImg.fill3DRect(
               boxStartX + (singleBoxWidth * (j + boxX)),
               boxStartY + (singleBoxHeight * (i + index)),

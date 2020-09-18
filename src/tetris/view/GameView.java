@@ -246,10 +246,15 @@ public class GameView extends RepaintView implements GameEventListener {
       int[][] ary = boxBuf[n];
 
       for (int i = 0; i < ary.length; i++) {
+        boolean colorSet = false;
         for (int j = 0; j < ary[i].length; j++) {
           int style = ary[i][j];
+
           if (style > 0) {
-            buffImg.setColor(color[style]);
+            if (!colorSet) {
+              colorSet = true;
+              buffImg.setColor(color[style]);
+            }
             buffImg.fill3DRect(
                 rightNextBoxesX + (singleBoxWidth * (j + 5)),
                 (n * rightNextBoxesHeightSpacing) + (singleBoxHeight * (i + 5)),
@@ -265,13 +270,12 @@ public class GameView extends RepaintView implements GameEventListener {
   // 畫陰影
   private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
     int boxX = xy[0];
-    // int boxY = xy[1];
+    buffImg.setColor(mShadowColor);
 
     for (int i = 0; i < box.length; i++) {
       for (int j = 0; j < box[i].length; j++) {
         int style = box[i][j];
         if (style > 0) {
-          buffImg.setColor(mShadowColor);
           buffImg.fill3DRect(
               boxStartX + (singleBoxWidth * (j + boxX)),
               boxStartY + (singleBoxHeight * (i + index)),
@@ -322,6 +326,7 @@ public class GameView extends RepaintView implements GameEventListener {
    */
   public void drawBox(int style, int x, int y, Graphics buffImg) {
     buffImg.setColor(color[style]);
+
     buffImg.fill3DRect(
         boxStartX + (singleBoxWidth * x),
         boxStartY + (singleBoxHeight * y),

@@ -1,4 +1,4 @@
-package tetris.view.component;
+package tetris.view;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -9,7 +9,7 @@ import java.util.concurrent.CountDownLatch;
 import tetris.Config;
 import tetris.game.CubeMatrix;
 import tetris.game.GameLoop;
-import tetris.view.InfoBar;
+import tetris.view.component.Role;
 
 /**
  * 映射對戰對手的畫面
@@ -81,15 +81,15 @@ public class AdversaryTetris extends Role {
     boxStartX = zoomable.zoom(62) + x;
     boxStartY = zoomable.zoom(79) + y;
 
-    singleBoxWidth = zoomable.zoom(19);
-    singleBoxHeight = zoomable.zoom(19);
+    singleBoxWidth = zoomable.zoom(getWidth());
+    singleBoxHeight = zoomable.zoom(getHeight());
 
     // 分數位置
-    levelLocationX = zoomable.zoom(40) + x;
+    levelLocationX = zoomable.zoom(50) + x;
     levelLocationY = zoomable.zoom(20) + y;
-    linesLocationX = zoomable.zoom(40) + x;
+    linesLocationX = zoomable.zoom(50) + x;
     linesLocationY = zoomable.zoom(45) + y;
-    scoreLocationX = zoomable.zoom(40) + x;
+    scoreLocationX = zoomable.zoom(50) + x;
     scoreLocationY = zoomable.zoom(70) + y;
 
     // 遊戲結束
@@ -200,6 +200,8 @@ public class AdversaryTetris extends Role {
 
   // 畫定住的方塊與其他背景格子
   private void showBacegroundBox(int[][] boxAry, Graphics buffImg) {
+    buffImg.setColor(Color.BLACK);
+    
     for (int i = 0; i < boxAry.length; i++) {
       for (int j = 0; j < boxAry[i].length; j++) {
         int style = boxAry[i][j];
@@ -233,12 +235,11 @@ public class AdversaryTetris extends Role {
   // 畫陰影
   private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
     int boxX = xy[0];
-
+    buffImg.setColor(mShadowColor);
     for (int i = 0; i < box.length; i++) {
       for (int j = 0; j < box[i].length; j++) {
         int style = box[i][j];
         if (style > 0) {
-          buffImg.setColor(mShadowColor);
           buffImg.fill3DRect(
               boxStartX + (singleBoxWidth * (j + boxX)),
               boxStartY + (singleBoxHeight * (i + index)),
