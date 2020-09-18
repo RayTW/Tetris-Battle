@@ -6,27 +6,27 @@ package util;
  * @param <S>
  */
 public class Pair<F, S> {
-  private F mFirst;
-  private S mSecond;
+  private F first;
+  private S second;
 
   public Pair(F first, S second) {
-    this.mFirst = first;
-    this.mSecond = second;
+    this.first = first;
+    this.second = second;
   }
 
   public void setFirst(F first) {
-    this.mFirst = first;
+    this.first = first;
   }
 
   public void setSecond(S second) {
-    this.mSecond = second;
+    this.second = second;
   }
 
   public F getFirst() {
-    return mFirst;
+    return first;
   }
 
   public S getSecond() {
-    return mSecond;
+    return second;
   }
 }

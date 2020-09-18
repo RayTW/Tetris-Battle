@@ -9,30 +9,30 @@ import java.util.concurrent.Callable;
  * @param <T>
  */
 public class CacheReuseList<T> {
-  private List<T> mObjects;
-  private int mIndex;
+  private List<T> objects;
+  private int index;
 
   public CacheReuseList(int size, Callable<T> generatorObj) throws Exception {
-    mObjects = new ArrayList<T>(size);
+    objects = new ArrayList<T>(size);
 
     for (int i = 0; i < size; i++) {
-      mObjects.add(generatorObj.call());
+      objects.add(generatorObj.call());
     }
   }
 
   public T next() {
     int index = 0;
-    synchronized (mObjects) {
-      index = mIndex;
-      mIndex++;
-      if (mIndex >= mObjects.size()) {
-        mIndex = 0;
+    synchronized (objects) {
+      index = this.index;
+      this.index++;
+      if (this.index >= objects.size()) {
+        this.index = 0;
       }
     }
-    return mObjects.get(index);
+    return objects.get(index);
   }
 
   public int size() {
-    return mObjects.size();
+    return objects.size();
   }
 }

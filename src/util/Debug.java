@@ -9,22 +9,22 @@ import java.util.Date;
  * @author Ray Lee Created on 2017/10/18
  */
 public class Debug {
-  private SimpleDateFormat mSimpleDateFormat;
-  private static Debug sInstance = new Debug();
+  private SimpleDateFormat simpleDateFormat;
+  private static Debug instance = new Debug();
 
   private Debug() {
-    mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
   }
 
   public static Debug get() {
-    return sInstance;
+    return instance;
   }
 
   public void print(String str) {
-    System.out.print(mSimpleDateFormat.format(new Date()) + " " + str);
+    System.out.print(simpleDateFormat.format(new Date()) + " " + str);
   }
 
   public void println(String str) {
-    System.out.println(mSimpleDateFormat.format(new Date()) + " " + str);
+    System.out.println(simpleDateFormat.format(new Date()) + " " + str);
   }
 }
