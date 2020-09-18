@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import tetris.Config;
 import tetris.view.component.RepaintView;
+import util.Pair;
 import tetris.view.component.FlashLabel;
 import tetris.view.component.Label;
 import tetris.view.component.MulticolorLabel;
@@ -21,8 +22,13 @@ public class MenuView extends RepaintView {
   private boolean isRepain = true;
   private Thread repainThread;
   private int arrow;
-  private ViewChangeEvent[] modeOptions = {ViewChangeEvent.SINGLE, ViewChangeEvent.BATTLE};
-  private String[][] modeOptionsName = {{">SINGLE", "BATTLE"}, {"SINGLE", ">BATTLE"}};
+
+  @SuppressWarnings("unchecked")
+  private Pair<ViewChangeEvent, String[]>[] options =
+      new Pair[] {
+        new Pair<>(ViewChangeEvent.SINGLE, new String[] {">SINGLE", "BATTLE"}),
+        new Pair<>(ViewChangeEvent.BATTLE, new String[] {"SINGLE", ">BATTLE"})
+      };
 
   public MenuView(int width, int height) {
     super(width, height);
@@ -67,38 +73,43 @@ public class MenuView extends RepaintView {
     singleText = new Label();
     singleText.setLocation(config.zoom(100), config.zoom(350));
     singleText.setFont(Font.BOLD, config.zoom(35));
-    singleText.setText(modeOptionsName[arrow][0]);
     add(singleText);
 
     battleText = new Label();
     battleText.setLocation(config.zoom(100), config.zoom(385));
     battleText.setFont(Font.BOLD, config.zoom(35));
-    battleText.setText(modeOptionsName[arrow][1]);
     add(battleText);
+
+    setModeArrow(arrow);
   }
 
   @Override
   public void onKeyCode(int code) {
     if (code == KeyEvent.VK_ENTER) {
-      if (modeOptions[arrow] == ViewChangeEvent.SINGLE) {
+      ViewChangeEvent mode = options[arrow].getFirst();
+
+      if (mode == ViewChangeEvent.SINGLE) {
         // 單機
         getOnChangeViewListener().onChangeView(ViewChangeEvent.SINGLE);
-      } else if (modeOptions[arrow] == ViewChangeEvent.BATTLE) {
+      } else if (mode == ViewChangeEvent.BATTLE) {
         // 對戰
         System.out.println("BATTLE");
       }
     } else if (code == KeyEvent.VK_UP) { // 遊標上移
       arrow--;
-      arrow += modeOptions.length;
-      arrow %= modeOptions.length;
-      singleText.setText(modeOptionsName[arrow][0]);
-      battleText.setText(modeOptionsName[arrow][1]);
+      arrow += options.length;
+      arrow %= options.length;
+      setModeArrow(arrow);
     } else if (code == KeyEvent.VK_DOWN) { // 遊標下移
       arrow++;
-      arrow %= modeOptions.length;
-      singleText.setText(modeOptionsName[arrow][0]);
-      battleText.setText(modeOptionsName[arrow][1]);
+      arrow %= options.length;
+      setModeArrow(arrow);
     }
+  }
+
+  private void setModeArrow(int r) {
+    singleText.setText(options[r].getSecond()[0]);
+    battleText.setText(options[r].getSecond()[1]);
   }
 
   @Override
