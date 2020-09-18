@@ -1,4 +1,4 @@
-package tetris.listener;
+package tetris.view.listener;
 
 /**
  * 滑鼠點擊到角色時觸發的事件

@@ -2,7 +2,7 @@ package tetris.view.component;
 
 import java.awt.Graphics;
 
-import tetris.listener.OnClickListener;
+import tetris.view.listener.OnClickListener;
 
 /**
  * 在畫面上可以被點擊的遊戲角色

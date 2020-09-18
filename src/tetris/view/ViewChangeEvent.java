@@ -8,6 +8,8 @@ package tetris.view;
 public enum ViewChangeEvent {
   /** 遊戲選單 */
   MENU,
-  /** 遊戲室 */
-  GAME,
+  /** 單機遊戲室 */
+  SINGLE,
+  /** 對戰遊戲室 */
+  BATTLE
 }

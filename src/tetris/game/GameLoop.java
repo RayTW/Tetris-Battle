@@ -3,7 +3,7 @@ package tetris.game;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import tetris.listener.GameEventListener;
+import tetris.view.listener.GameEventListener;
 
 /**
  * 控制遊戲流程

@@ -10,9 +10,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 
-import tetris.view.ControlView;
 import tetris.view.GameView;
 import tetris.view.MenuView;
+import tetris.view.component.RepaintView;
+import tetris.view.component.ComponentView;
 
 /**
  * 俄羅斯方塊主程式,建立GameView並add之後執行
@@ -21,7 +22,7 @@ import tetris.view.MenuView;
  */
 public class Tetris extends JFrame {
   private static final long serialVersionUID = 1L;
-  private ControlView view;
+  private ComponentView view;
 
   public Tetris() {}
 
@@ -34,8 +35,8 @@ public class Tetris extends JFrame {
 
           @Override
           public void componentAdded(ContainerEvent e) {
-            if (e.getChild() instanceof ControlView) {
-              ControlView o = (ControlView) e.getChild();
+            if (e.getChild() instanceof RepaintView) {
+              RepaintView o = (RepaintView) e.getChild();
 
               o.initialize();
             }
@@ -43,8 +44,8 @@ public class Tetris extends JFrame {
 
           @Override
           public void componentRemoved(ContainerEvent e) {
-            if (e.getChild() instanceof ControlView) {
-              ControlView o = (ControlView) e.getChild();
+            if (e.getChild() instanceof RepaintView) {
+              RepaintView o = (RepaintView) e.getChild();
 
               o.release();
             }
@@ -55,7 +56,7 @@ public class Tetris extends JFrame {
         event -> {
           pane.remove(view);
           switch (event) {
-            case GAME:
+            case SINGLE:
               view = new GameView(getWidth(), getHeight());
               break;
             case MENU:

@@ -1,4 +1,4 @@
-package tetris.view;
+package tetris.view.component;
 
 import java.awt.Graphics;
 import java.awt.Image;
@@ -6,34 +6,25 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.swing.JComponent;
-
-import tetris.listener.OnChangeViewListener;
-import tetris.view.component.ClickableRole;
-import tetris.view.component.Role;
-
-/** @author Ray Lee Created on 2020/09/16 */
-public class ControlView extends JComponent {
+/**
+ * 可繪圖的view.
+ *
+ * @author Ray Lee Created on 2020/09/16
+ */
+public class RepaintView extends ComponentView {
   private static final long serialVersionUID = 1L;
 
   private Image canvasBuffer = null;
   private int screenWidth;
   private int screenHeight;
   private List<Role> rolePool;
-  private OnChangeViewListener changeViewListener;
 
-  public ControlView(int width, int height) {
+  public RepaintView(int width, int height) {
     rolePool = new CopyOnWriteArrayList<>();
     screenWidth = width;
     screenHeight = height;
     // 設定畫面大小
     setSize(width, height);
-  }
-
-  public void initialize() {}
-
-  public void setOnChangeViewListener(OnChangeViewListener listener) {
-    changeViewListener = listener;
   }
 
   // 雙緩衝區繪圖
@@ -62,8 +53,10 @@ public class ControlView extends JComponent {
     rolePool.stream().forEach(r -> r.onDraw(g));
   }
 
+  @Override
   public void onKeyCode(int code) {}
 
+  @Override
   public void onMouseClicked(MouseEvent e) {
     rolePool
         .stream()
@@ -71,10 +64,4 @@ public class ControlView extends JComponent {
         .map(ClickableRole.class::cast)
         .forEach(r -> r.onClick());
   }
-
-  protected OnChangeViewListener getOnChangeViewListener() {
-    return changeViewListener;
-  }
-
-  public void release() {}
 }

@@ -9,7 +9,8 @@ import java.awt.event.MouseEvent;
 import tetris.Config;
 import tetris.game.GameEvent;
 import tetris.game.GameLoop;
-import tetris.listener.GameEventListener;
+import tetris.view.component.RepaintView;
+import tetris.view.listener.GameEventListener;
 import util.AudioPlayer;
 import util.Debug;
 
@@ -18,7 +19,7 @@ import util.Debug;
  *
  * @author Ray
  */
-public class GameView extends ControlView implements GameEventListener {
+public class GameView extends RepaintView implements GameEventListener {
   private static final long serialVersionUID = 1L;
   private int nextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
   private int[][][] boxBuffer; // 下次要出現的方塊style

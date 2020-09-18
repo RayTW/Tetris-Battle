@@ -1,4 +1,4 @@
-package tetris.listener;
+package tetris.view.listener;
 
 import tetris.game.GameEvent;
 

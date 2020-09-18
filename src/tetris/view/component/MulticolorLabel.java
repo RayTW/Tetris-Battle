@@ -9,7 +9,7 @@ import java.awt.Graphics;
  *
  * @author Ray Lee
  */
-public class MulticolorText extends Role {
+public class MulticolorLabel extends Role {
   private int colorAlpha = 255;
   private int alphaFlag = 8;
   private int textGap = 0;
@@ -18,9 +18,9 @@ public class MulticolorText extends Role {
   private Font titleFont;
   private String text = "";
   private Color[] textColor = {};
-  private boolean textFlash = false;
+  private boolean isFlash = false;
 
-  public MulticolorText(String text, Color[] textColor, int textGap) {
+  public MulticolorLabel(String text, Color[] textColor, int textGap) {
     this.text = text;
     this.textColor = textColor;
     this.textGap = textGap;
@@ -36,9 +36,9 @@ public class MulticolorText extends Role {
    *
    * @param enable
    */
-  public void setTextFlash(boolean enable) {
-    textFlash = enable;
-    if (textFlash) {
+  public void setFlash(boolean enable) {
+    isFlash = enable;
+    if (isFlash) {
       colorAlpha = 0;
     }
   }
@@ -57,7 +57,7 @@ public class MulticolorText extends Role {
     int gap = textGap;
 
     // 讓文字淡入淡出效果
-    if (textFlash) {
+    if (isFlash) {
       colorAlpha += alphaFlag;
       if (colorAlpha > 255) {
         colorAlpha = 255;
