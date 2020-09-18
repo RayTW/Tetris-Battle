@@ -56,7 +56,6 @@ public class GameView extends RepaintView implements GameEventListener {
   public GameView(int width, int height) {
     super(width, height);
     backgroundMusic = playMusic("sound/music.wav");
-    initialize();
   }
 
   @Override
