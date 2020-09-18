@@ -1,18 +1,18 @@
 package tetris.game;
 
-public class GameBox {
-  public int mBoxRowCount = 20; // 直的20個方塊
-  public int mBoxColumnCount = 10; // 橫的10個方塊
-  private int[][] mBoxes; // 整個可以放置方塊、移動方塊的大陣列
+public class CubeMatrix {
+  public int cubeRowCount = 20; // 直的20個方塊
+  public int cubeColumnCount = 10; // 橫的10個方塊
+  private int[][] cube; // 整個可以放置方塊、移動方塊的大陣列
 
-  private Box mNowBox; // 目前移動中的方塊
+  private Cube currentCube; // 目前移動中的方塊
 
-  public GameBox() {
+  public CubeMatrix() {
     initialize();
   }
 
   public void initialize() {
-    mBoxes = new int[mBoxRowCount][mBoxColumnCount];
+    cube = new int[cubeRowCount][cubeColumnCount];
   }
 
   // ----------------------------public
@@ -23,21 +23,21 @@ public class GameBox {
    * @param style
    * @return
    */
-  public boolean createNewBox(int style) {
+  public boolean createNewCube(int style) {
     boolean b = true;
-    Box nb = new Box();
+    Cube nb = new Cube();
     nb.setBoxData(style);
-    nb.setNowX((mBoxColumnCount / 2) - 1);
-    mNowBox = nb;
+    nb.setNowX((cubeColumnCount / 2) - 1);
+    currentCube = nb;
 
-    if (hitTest(mBoxes, mNowBox)) { // 方塊一建立就撞到
+    if (hitTest(cube, currentCube)) { // 方塊一建立就撞到
       b = false;
     }
     return b;
   }
 
-  public int[][] createBox(int style) {
-    Box b = new Box();
+  public int[][] createCube(int style) {
+    Cube b = new Cube();
     b.setBoxData(style);
     return b.getBoxAry(0);
   }
@@ -48,11 +48,11 @@ public class GameBox {
    * @return
    */
   public boolean moveDown() {
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
 
     // 判斷方塊撞到底部
     int boxY = tempNowBox.getNowY() + tempNowBox.getNowTurnHeight();
-    if (boxY >= mBoxRowCount) {
+    if (boxY >= cubeRowCount) {
       return false;
     }
 
@@ -61,7 +61,7 @@ public class GameBox {
     int nx = tempNowBox.getNowX();
     int ny = tempNowBox.getNowY();
 
-    if (hitTest(mBoxes, nbAry, nx, ny + 1)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+    if (hitTest(cube, nbAry, nx, ny + 1)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
       b = false;
     } else { // 方塊沒碰撞到其他方塊，可下移
       tempNowBox.move(0, 1);
@@ -76,15 +76,15 @@ public class GameBox {
    */
   public boolean moveRight() {
     boolean b = true;
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
     // 取得目前方塊右移後的x位置+上方塊的寬度
     int x = tempNowBox.getNowX() + tempNowBox.getNowTurnWight() + 1; // 假設右移1格
 
-    if (x > mBoxColumnCount) { // 判斷方塊位置是否會超過boxAry的寬度
+    if (x > cubeColumnCount) { // 判斷方塊位置是否會超過boxAry的寬度
       b = false;
     } else { // 沒超過牆，判斷是否撞到其他方塊
       if (hitTest(
-          mBoxes,
+          cube,
           tempNowBox.getNowturnBoxAry(),
           tempNowBox.getNowX() + 1,
           tempNowBox.getNowY())) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
@@ -104,7 +104,7 @@ public class GameBox {
    */
   public boolean moveLeft() {
     boolean b = true;
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
     int[][] nowturnBoxAry = tempNowBox.getNowturnBoxAry();
     int x = tempNowBox.getNowX() - 1;
 
@@ -121,7 +121,7 @@ public class GameBox {
       b = false;
     } else {
       if (hitTest(
-          mBoxes,
+          cube,
           nowturnBoxAry,
           tempNowBox.getNowX() - 1,
           tempNowBox.getNowY())) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
@@ -149,7 +149,7 @@ public class GameBox {
    * @return
    */
   public boolean turnRight() {
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
     int rightTurn = tempNowBox.nextTurn(1); // 取出順轉1次後的方塊位置索引值
     int turnW = tempNowBox.getWight(rightTurn);
     int turnH = tempNowBox.getHeight(rightTurn);
@@ -159,14 +159,14 @@ public class GameBox {
     int w = tempNowBox.getNowX() + turnW;
     int[][] turnAry = tempNowBox.getBoxAry(rightTurn);
 
-    if (h > mBoxRowCount) { // 判斷順轉後的方塊位置是否會超過boxAry的寬度或底部
+    if (h > cubeRowCount) { // 判斷順轉後的方塊位置是否會超過boxAry的寬度或底部
       return false;
     }
     if (nx == -1) {
       // if(w > BOX_W){//判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
       int tmpX = 1;
 
-      if (hitTest(mBoxes, turnAry, nx + tmpX, ny)) {
+      if (hitTest(cube, turnAry, nx + tmpX, ny)) {
         return false;
       } else {
         tempNowBox.move(tmpX, 0);
@@ -174,17 +174,17 @@ public class GameBox {
       }
       // }
 
-      if (hitTest(mBoxes, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+      if (hitTest(cube, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
         return false;
       } else {
         tempNowBox.turnRight();
         return true;
       }
     } else {
-      if (w > mBoxColumnCount) { // 判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
-        int tmpX = w - mBoxColumnCount;
+      if (w > cubeColumnCount) { // 判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
+        int tmpX = w - cubeColumnCount;
 
-        if (hitTest(mBoxes, turnAry, nx + (-tmpX), ny)) {
+        if (hitTest(cube, turnAry, nx + (-tmpX), ny)) {
           return false;
         } else {
           tempNowBox.move(-tmpX, 0);
@@ -192,7 +192,7 @@ public class GameBox {
         }
       }
 
-      if (hitTest(mBoxes, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+      if (hitTest(cube, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
         return false;
       } else {
         tempNowBox.turnRight();
@@ -207,7 +207,7 @@ public class GameBox {
    * @return
    */
   public boolean turnLeft() {
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
     int leftTurn = tempNowBox.nextTurn(-1); // 取出逆轉1次後的方塊位置索引值
     int turnH = tempNowBox.getHeight(leftTurn) + tempNowBox.getNowY();
     int turnW = tempNowBox.getWight(leftTurn);
@@ -216,14 +216,14 @@ public class GameBox {
     int ny = tempNowBox.getNowY();
     int[][] turnAry = tempNowBox.getBoxAry(leftTurn);
 
-    if (turnH > mBoxRowCount) { // 判斷轉向是否超出高度
+    if (turnH > cubeRowCount) { // 判斷轉向是否超出高度
       return false;
     }
     if (nx == -1) {
       // if(w > BOX_W){//判斷是否轉向超出右牆,再判斷超出後，方塊左移之後是否會撞到其他方塊
       int tmpX = 1;
 
-      if (hitTest(mBoxes, turnAry, nx + tmpX, ny)) {
+      if (hitTest(cube, turnAry, nx + tmpX, ny)) {
         return false;
       } else {
         tempNowBox.move(tmpX, 0);
@@ -231,17 +231,17 @@ public class GameBox {
       }
       // }
 
-      if (hitTest(mBoxes, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+      if (hitTest(cube, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
         return false;
       } else {
         tempNowBox.turnRight();
         return true;
       }
     } else { // 沒超過高度
-      if (w > mBoxColumnCount) { // 判斷是否超過寬度
-        int tmpX = w - mBoxColumnCount;
+      if (w > cubeColumnCount) { // 判斷是否超過寬度
+        int tmpX = w - cubeColumnCount;
 
-        if (hitTest(mBoxes, turnAry, nx + (-tmpX), ny)) { // 判斷轉向後是否撞到其他方塊
+        if (hitTest(cube, turnAry, nx + (-tmpX), ny)) { // 判斷轉向後是否撞到其他方塊
           return false;
         } else { // 方塊轉向後超出寬度，因此將方塊左移tmpX格
           tempNowBox.move(-tmpX, 0);
@@ -249,7 +249,7 @@ public class GameBox {
         }
       }
 
-      if (hitTest(mBoxes, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
+      if (hitTest(cube, turnAry, nx, ny)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
         return false;
       } else { // 方塊可逆轉
         tempNowBox.turnLeft();
@@ -272,23 +272,23 @@ public class GameBox {
 
       for (int i = 0; i < data.length; i++) {
         int line = Integer.parseInt(data[i]);
-        moveLine(mBoxes, 0, line);
+        moveLine(cube, 0, line);
       }
     }
   }
 
   /** 清空整個可移動方塊區域的二維陣列 */
-  public void clearBoxAry() {
-    for (int i = 0; i < mBoxes.length; i++) {
-      for (int j = 0; j < mBoxes[i].length; j++) {
-        mBoxes[i][j] = 0;
+  public void clearAllCube() {
+    for (int i = 0; i < cube.length; i++) {
+      for (int j = 0; j < cube[i].length; j++) {
+        cube[i][j] = 0;
       }
     }
   }
 
   /** 取得目前的整個遊戲畫面可移動方塊區域的二維陣列 */
-  public int[][] getBoxAry() {
-    return mBoxes;
+  public int[][] getMatrix() {
+    return cube;
   }
 
   /**
@@ -297,12 +297,12 @@ public class GameBox {
    *
    * @return
    */
-  public int getNowBoxIndex() {
-    int index = mBoxes.length + 1;
-    for (int i = 0; i < mBoxes.length; i++) {
+  public int getCurrentCubeIndex() {
+    int index = cube.length + 1;
+    for (int i = 0; i < cube.length; i++) {
       index--;
-      for (int j = 0; j < mBoxes[i].length; j++) {
-        if (mBoxes[i][j] > 0) {
+      for (int j = 0; j < cube[i].length; j++) {
+        if (cube[i][j] > 0) {
           return index;
         }
       }
@@ -316,15 +316,15 @@ public class GameBox {
    * @return
    */
   public String getClearLine() {
-    Box nb = mNowBox;
+    Cube nb = currentCube;
     StringBuffer lineList = new StringBuffer();
     int ny = nb.getNowY();
 
-    for (int i = ny; i < mBoxes.length; i++) {
-      int BW = mBoxes[i].length;
+    for (int i = ny; i < cube.length; i++) {
+      int BW = cube[i].length;
       int checkCnt = 0;
       for (int j = 0; j < BW; j++) {
-        int boxStyle = mBoxes[i][j];
+        int boxStyle = cube[i][j];
         if (boxStyle > 0 && boxStyle != 9) {
           checkCnt++;
           if (checkCnt == BW) {
@@ -345,7 +345,7 @@ public class GameBox {
    * @param style 新增的方塊style
    */
   public void addGarbageBoxOneLine(int style) {
-    int[][] tmpAry = mBoxes;
+    int[][] tmpAry = cube;
     int[] tmp = tmpAry[0];
 
     int i = 0;
@@ -367,7 +367,7 @@ public class GameBox {
    */
   public void addGarbageBoxOneLine(String styleList) {
     String[] styleAry = styleList.split("[|]");
-    int[][] tmpAry = mBoxes;
+    int[][] tmpAry = cube;
     int[] tmp = tmpAry[0];
 
     int i = 0;
@@ -402,8 +402,8 @@ public class GameBox {
     int garbageCount = 0; // 自己目前的垃圾方塊數
 
     // 計算自己有幾行不能消掉的垃圾方塊
-    for (int i = mBoxes.length - 1; i >= 0; i--) {
-      int style = mBoxes[i][0];
+    for (int i = cube.length - 1; i >= 0; i--) {
+      int style = cube[i][0];
       if (style == 9) {
         garbageCount++;
       }
@@ -412,7 +412,7 @@ public class GameBox {
     // 以自己消除的行數去清除垃圾方塊行數
     for (int i = count - 1; i >= 0 && garbageCount > 0; i--) {
       // int line = Integer.parseInt(data[i]);
-      moveLine(mBoxes, 0, mBoxes.length - 1);
+      moveLine(cube, 0, cube.length - 1);
       garbageCount--;
       lineCount--;
     }
@@ -425,8 +425,8 @@ public class GameBox {
    *
    * @return
    */
-  public int[][] getNowBoxAry() {
-    return mNowBox.getNowturnBoxAry();
+  public int[][] getCurrentCube() {
+    return currentCube.getNowturnBoxAry();
   }
 
   /**
@@ -435,7 +435,7 @@ public class GameBox {
    * @return
    */
   public String getNowturnBoxStyleStr() {
-    return mNowBox.getNowturnBoxStyleStr();
+    return currentCube.getNowturnBoxStyleStr();
   }
 
   /**
@@ -444,7 +444,7 @@ public class GameBox {
    * @return
    */
   public int[] getNowBoxXY() {
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
     int[] xy = new int[4];
     xy[0] = tempNowBox.getNowX();
     xy[1] = tempNowBox.getNowY();
@@ -460,7 +460,7 @@ public class GameBox {
    * @return
    */
   public int getDownY() {
-    Box tempNowBox = mNowBox;
+    Cube tempNowBox = currentCube;
     int nx = tempNowBox.getNowX();
     int ny = tempNowBox.getNowY();
     int[][] nbAry = tempNowBox.getNowturnBoxAry();
@@ -468,11 +468,11 @@ public class GameBox {
     while (true) {
       // 判斷方塊撞到底部
       int boxY = ny + tempNowBox.getNowTurnHeight();
-      if (boxY >= mBoxRowCount) {
+      if (boxY >= cubeRowCount) {
         return ny;
       }
 
-      if (hitTest(mBoxes, nbAry, nx, ny + 1)) { // 方塊沒碰撞到其他方塊，可下移
+      if (hitTest(cube, nbAry, nx, ny + 1)) { // 方塊沒碰撞到其他方塊，可下移
         break;
       } else {
         ny++;
@@ -489,8 +489,8 @@ public class GameBox {
    * @param y
    */
   public void addBox() {
-    Box nb = mNowBox;
-    int[][] tempBoxAry = mBoxes;
+    Cube nb = currentCube;
+    int[][] tempBoxAry = cube;
     int x = nb.getNowX();
     int y = nb.getNowY();
     int[][] b = nb.getNowturnBoxAry();
@@ -508,8 +508,8 @@ public class GameBox {
    * @return
    */
   public String getLineList(String lineData, boolean isGap) {
-    Box nb = mNowBox;
-    int[][] tempBoxAry = mBoxes;
+    Cube nb = currentCube;
+    int[][] tempBoxAry = cube;
     StringBuffer lineListStr = new StringBuffer();
     String[] lineAry = lineData.split("[,]");
 
@@ -534,7 +534,7 @@ public class GameBox {
     for (int i = 0; i < lineAry.length; i++) {
       int line = Integer.parseInt(lineAry[i]);
 
-      int[] box = mBoxes[line];
+      int[] box = cube[line];
       StringBuffer lineStr = new StringBuffer();
       for (int j = 0; j < box.length; j++) {
         if (lineStr.length() > 0) {
@@ -563,7 +563,7 @@ public class GameBox {
    * @param nb
    * @return
    */
-  protected boolean hitTest(int[][] tempBoxAry, Box nb) {
+  protected boolean hitTest(int[][] tempBoxAry, Cube nb) {
     int[][] newBox = nb.getNowturnBoxAry();
     int ny = nb.getNowY();
     int nx = nb.getNowX();

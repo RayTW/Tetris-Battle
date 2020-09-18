@@ -5,7 +5,7 @@ package tetris.view;
  *
  * @author Ray
  */
-public enum ViewChangeEvent {
+public enum ViewName {
   /** 遊戲選單 */
   MENU,
   /** 單機遊戲室 */

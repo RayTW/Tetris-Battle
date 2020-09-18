@@ -5,7 +5,7 @@ package tetris.game;
  *
  * @author Ray
  */
-public class Box {
+public class Cube {
   /** 1.長條 */
   public static final String STYLE1 = "0,0|0,1|0,2|0,3@0,0|1,0|2,0|3,0";
   /** 2.反L */
@@ -36,7 +36,7 @@ public class Box {
   private int[][][] mBoxAry; // 此方塊轉向後的值
   private int[][] mHW; // 此方塊轉向後的高、寬
 
-  public Box() {
+  public Cube() {
     initialize();
   }
 

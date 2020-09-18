@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import tetris.Config;
 import tetris.game.GameEvent;
 import tetris.game.GameLoop;
+import tetris.view.component.AdversaryTetris;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
 import util.AudioPlayer;
@@ -52,11 +53,11 @@ public class BattleView extends RepaintView implements GameEventListener {
   private GameLoop gameLoop; // 遊戲邏輯(無畫面)
   private AudioPlayer backgroundMusic; // 播放背景音樂
   private InfoBar mInfoBar;
+  private AdversaryTetris adversaryTetris;
 
   public BattleView(int width, int height) {
     super(width, height);
     backgroundMusic = playMusic("sound/music.wav");
-    initialize();
   }
 
   @Override
@@ -81,6 +82,10 @@ public class BattleView extends RepaintView implements GameEventListener {
     gameOverLocationY = Config.get().zoom(250);
     nextRoundCountdownSecondLocationX = Config.get().zoom(155);
     nextRoundCountdownSecondLocationY = Config.get().zoom(270);
+
+    adversaryTetris = new AdversaryTetris(value -> (int) (value * 0.5));
+    adversaryTetris.setLocation(310, 362);
+    add(adversaryTetris);
 
     // 分數、消除行數、等級
     mInfoBar = new InfoBar();
@@ -128,6 +133,10 @@ public class BattleView extends RepaintView implements GameEventListener {
     if (gameLoop.isGameOver()) {
       return;
     }
+    if (code == KeyEvent.VK_ESCAPE) {
+      changeView(ViewName.MENU);
+      return;
+    }
     if (!gameLoop.isPause()) {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
@@ -146,15 +155,11 @@ public class BattleView extends RepaintView implements GameEventListener {
         case KeyEvent.VK_SPACE: // 空白鍵,快速掉落方塊
           quickDown();
           break;
-        case KeyEvent.VK_S: // S鍵,暫停
-          gameLoop.pause();
-          break;
         default:
       }
-    } else {
-      if (code == KeyEvent.VK_R) { // R鍵,回到遊戲繼續
-        gameLoop.rusme();
-      }
+      // TODO ---test---begin
+      adversaryTetris.onKeyCode(code, false);
+      // TODO ---test---end
     }
 
     // 每次按了鍵盤就將畫面重繪
@@ -182,6 +187,8 @@ public class BattleView extends RepaintView implements GameEventListener {
   // 雙緩衝區繪圖
   @Override
   public void onPaintComponent(Graphics canvas) {
+    super.onPaintComponent(canvas);
+
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
     int[][] boxAry = gameLoop.getBoxAry();
     showBacegroundBox(boxAry, canvas);
@@ -354,13 +361,26 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     if (GameEvent.BOX_TURN == code) {
       playSound("sound/turn.wav");
-
+      return;
+    }
+    // 方塊下移
+    if (GameEvent.BOX_MOVE_DOWN == code) {
+      // TODO ---test---begin
+      adversaryTetris.onKeyCode(KeyEvent.VK_DOWN, true);
+      // TODO ---test---end
       return;
     }
     // 方塊落到底
     if (GameEvent.BOX_DOWN == code) {
       // 播放方塊掉落音效
       playSound("sound/down.wav");
+      return;
+    }
+    // 建立完下一個方塊
+    if (GameEvent.BOX_NEW == code) {
+      // TODO ---test---begin
+      adversaryTetris.createCube(Integer.parseInt(data));
+      // TODO ---test---end
       return;
     }
     // 建立完下一個方塊
@@ -410,6 +430,10 @@ public class BattleView extends RepaintView implements GameEventListener {
       // 清除全畫面方塊
       gameLoop.clearBox();
 
+      // TODO ---test---begin
+      adversaryTetris.reset();
+      // TODO ---test---end
+
       // 設定方塊掉落秒數
       gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
 
@@ -430,5 +454,10 @@ public class BattleView extends RepaintView implements GameEventListener {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public void release() {
+    backgroundMusic.stop();
   }
 }

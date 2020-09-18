@@ -24,10 +24,10 @@ public class MenuView extends RepaintView {
   private int arrow;
 
   @SuppressWarnings("unchecked")
-  private Pair<ViewChangeEvent, String[]>[] options =
+  private Pair<ViewName, String[]>[] options =
       new Pair[] {
-        new Pair<>(ViewChangeEvent.SINGLE, new String[] {">SINGLE", "BATTLE"}),
-        new Pair<>(ViewChangeEvent.BATTLE, new String[] {"SINGLE", ">BATTLE"})
+        new Pair<>(ViewName.SINGLE, new String[] {">SINGLE", "BATTLE"}),
+        new Pair<>(ViewName.BATTLE, new String[] {"SINGLE", ">BATTLE"})
       };
 
   public MenuView(int width, int height) {
@@ -86,14 +86,14 @@ public class MenuView extends RepaintView {
   @Override
   public void onKeyCode(int code) {
     if (code == KeyEvent.VK_ENTER) {
-      ViewChangeEvent mode = options[arrow].getFirst();
+      ViewName mode = options[arrow].getFirst();
 
-      if (mode == ViewChangeEvent.SINGLE) {
+      if (mode == ViewName.SINGLE) {
         // 單機
-        getOnChangeViewListener().onChangeView(ViewChangeEvent.SINGLE);
-      } else if (mode == ViewChangeEvent.BATTLE) {
+        changeView(ViewName.SINGLE);
+      } else if (mode == ViewName.BATTLE) {
         // 對戰
-        System.out.println("BATTLE");
+        changeView(ViewName.BATTLE);
       }
     } else if (code == KeyEvent.VK_UP) { // 遊標上移
       arrow--;

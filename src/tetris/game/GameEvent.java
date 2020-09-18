@@ -12,6 +12,10 @@ public enum GameEvent {
   BOX_TURN,
   /** 方塊落到底 */
   BOX_DOWN,
+  /** 方塊下移 */
+  BOX_MOVE_DOWN,
+  /** 下一個創建的方塊 */
+  BOX_NEW,
   /** 建立完下一個方塊 */
   BOX_NEXT,
   /** 有方塊可清除,將要清除方塊,可取得要消去的方塊資料 */

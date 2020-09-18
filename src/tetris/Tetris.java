@@ -3,16 +3,17 @@ package tetris;
 import java.awt.Container;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JFrame;
 
-import tetris.view.GameView;
-import tetris.view.MenuView;
+import tetris.view.ViewFactory;
+import tetris.view.ViewName;
 import tetris.view.component.RepaintView;
+import tetris.view.listener.OnChangeViewListener;
 import tetris.view.component.ComponentView;
 
 /**
@@ -20,15 +21,17 @@ import tetris.view.component.ComponentView;
  *
  * @author Ray Lee
  */
-public class Tetris extends JFrame {
+public class Tetris extends JFrame implements OnChangeViewListener {
   private static final long serialVersionUID = 1L;
   private ComponentView view;
+  private ViewFactory viewFactory;
 
   public Tetris() {}
 
   public void initialize() {
-    view = new MenuView(getWidth(), getHeight());
     Container pane = getContentPane();
+    viewFactory = new ViewFactory();
+    view = viewFactory.create(ViewName.MENU, getWidth(), getHeight());
 
     pane.addContainerListener(
         new ContainerListener() {
@@ -52,37 +55,18 @@ public class Tetris extends JFrame {
           }
         });
 
-    view.setOnChangeViewListener(
-        event -> {
-          pane.remove(view);
-          switch (event) {
-            case SINGLE:
-              view = new GameView(getWidth(), getHeight());
-              break;
-            case MENU:
-              view = new MenuView(getWidth(), getHeight());
-              break;
-            default:
-          }
-          pane.add(view);
-        });
+    view.setOnChangeViewListener(this);
     pane.add(view);
 
     // 鍵盤事件處理
     addKeyListener(
-        new KeyListener() {
-          @Override
-          public void keyReleased(KeyEvent e) {}
-
+        new KeyAdapter() {
           @Override
           public void keyPressed(KeyEvent e) {
             if (view != null) {
               view.onKeyCode(e.getKeyCode());
             }
           }
-
-          @Override
-          public void keyTyped(KeyEvent e) {}
         });
     addMouseListener(
         new MouseAdapter() {
@@ -108,5 +92,14 @@ public class Tetris extends JFrame {
     tetris.setResizable(false); // 視窗放大按鈕無效
     tetris.initialize();
     tetris.setVisible(true);
+  }
+
+  @Override
+  public void onChangeView(ViewName event) {
+    getContentPane().remove(view);
+    view.setOnChangeViewListener(null);
+    view = viewFactory.create(event, getWidth(), getHeight());
+    view.setOnChangeViewListener(this);
+    getContentPane().add(view);
   }
 }

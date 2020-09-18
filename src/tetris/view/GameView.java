@@ -127,6 +127,10 @@ public class GameView extends RepaintView implements GameEventListener {
     if (gameLoop.isGameOver()) {
       return;
     }
+    if (code == KeyEvent.VK_ESCAPE) {
+      changeView(ViewName.MENU);
+      return;
+    }
     if (!gameLoop.isPause()) {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
@@ -429,5 +433,11 @@ public class GameView extends RepaintView implements GameEventListener {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public void release() {
+    backgroundMusic.stop();
+    gameLoop.stopGame();
   }
 }

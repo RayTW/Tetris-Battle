@@ -2,6 +2,8 @@ package tetris.view.component;
 
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
+
+import tetris.view.ViewName;
 import tetris.view.listener.OnChangeViewListener;
 
 public abstract class ComponentView extends JComponent {
@@ -17,8 +19,10 @@ public abstract class ComponentView extends JComponent {
     changeViewListener = listener;
   }
 
-  protected OnChangeViewListener getOnChangeViewListener() {
-    return changeViewListener;
+  public void changeView(ViewName name) {
+    if (changeViewListener != null) {
+      changeViewListener.onChangeView(name);
+    }
   }
 
   public void onKeyCode(int code) {}

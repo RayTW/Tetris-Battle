@@ -1,6 +1,6 @@
 package tetris.view.listener;
 
-import tetris.view.ViewChangeEvent;
+import tetris.view.ViewName;
 
 /**
  * view切換事件
@@ -13,5 +13,5 @@ public interface OnChangeViewListener {
    *
    * @param view 即將前往的場景名稱
    */
-  public void onChangeView(ViewChangeEvent view);
+  public void onChangeView(ViewName view);
 }

@@ -13,16 +13,17 @@ import tetris.view.listener.GameEventListener;
 public class GameLoop implements Runnable {
   private float sec;
   private Random rand;
-  private GameBox gameBox;
+  private CubeMatrix gameBox;
   private boolean isRun;
   private boolean isPause;
   private boolean isGameOver; // 是否遊戲結束
   private boolean isClean; // 目前是否有方塊到底
   private GameEventListener eventListener;
   private CountDownLatch checkClean;
+  private Thread thread;
 
-  private int mFlag; // 目前使用的方塊位置
-  private String[] mStyleAry; // 預戴方塊buffer區
+  private int flag; // 目前使用的方塊位置
+  private String[] styleBuffer; // 預戴方塊buffer區
 
   public GameLoop() {
     isRun = true;
@@ -31,23 +32,28 @@ public class GameLoop implements Runnable {
   }
 
   public void initialize() {
-    mFlag = 0;
-    mStyleAry = new String[0];
+    flag = 0;
+    styleBuffer = new String[0];
     sec = 0.2f;
-    gameBox = new GameBox();
+    gameBox = new CubeMatrix();
     isPause = false;
     isGameOver = false;
     newCheckLine();
     setBoxList(getRandBox(5)); // 設定使用5組亂數排列方塊進行遊戲
-    nextCreatBox();
   }
 
   public void startGame() {
-    new Thread(this).start();
+    thread = new Thread(this);
+    thread.start();
   }
 
   public void stopGame() {
     isRun = false;
+    isGameOver = true;
+    thread.interrupt();
+    while (checkClean.getCount() > 0) {
+      checkClean.countDown();
+    }
   }
 
   private void newCheckLine() {
@@ -67,18 +73,21 @@ public class GameLoop implements Runnable {
 
   @Override
   public void run() {
+    // 遊戲開始才建立第1個方塊
+    nextCreateBox();
     while (isRun) {
       try {
         if (!isPause && !isGameOver) { // 沒有按暫停才可玩
           if (!gameBox.moveDown()) { // 方塊已到底停住,不能再往下移
             isClean = true;
             tryCheckClean();
+          } else {
+            publishEvent(GameEvent.BOX_MOVE_DOWN, "");
           }
           publishEvent(GameEvent.REPAINT, "");
         }
         Thread.sleep((int) (1000 * sec));
       } catch (InterruptedException e) {
-        e.printStackTrace();
       }
     }
     close();
@@ -91,7 +100,7 @@ public class GameLoop implements Runnable {
    */
   public void setBoxList(String boxList) {
     if (!boxList.isEmpty()) {
-      mStyleAry = boxList.split("[|]");
+      styleBuffer = boxList.split("[|]");
     }
   }
 
@@ -102,7 +111,7 @@ public class GameLoop implements Runnable {
    * @return
    */
   public String getRandBox(int n) {
-    int[] boxAry = new int[Box.getStyleCount()];
+    int[] boxAry = new int[Cube.getStyleCount()];
     StringBuffer styleList = new StringBuffer();
 
     // 初始化可使用的方塊style,目前為1~7
@@ -147,11 +156,11 @@ public class GameLoop implements Runnable {
    */
   public int nextBox() {
     int style = 0;
-    if (mFlag > mStyleAry.length - 1) {
-      mFlag = 0;
+    if (flag > styleBuffer.length - 1) {
+      flag = 0;
     }
-    style = Integer.parseInt(mStyleAry[mFlag]);
-    mFlag++;
+    style = Integer.parseInt(styleBuffer[flag]);
+    flag++;
     return style;
   }
 
@@ -163,13 +172,13 @@ public class GameLoop implements Runnable {
    */
   public String[] getAnyCountBox(int n) {
     String[] nBox = new String[n];
-    int tmpFlag = mFlag;
+    int tmpFlag = flag;
 
     for (int i = 0; i < n; i++) {
-      if (tmpFlag > mStyleAry.length - 1) {
+      if (tmpFlag > styleBuffer.length - 1) {
         tmpFlag = 0;
       }
-      nBox[i] = mStyleAry[tmpFlag];
+      nBox[i] = styleBuffer[tmpFlag];
       tmpFlag++;
     }
     return nBox;
@@ -304,18 +313,18 @@ public class GameLoop implements Runnable {
    * @return
    */
   public int getNowBoxIndex() {
-    return gameBox.getNowBoxIndex();
+    return gameBox.getCurrentCubeIndex();
   }
 
   /** 取得目前的整個遊戲畫面可移動方塊區域的二維陣列 */
   public int[][] getBoxAry() {
-    return gameBox.getBoxAry();
+    return gameBox.getMatrix();
   }
 
   /** 亂數產生方塊 */
   public boolean randCreatBox() {
-    int style = rand.nextInt(Box.getStyleCount()) + 1;
-    return gameBox.createNewBox(style);
+    int style = rand.nextInt(Cube.getStyleCount()) + 1;
+    return gameBox.createNewCube(style);
   }
 
   /**
@@ -323,13 +332,14 @@ public class GameLoop implements Runnable {
    *
    * @return
    */
-  public boolean nextCreatBox() {
+  public boolean nextCreateBox() {
     int style = nextBox();
-    return gameBox.createNewBox(style);
+    publishEvent(GameEvent.BOX_NEW, String.valueOf(style));
+    return gameBox.createNewCube(style);
   }
 
   public int[][] createBox(int style) {
-    return gameBox.createBox(style);
+    return gameBox.createCube(style);
   }
 
   private void tryCheckClean() {
@@ -355,7 +365,7 @@ public class GameLoop implements Runnable {
 
     publishEvent(GameEvent.BOX_GARBAGE, lineData);
 
-    boolean isOK = nextCreatBox(); // 建立方塊
+    boolean isOK = nextCreateBox(); // 建立方塊
     if (!isOK) { // 建立失敗
       isGameOver = true;
       publishEvent(GameEvent.REPAINT, "");
@@ -374,7 +384,7 @@ public class GameLoop implements Runnable {
 
   /** 清空整個畫面所有方塊 */
   public void clearBox() {
-    gameBox.clearBoxAry();
+    gameBox.clearAllCube();
   }
 
   /**
@@ -383,7 +393,7 @@ public class GameLoop implements Runnable {
    * @return
    */
   public int[][] getNowBoxAry() {
-    return gameBox.getNowBoxAry();
+    return gameBox.getCurrentCube();
   }
 
   /**
@@ -404,12 +414,12 @@ public class GameLoop implements Runnable {
     return gameBox.getDownY();
   }
 
-  public void close() {
+  private void close() {
     checkClean.countDown();
     eventListener = null;
     rand = null;
     gameBox = null;
-    mStyleAry = null;
+    styleBuffer = null;
   }
 
   /**
