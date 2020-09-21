@@ -78,10 +78,10 @@ public class InfoBar {
   }
 
   public void addCleanedCount(int cleanedCount) {
-    if ((cleanedCount + cleanedCount) > cleanedCountMax) {
-      cleanedCount = cleanedCountMax;
+    if ((this.cleanedCount + cleanedCount) > cleanedCountMax) {
+      this.cleanedCount = cleanedCountMax;
     } else {
-      cleanedCount += cleanedCount;
+      this.cleanedCount += cleanedCount;
     }
   }
 
