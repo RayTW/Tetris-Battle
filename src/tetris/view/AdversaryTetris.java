@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.util.concurrent.CountDownLatch;
-
 import tetris.Config;
+import tetris.game.Cube;
 import tetris.game.CubeMatrix;
 import tetris.game.GameLoop;
 import tetris.view.component.Role;
+import util.CountDownConsumer;
 
 /**
  * 映射對戰對手的畫面
@@ -45,7 +45,7 @@ public class AdversaryTetris extends Role {
 
   private InfoBar mInfoBar;
   private Zoomable zoomable;
-  private CountDownLatch checkClean;
+  private CountDownConsumer<Cube> checkClean;
 
   public AdversaryTetris(Zoomable zoomable) {
     scoreFont = null;
@@ -55,7 +55,9 @@ public class AdversaryTetris extends Role {
 
     // 分數、消除行數、等級
     mInfoBar = new InfoBar();
-    newCheckLine();
+    checkClean = new CountDownConsumer<>();
+    checkClean.setConsumer(this::cleanLine);
+    checkClean.start();
   }
 
   @Override
@@ -97,30 +99,14 @@ public class AdversaryTetris extends Role {
     gameOverLocationY = zoomable.zoom(250) + y;
   }
 
-  private void newCheckLine() {
-    checkClean = new CountDownLatch(1);
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          checkClean.await();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        cleanLine();
-      }
-    }.start();
-  }
-
-  private void cleanLine() {
-    gameBox.addBox();
+  private void cleanLine(Cube c) {
+    gameBox.addBox(c);
     // 取得可消除的行數
     String lineData = gameBox.getClearLine();
 
     if (!lineData.isEmpty()) {
       gameBox.clearLine(lineData); // 實際將可消除的方塊行數移除
     }
-    newCheckLine();
   }
 
   // 接收鍵盤事件
@@ -147,8 +133,7 @@ public class AdversaryTetris extends Role {
     } else {
       if (code == KeyEvent.VK_DOWN) {
         if (!gameBox.moveDown()) {
-          System.out.println("checkClean.countDown2");
-          checkClean.countDown();
+          tryCleanLine();
         }
       }
     }
@@ -158,8 +143,7 @@ public class AdversaryTetris extends Role {
     if (gameBox.moveDown()) {
       mInfoBar.addScore(Config.get().getMoveDownScore());
     } else {
-      System.out.println("checkClean.countDown");
-      checkClean.countDown();
+      tryCleanLine();
     }
   }
 
@@ -173,6 +157,12 @@ public class AdversaryTetris extends Role {
     if (quickDownScore > 0) {
       mInfoBar.addScore(quickDownScore * Config.get().getQuickDownScore());
     }
+    tryCleanLine();
+  }
+
+  private void tryCleanLine() {
+    checkClean.set(gameBox.getCube());
+    checkClean.countDown();
   }
 
   // 雙緩衝區繪圖
@@ -201,7 +191,7 @@ public class AdversaryTetris extends Role {
   // 畫定住的方塊與其他背景格子
   private void showBacegroundBox(int[][] boxAry, Graphics buffImg) {
     buffImg.setColor(Color.BLACK);
-    
+
     for (int i = 0; i < boxAry.length; i++) {
       for (int j = 0; j < boxAry[i].length; j++) {
         int style = boxAry[i][j];
@@ -323,6 +313,10 @@ public class AdversaryTetris extends Role {
     mInfoBar.initialize();
     // 清除全畫面方塊
     gameBox.clearAllCube();
+  }
+
+  public void close() {
+    checkClean.stop();
   }
 
   public static interface Zoomable {

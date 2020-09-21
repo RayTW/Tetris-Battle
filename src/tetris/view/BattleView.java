@@ -189,9 +189,9 @@ public class BattleView extends RepaintView implements GameEventListener {
   @Override
   public void onPaintComponent(Graphics canvas) {
     super.onPaintComponent(canvas);
-    
+
     canvas.setColor(Color.BLACK);
-    
+
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
     int[][] boxAry = gameLoop.getBoxAry();
     showBacegroundBox(boxAry, canvas);
@@ -273,7 +273,7 @@ public class BattleView extends RepaintView implements GameEventListener {
   private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
     int boxX = xy[0];
     buffImg.setColor(mShadowColor);
-    
+
     for (int i = 0; i < box.length; i++) {
       for (int j = 0; j < box[i].length; j++) {
         int style = box[i][j];
@@ -461,5 +461,6 @@ public class BattleView extends RepaintView implements GameEventListener {
   @Override
   public void release() {
     backgroundMusic.stop();
+    adversaryTetris.close();
   }
 }

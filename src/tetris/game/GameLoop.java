@@ -1,9 +1,8 @@
 package tetris.game;
 
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
-
 import tetris.view.listener.GameEventListener;
+import util.CountDownConsumer;
 
 /**
  * 控制遊戲流程
@@ -19,7 +18,7 @@ public class GameLoop implements Runnable {
   private boolean isGameOver; // 是否遊戲結束
   private boolean isClean; // 目前是否有方塊到底
   private GameEventListener eventListener;
-  private CountDownLatch checkClean;
+  private CountDownConsumer<Cube> checkClean;
   private Thread thread;
 
   private int flag; // 目前使用的方塊位置
@@ -28,6 +27,8 @@ public class GameLoop implements Runnable {
   public GameLoop() {
     isRun = true;
     rand = new Random();
+    checkClean = new CountDownConsumer<>();
+    checkClean.setConsumer(this::cleanLine);
     initialize();
   }
 
@@ -38,7 +39,7 @@ public class GameLoop implements Runnable {
     gameBox = new CubeMatrix();
     isPause = false;
     isGameOver = false;
-    newCheckLine();
+    checkClean.start();
     setBoxList(getRandBox(5)); // 設定使用5組亂數排列方塊進行遊戲
   }
 
@@ -51,24 +52,7 @@ public class GameLoop implements Runnable {
     isRun = false;
     isGameOver = true;
     thread.interrupt();
-    while (checkClean.getCount() > 0) {
-      checkClean.countDown();
-    }
-  }
-
-  private void newCheckLine() {
-    checkClean = new CountDownLatch(1);
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          checkClean.await();
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        cleanLine();
-      }
-    }.start();
+    checkClean.stop();
   }
 
   @Override
@@ -343,14 +327,15 @@ public class GameLoop implements Runnable {
   }
 
   private void tryCheckClean() {
+    checkClean.set(gameBox.getCube());
     checkClean.countDown();
   }
 
-  private void cleanLine() {
+  private void cleanLine(Cube c) {
     if (isGameOver()) {
       return;
     }
-    gameBox.addBox();
+    gameBox.addBox(c);
     publishEvent(GameEvent.REPAINT, "");
     publishEvent(GameEvent.BOX_DOWN, "");
 
@@ -374,7 +359,6 @@ public class GameLoop implements Runnable {
     publishEvent(GameEvent.REPAINT, "");
     publishEvent(GameEvent.BOX_NEXT, "");
     isClean = false;
-    newCheckLine();
   }
 
   /** 目前掉落方塊已定格中，進行檢查可消方塊 */

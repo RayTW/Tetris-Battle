@@ -21,7 +21,7 @@ public class ViewFactory {
         break;
       default:
     }
-    
+
     return view;
   }
 }

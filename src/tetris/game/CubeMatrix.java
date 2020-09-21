@@ -421,12 +421,21 @@ public class CubeMatrix {
   }
 
   /**
-   * 取得掉落中方塊
+   * 取得掉落中方塊二維陣列
    *
    * @return
    */
   public int[][] getCurrentCube() {
     return currentCube.getNowturnBoxAry();
+  }
+
+  /**
+   * 取得掉落中方塊物件
+   *
+   * @return
+   */
+  public Cube getCube() {
+    return currentCube;
   }
 
   /**
@@ -488,20 +497,17 @@ public class CubeMatrix {
   /**
    * 畫上新位置方塊
    *
-   * @param b
-   * @param x
-   * @param y
+   * @param c
    */
-  public void addBox() {
-    Cube nb = currentCube;
+  public void addBox(Cube c) {
     int[][] tempBoxAry = cube;
-    int x = nb.getNowX();
-    int y = nb.getNowY();
-    int[][] b = nb.getNowturnBoxAry();
+    int x = c.getNowX();
+    int y = c.getNowY();
+    int[][] b = c.getNowturnBoxAry();
 
     for (int i = 0; i < b.length; i++) {
       for (int j = 0; j < b[i].length; j++) {
-        if (b[i][j] > 0) tempBoxAry[i + y][j + x] = nb.getStyle();
+        if (b[i][j] > 0) tempBoxAry[i + y][j + x] = c.getStyle();
       }
     }
   }
