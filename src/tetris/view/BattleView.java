@@ -47,11 +47,11 @@ public class BattleView extends RepaintView implements GameEventListener {
     new Color(255, 0, 255, 250),
     new Color(50, 100, 150, 250)
   };
-  private Color mShadowColor = new Color(0, 0, 0, 128);
+  private Color shadowColor = new Color(0, 0, 0, 128);
 
   private GameLoop gameLoop; // 遊戲邏輯(無畫面)
   private AudioPlayer backgroundMusic; // 播放背景音樂
-  private InfoBar mInfoBar;
+  private InfoBar infoBar;
   private AdversaryTetris adversaryTetris;
 
   public BattleView(int width, int height) {
@@ -85,11 +85,11 @@ public class BattleView extends RepaintView implements GameEventListener {
     adversaryTetris = new AdversaryTetris(value -> (int) (value * 0.5));
     adversaryTetris.setWidth(Config.get().zoom(15));
     adversaryTetris.setHeight(Config.get().zoom(15));
-    adversaryTetris.setLocation(Config.get().zoom(230), Config.get().zoom(250));
+    adversaryTetris.setLocation(Config.get().zoom(260), Config.get().zoom(280));
     add(adversaryTetris);
 
     // 分數、消除行數、等級
-    mInfoBar = new InfoBar();
+    infoBar = new InfoBar();
     // 建立遊戲邏輯
     gameLoop = new GameLoop();
 
@@ -97,7 +97,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     gameLoop.setEventListener(this);
 
     // 設定方塊掉落秒數為
-    gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+    gameLoop.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
 
     // 設定下次要出現的方塊style個數為顯示3個
     boxBuffer = getBufBox(gameLoop, nextBoxCount);
@@ -169,7 +169,7 @@ public class BattleView extends RepaintView implements GameEventListener {
 
   private void moveDown() {
     if (gameLoop.moveDown()) {
-      mInfoBar.addScore(Config.get().getMoveDownScore());
+      infoBar.addScore(Config.get().getMoveDownScore());
     }
   }
 
@@ -181,7 +181,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     int quickDownScore = after - befor;
 
     if (quickDownScore > 0) {
-      mInfoBar.addScore(quickDownScore * Config.get().getQuickDownScore());
+      infoBar.addScore(quickDownScore * Config.get().getQuickDownScore());
     }
   }
 
@@ -209,10 +209,10 @@ public class BattleView extends RepaintView implements GameEventListener {
     showBufferBox(boxBuffer, canvas);
 
     // 顯示分數
-    showInfoBar(mInfoBar, canvas);
+    showInfoBar(infoBar, canvas);
 
     // 顯示遊戲結束，並倒數秒數
-    showGameOver(mInfoBar, canvas);
+    showGameOver(infoBar, canvas);
   }
 
   // 畫定住的方塊與其他背景格子
@@ -272,7 +272,7 @@ public class BattleView extends RepaintView implements GameEventListener {
   // 畫陰影
   private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
     int boxX = xy[0];
-    buffImg.setColor(mShadowColor);
+    buffImg.setColor(shadowColor);
 
     for (int i = 0; i < box.length; i++) {
       for (int j = 0; j < box[i].length; j++) {
@@ -399,8 +399,8 @@ public class BattleView extends RepaintView implements GameEventListener {
     if (GameEvent.CLEANED_LINE == code) {
       Debug.get().println("方塊清除完成" + data);
       String[] lines = data.split("[,]", -1);
-      mInfoBar.addCleanedCount(lines.length);
-      mInfoBar.addScore(Config.get().getCleanLinesScore(lines.length));
+      infoBar.addCleanedCount(lines.length);
+      infoBar.addScore(Config.get().getCleanLinesScore(lines.length));
 
       if (tryLevelUp()) {
         Debug.get().println("提升等級!!");
@@ -414,12 +414,12 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     // 方塊頂到最高處，遊戲結束
     if (GameEvent.GAME_OVER == code) {
-      mInfoBar.setWaitNextRoundSecond(Config.get().getNextRoundDelaySecond());
+      infoBar.setWaitNextRoundSecond(Config.get().getNextRoundDelaySecond());
 
-      while (mInfoBar.getWaitNextRoundSecond() > 0) {
+      while (infoBar.getWaitNextRoundSecond() > 0) {
         repaint();
-        Debug.get().println(mInfoBar.getWaitNextRoundSecond() + "秒後開始新局...");
-        mInfoBar.addWaitNextRoundSecond(-1);
+        Debug.get().println(infoBar.getWaitNextRoundSecond() + "秒後開始新局...");
+        infoBar.addWaitNextRoundSecond(-1);
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -428,7 +428,7 @@ public class BattleView extends RepaintView implements GameEventListener {
         }
       }
       // 重置分數
-      mInfoBar.initialize();
+      infoBar.initialize();
       // 清除全畫面方塊
       gameLoop.clearBox();
 
@@ -437,7 +437,7 @@ public class BattleView extends RepaintView implements GameEventListener {
       // TODO ---test---end
 
       // 設定方塊掉落秒數
-      gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+      gameLoop.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
 
       // 當方塊到頂時，會自動將GameOver設為true,因此下次要開始時需設定遊戲為false表示可進行遊戲
       gameLoop.setGameOver(false);
@@ -447,12 +447,12 @@ public class BattleView extends RepaintView implements GameEventListener {
 
   /** 試著計算是否提升等級1級，並重設方塊掉落速度 */
   private boolean tryLevelUp() {
-    int currentLevel = mInfoBar.getLevel();
-    int newLevel = Config.get().linesConvertLevel(mInfoBar.getCleanedCount());
+    int currentLevel = infoBar.getLevel();
+    int newLevel = Config.get().linesConvertLevel(infoBar.getCleanedCount());
 
     if (currentLevel != newLevel) {
-      mInfoBar.setLevel(newLevel);
-      gameLoop.setSecond(Config.get().getBoxFallSpeed(mInfoBar.getLevel()));
+      infoBar.setLevel(newLevel);
+      gameLoop.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
       return true;
     }
     return false;
