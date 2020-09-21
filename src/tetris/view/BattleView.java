@@ -85,7 +85,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     adversaryTetris = new AdversaryTetris(value -> (int) (value * 0.5));
     adversaryTetris.setWidth(Config.get().zoom(15));
     adversaryTetris.setHeight(Config.get().zoom(15));
-    adversaryTetris.setLocation(Config.get().zoom(260), Config.get().zoom(280));
+    adversaryTetris.setLocation(Config.get().zoom(260), Config.get().zoom(270));
     add(adversaryTetris);
 
     // 分數、消除行數、等級
@@ -414,6 +414,9 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     // 方塊頂到最高處，遊戲結束
     if (GameEvent.GAME_OVER == code) {
+      // TODO ---test---begin
+      adversaryTetris.setGameOver(true);
+      // TODO ---test---end
       infoBar.setWaitNextRoundSecond(Config.get().getNextRoundDelaySecond());
 
       while (infoBar.getWaitNextRoundSecond() > 0) {

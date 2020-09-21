@@ -46,6 +46,7 @@ public class AdversaryTetris extends Role {
   private InfoBar mInfoBar;
   private Zoomable zoomable;
   private CountDownConsumer<Cube> checkClean;
+  private boolean isGameOver;
 
   public AdversaryTetris(Zoomable zoomable) {
     scoreFont = null;
@@ -81,22 +82,22 @@ public class AdversaryTetris extends Role {
 
   private void resetLocation(int x, int y) {
     boxStartX = x;
-    boxStartY = zoomable.zoom(80) + y;
+    boxStartY = Config.get().zoom(zoomable.zoom(80)) + y;
 
     singleBoxWidth = zoomable.zoom(getWidth());
     singleBoxHeight = zoomable.zoom(getHeight());
 
     // 分數位置
     levelLocationX = x;
-    levelLocationY = zoomable.zoom(20) + y;
+    levelLocationY = Config.get().zoom(zoomable.zoom(20)) + y;
     linesLocationX = x;
-    linesLocationY = zoomable.zoom(45) + y;
+    linesLocationY = Config.get().zoom(zoomable.zoom(45)) + y;
     scoreLocationX = x;
-    scoreLocationY = zoomable.zoom(70) + y;
+    scoreLocationY = Config.get().zoom(zoomable.zoom(70)) + y;
 
     // 遊戲結束
-    gameOverLocationX = zoomable.zoom(100) + x;
-    gameOverLocationY = zoomable.zoom(250) + y;
+    gameOverLocationX = Config.get().zoom(zoomable.zoom(30)) + x;
+    gameOverLocationY = Config.get().zoom(zoomable.zoom(250)) + y;
   }
 
   private void cleanLine(Cube c) {
@@ -185,8 +186,8 @@ public class AdversaryTetris extends Role {
     // 顯示分數
     showInfoBar(mInfoBar, canvas);
 
-    //    // 顯示遊戲結束，並倒數秒數
-    //    showGameOver(mInfoBar, canvas);
+    // 顯示遊戲結束
+    showGameOver(mInfoBar, canvas);
   }
 
   // 畫定住的方塊與其他背景格子
@@ -245,7 +246,7 @@ public class AdversaryTetris extends Role {
   private void showInfoBar(InfoBar info, Graphics buffImg) {
     if (scoreFont == null) {
       Font currentFont = buffImg.getFont();
-      Font newFont = currentFont.deriveFont(Font.BOLD, zoomable.zoom(20));
+      Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().zoom(zoomable.zoom(20)));
       scoreFont = newFont;
     }
     // 調整分數字型
@@ -259,7 +260,14 @@ public class AdversaryTetris extends Role {
     buffImg.drawString("LINES : " + info.getCleanedCount(), scoreLocationX, scoreLocationY);
   }
 
+  public void setGameOver(boolean gameOver) {
+    isGameOver = gameOver;
+  }
+
   private void showGameOver(InfoBar info, Graphics buffImg) {
+    if (!isGameOver) {
+      return;
+    }
     buffImg.setColor(Color.DARK_GRAY);
     buffImg.drawString("GAME OVER", gameOverLocationX, gameOverLocationY);
   }
@@ -310,6 +318,7 @@ public class AdversaryTetris extends Role {
 
   /** 重置遊戲頁面 */
   public void reset() {
+    isGameOver = false;
     // 重置分數
     mInfoBar.initialize();
     // 清除全畫面方塊
