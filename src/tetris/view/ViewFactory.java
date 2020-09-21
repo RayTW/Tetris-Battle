@@ -11,7 +11,7 @@ public class ViewFactory {
 
     switch (name) {
       case SINGLE:
-        view = new GameView(width, height);
+        view = new SingleView(width, height);
         break;
       case BATTLE:
         view = new BattleView(width, height);
