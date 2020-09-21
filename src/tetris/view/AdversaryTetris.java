@@ -62,8 +62,8 @@ public class AdversaryTetris extends Role {
 
   @Override
   public void setLocation(int x, int y) {
-    setX(x);
-    setY(y);
+    super.setX(x);
+    super.setY(y);
     resetLocation(x, y);
   }
 
@@ -80,18 +80,18 @@ public class AdversaryTetris extends Role {
   }
 
   private void resetLocation(int x, int y) {
-    boxStartX = zoomable.zoom(62) + x;
-    boxStartY = zoomable.zoom(79) + y;
+    boxStartX = x;
+    boxStartY = zoomable.zoom(80) + y;
 
     singleBoxWidth = zoomable.zoom(getWidth());
     singleBoxHeight = zoomable.zoom(getHeight());
 
     // 分數位置
-    levelLocationX = zoomable.zoom(50) + x;
+    levelLocationX = x;
     levelLocationY = zoomable.zoom(20) + y;
-    linesLocationX = zoomable.zoom(50) + x;
+    linesLocationX = x;
     linesLocationY = zoomable.zoom(45) + y;
-    scoreLocationX = zoomable.zoom(50) + x;
+    scoreLocationX = x;
     scoreLocationY = zoomable.zoom(70) + y;
 
     // 遊戲結束
