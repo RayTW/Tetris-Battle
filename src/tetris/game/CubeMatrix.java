@@ -42,12 +42,7 @@ public class CubeMatrix {
     return b.getBoxAry(0);
   }
 
-  /**
-   * 向下移1格,回傳是否可再往下移 true:可繼續下移,false:不可往下移
-   *
-   * @return
-   */
-  public boolean moveDown() {
+  public boolean tryMoveDown() {
     Cube tempNowBox = currentCube;
 
     // 判斷方塊撞到底部
@@ -56,17 +51,26 @@ public class CubeMatrix {
       return false;
     }
 
-    boolean b = true;
     int[][] nbAry = tempNowBox.getNowturnBoxAry();
     int nx = tempNowBox.getNowX();
     int ny = tempNowBox.getNowY();
 
-    if (hitTest(cube, nbAry, nx, ny + 1)) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
-      b = false;
-    } else { // 方塊沒碰撞到其他方塊，可下移
+    return !hitTest(cube, nbAry, nx, ny + 1);
+  }
+
+  /**
+   * 向下移1格,回傳是否可再往下移 true:可繼續下移,false:不可往下移
+   *
+   * @return
+   */
+  public boolean moveDown() {
+    Cube tempNowBox = currentCube;
+
+    if (tryMoveDown()) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
       tempNowBox.move(0, 1);
+      return true;
     }
-    return b;
+    return false;
   }
 
   /**

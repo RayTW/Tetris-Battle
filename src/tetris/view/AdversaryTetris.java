@@ -132,7 +132,8 @@ public class AdversaryTetris extends Role {
       }
     } else {
       if (code == KeyEvent.VK_DOWN) {
-        if (!gameBox.moveDown()) {
+        gameBox.moveDown();
+        if (!gameBox.tryMoveDown()) {
           tryCleanLine();
         }
       }
