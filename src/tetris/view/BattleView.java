@@ -8,7 +8,7 @@ import java.awt.event.MouseEvent;
 
 import tetris.Config;
 import tetris.game.GameEvent;
-import tetris.game.GameLoop;
+import tetris.game.GameFlow;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
 import util.AudioPlayer;
@@ -49,10 +49,10 @@ public class BattleView extends RepaintView implements GameEventListener {
   };
   private Color shadowColor = new Color(0, 0, 0, 128);
 
-  private GameLoop gameLoop; // 遊戲邏輯(無畫面)
+  private GameFlow gameFlow; // 遊戲邏輯(無畫面)
   private AudioPlayer backgroundMusic; // 播放背景音樂
   private InfoBar infoBar;
-  private AdversaryTetris adversaryTetris;
+  private OpponentTetris opponentTetris;
 
   public BattleView(int width, int height) {
     super(width, height);
@@ -82,28 +82,28 @@ public class BattleView extends RepaintView implements GameEventListener {
     nextRoundCountdownSecondLocationX = Config.get().zoom(155);
     nextRoundCountdownSecondLocationY = Config.get().zoom(270);
 
-    adversaryTetris = new AdversaryTetris(value -> (int) (value * 0.5));
-    adversaryTetris.setWidth(Config.get().zoom(15));
-    adversaryTetris.setHeight(Config.get().zoom(15));
-    adversaryTetris.setLocation(Config.get().zoom(260), Config.get().zoom(270));
-    add(adversaryTetris);
+    opponentTetris = new OpponentTetris(value -> (int) (value * 0.5));
+    opponentTetris.setWidth(Config.get().zoom(15));
+    opponentTetris.setHeight(Config.get().zoom(15));
+    opponentTetris.setLocation(Config.get().zoom(260), Config.get().zoom(270));
+    add(opponentTetris);
 
     // 分數、消除行數、等級
     infoBar = new InfoBar();
     // 建立遊戲邏輯
-    gameLoop = new GameLoop();
+    gameFlow = new GameFlow();
 
     // 設定使用GameView代理遊戲邏輯進行畫面的繪圖
-    gameLoop.setEventListener(this);
+    gameFlow.setEventListener(this);
 
     // 設定方塊掉落秒數為
-    gameLoop.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
+    gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
 
     // 設定下次要出現的方塊style個數為顯示3個
-    boxBuffer = getBufBox(gameLoop, nextBoxCount);
+    boxBuffer = getBufBox(gameFlow, nextBoxCount);
 
     // 啟動遊戲邏輯執行緒
-    gameLoop.startGame();
+    gameFlow.start();
   }
 
   private AudioPlayer playMusic(String path) {
@@ -131,27 +131,27 @@ public class BattleView extends RepaintView implements GameEventListener {
   // 接收鍵盤事件
   @Override
   public void onKeyCode(int code) {
-    if (gameLoop.isGameOver()) {
+    if (gameFlow.isGameOver()) {
       return;
     }
     if (code == KeyEvent.VK_ESCAPE) {
       changeView(ViewName.MENU);
       return;
     }
-    if (!gameLoop.isPause()) {
+    if (!gameFlow.isPause()) {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
-          gameLoop.turnRight();
+          gameFlow.turnRight();
           onEvent(GameEvent.BOX_TURN, null);
           break;
         case KeyEvent.VK_DOWN: // 下,下移方塊
           moveDown();
           break;
         case KeyEvent.VK_LEFT: // 左,左移方塊
-          gameLoop.moveLeft();
+          gameFlow.moveLeft();
           break;
         case KeyEvent.VK_RIGHT: // 右,右移方塊
-          gameLoop.moveRight();
+          gameFlow.moveRight();
           break;
         case KeyEvent.VK_SPACE: // 空白鍵,快速掉落方塊
           quickDown();
@@ -159,7 +159,7 @@ public class BattleView extends RepaintView implements GameEventListener {
         default:
       }
       // TODO ---test---begin
-      adversaryTetris.onKeyCode(code, false);
+      opponentTetris.onKeyCode(code, false);
       // TODO ---test---end
     }
 
@@ -168,15 +168,15 @@ public class BattleView extends RepaintView implements GameEventListener {
   }
 
   private void moveDown() {
-    if (gameLoop.moveDown()) {
+    if (gameFlow.moveDown()) {
       infoBar.addScore(Config.get().getMoveDownScore());
     }
   }
 
   private void quickDown() {
-    int befor = gameLoop.getNowBoxXY()[1];
-    gameLoop.quickDown();
-    int after = gameLoop.getNowBoxXY()[1];
+    int befor = gameFlow.getNowBoxXY()[1];
+    gameFlow.quickDown();
+    int after = gameFlow.getNowBoxXY()[1];
     // 若方塊快速落到底，再另外加分數
     int quickDownScore = after - befor;
 
@@ -193,15 +193,15 @@ public class BattleView extends RepaintView implements GameEventListener {
     canvas.setColor(Color.BLACK);
 
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
-    int[][] boxAry = gameLoop.getBoxAry();
+    int[][] boxAry = gameFlow.getBoxAry();
     showBacegroundBox(boxAry, canvas);
 
     // 畫掉落中的方塊
-    int[] xy = gameLoop.getNowBoxXY();
-    int[][] box = gameLoop.getNowBoxAry();
+    int[] xy = gameFlow.getNowBoxXY();
+    int[][] box = gameFlow.getNowBoxAry();
 
     // 畫陰影
-    shadow(xy, box, canvas, gameLoop.getDownY());
+    shadow(xy, box, canvas, gameFlow.getDownY());
 
     showDownBox(xy, box, canvas);
 
@@ -307,7 +307,7 @@ public class BattleView extends RepaintView implements GameEventListener {
   }
 
   private void showGameOver(InfoBar info, Graphics buffImg) {
-    if (gameLoop.isGameOver()) {
+    if (gameFlow.isGameOver()) {
       buffImg.setColor(Color.DARK_GRAY);
       buffImg.drawString("GAME OVER", gameOverLocationX, gameOverLocationY);
 
@@ -344,7 +344,7 @@ public class BattleView extends RepaintView implements GameEventListener {
    * @param tetris
    * @return
    */
-  public int[][][] getBufBox(GameLoop tetris, int cnt) {
+  public int[][][] getBufBox(GameFlow tetris, int cnt) {
     String[] bufbox = tetris.getAnyCountBox(cnt);
     int[][][] ary = new int[bufbox.length][][];
     for (int i = 0; i < bufbox.length; i++) {
@@ -368,7 +368,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     // 方塊下移
     if (GameEvent.BOX_MOVE_DOWN == code) {
       // TODO ---test---begin
-      adversaryTetris.onKeyCode(KeyEvent.VK_DOWN, true);
+      opponentTetris.onKeyCode(KeyEvent.VK_DOWN, true);
       // TODO ---test---end
       return;
     }
@@ -381,13 +381,13 @@ public class BattleView extends RepaintView implements GameEventListener {
     // 建立完下一個方塊
     if (GameEvent.BOX_NEW == code) {
       // TODO ---test---begin
-      adversaryTetris.createCube(Integer.parseInt(data));
+      opponentTetris.createCube(Integer.parseInt(data));
       // TODO ---test---end
       return;
     }
     // 建立完下一個方塊
     if (GameEvent.BOX_NEXT == code) {
-      boxBuffer = getBufBox(gameLoop, nextBoxCount);
+      boxBuffer = getBufBox(gameFlow, nextBoxCount);
       return;
     }
     // 有方塊可清除,將要清除方塊,可取得要消去的方塊資料
@@ -415,7 +415,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     // 方塊頂到最高處，遊戲結束
     if (GameEvent.GAME_OVER == code) {
       // TODO ---test---begin
-      adversaryTetris.setGameOver(true);
+      opponentTetris.setGameOver(true);
       // TODO ---test---end
       infoBar.setWaitNextRoundSecond(Config.get().getNextRoundDelaySecond());
 
@@ -433,17 +433,17 @@ public class BattleView extends RepaintView implements GameEventListener {
       // 重置分數
       infoBar.initialize();
       // 清除全畫面方塊
-      gameLoop.clearBox();
+      gameFlow.clearBox();
 
       // TODO ---test---begin
-      adversaryTetris.reset();
+      opponentTetris.reset();
       // TODO ---test---end
 
       // 設定方塊掉落秒數
-      gameLoop.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
+      gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
 
       // 當方塊到頂時，會自動將GameOver設為true,因此下次要開始時需設定遊戲為false表示可進行遊戲
-      gameLoop.setGameOver(false);
+      gameFlow.setGameOver(false);
     }
     return;
   }
@@ -455,7 +455,7 @@ public class BattleView extends RepaintView implements GameEventListener {
 
     if (currentLevel != newLevel) {
       infoBar.setLevel(newLevel);
-      gameLoop.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
+      gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
       return true;
     }
     return false;
@@ -464,6 +464,7 @@ public class BattleView extends RepaintView implements GameEventListener {
   @Override
   public void release() {
     backgroundMusic.stop();
-    adversaryTetris.close();
+    opponentTetris.close();
+    gameFlow.stop();
   }
 }

@@ -1,16 +1,17 @@
 package util;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class CountDownConsumer<T> {
   private CountDownLatch latch;
   private T object;
   private Consumer<T> consumer;
-  private boolean isStop;
+  private AtomicBoolean isStop;
 
   public CountDownConsumer() {
-    isStop = false;
+    isStop = new AtomicBoolean(false);
   }
 
   public void setConsumer(Consumer<T> consumer) {
@@ -31,8 +32,8 @@ public class CountDownConsumer<T> {
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-        consumer.accept(object);
-        if (!isStop) {
+        if (!isStop.get()) {
+          consumer.accept(object);
           CountDownConsumer.this.start();
         }
       }
@@ -44,7 +45,7 @@ public class CountDownConsumer<T> {
   }
 
   public void stop() {
-    isStop = true;
+    isStop.set(true);
     while (latch.getCount() > 0) {
       latch.countDown();
     }

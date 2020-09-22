@@ -7,7 +7,7 @@ import java.awt.event.KeyEvent;
 import tetris.Config;
 import tetris.game.Cube;
 import tetris.game.CubeMatrix;
-import tetris.game.GameLoop;
+import tetris.game.GameFlow;
 import tetris.view.component.Role;
 import util.CountDownConsumer;
 
@@ -16,7 +16,7 @@ import util.CountDownConsumer;
  *
  * @author Ray
  */
-public class AdversaryTetris extends Role {
+public class OpponentTetris extends Role {
   private CubeMatrix gameBox;
   private int boxStartX; // 掉落方塊的初始位置x
   private int boxStartY; // 掉落方塊的初始位置y
@@ -48,7 +48,7 @@ public class AdversaryTetris extends Role {
   private CountDownConsumer<Cube> checkClean;
   private boolean isGameOver;
 
-  public AdversaryTetris(Zoomable zoomable) {
+  public OpponentTetris(Zoomable zoomable) {
     scoreFont = null;
     this.zoomable = zoomable;
     gameBox = new CubeMatrix();
@@ -298,7 +298,7 @@ public class AdversaryTetris extends Role {
    * @param tetris
    * @return
    */
-  public int[][][] getBufBox(GameLoop tetris, int cnt) {
+  public int[][][] getBufBox(GameFlow tetris, int cnt) {
     String[] bufbox = tetris.getAnyCountBox(cnt);
     int[][][] ary = new int[bufbox.length][][];
     for (int i = 0; i < bufbox.length; i++) {

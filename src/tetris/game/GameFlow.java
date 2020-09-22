@@ -9,7 +9,7 @@ import util.CountDownConsumer;
  *
  * @author Ray
  */
-public class GameLoop implements Runnable {
+public class GameFlow implements Runnable {
   private float sec;
   private Random rand;
   private CubeMatrix gameBox;
@@ -24,7 +24,7 @@ public class GameLoop implements Runnable {
   private int flag; // 目前使用的方塊位置
   private String[] styleBuffer; // 預戴方塊buffer區
 
-  public GameLoop() {
+  public GameFlow() {
     isRun = true;
     rand = new Random();
     checkClean = new CountDownConsumer<>();
@@ -43,12 +43,12 @@ public class GameLoop implements Runnable {
     setBoxList(getRandBox(5)); // 設定使用5組亂數排列方塊進行遊戲
   }
 
-  public void startGame() {
+  public void start() {
     thread = new Thread(this);
     thread.start();
   }
 
-  public void stopGame() {
+  public void stop() {
     isRun = false;
     isGameOver = true;
     thread.interrupt();
@@ -74,7 +74,10 @@ public class GameLoop implements Runnable {
       } catch (InterruptedException e) {
       }
     }
-    close();
+    eventListener = null;
+    rand = null;
+    gameBox = null;
+    styleBuffer = null;
   }
 
   /**
@@ -400,14 +403,6 @@ public class GameLoop implements Runnable {
    */
   public int getDownY() {
     return gameBox.getDownY();
-  }
-
-  private void close() {
-    checkClean.countDown();
-    eventListener = null;
-    rand = null;
-    gameBox = null;
-    styleBuffer = null;
   }
 
   /**
