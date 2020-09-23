@@ -135,7 +135,7 @@ public class SingleView extends RepaintView implements GameEventListener {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
           gameFlow.turnRight();
-          onEvent(GameEvent.BOX_TURN, null);
+          playSound("sound/turn.wav");
           break;
         case KeyEvent.VK_DOWN: // 下,下移方塊
           moveDown();
@@ -358,11 +358,6 @@ public class SingleView extends RepaintView implements GameEventListener {
     // 收到重畫自己畫面的陣列
     if (GameEvent.REPAINT == code) {
       repaint();
-      return;
-    }
-    if (GameEvent.BOX_TURN == code) {
-      playSound("sound/turn.wav");
-
       return;
     }
     // 方塊落到底

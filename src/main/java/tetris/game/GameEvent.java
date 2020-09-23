@@ -6,11 +6,10 @@ package tetris.game;
  * @author Ray
  */
 public enum GameEvent {
+  /** 遊戲開始 */
   GAME_START,
   /** 重畫畫面的全部方塊陣列 */
   REPAINT,
-  /** 方塊旋轉 */
-  BOX_TURN,
   /** 方塊落到底 */
   BOX_DOWN,
   /** 方塊下移 */
