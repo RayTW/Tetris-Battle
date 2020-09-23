@@ -57,6 +57,7 @@ public class GameFlow implements Runnable {
 
   @Override
   public void run() {
+    publishEvent(GameEvent.GAME_START, "");
     // 遊戲開始才建立第1個方塊
     nextCreateBox();
     while (isRun) {
@@ -287,7 +288,7 @@ public class GameFlow implements Runnable {
    * @param code
    * @param data
    */
-  public void publishEvent(GameEvent code, String data) {
+  public void publishEvent(GameEvent code, Object data) {
     if (eventListener != null) {
       eventListener.onEvent(code, data);
     }
@@ -339,6 +340,7 @@ public class GameFlow implements Runnable {
       return;
     }
     gameBox.addBox(c);
+    publishEvent(GameEvent.CLEAN_LINE_BEFORE, c);
     publishEvent(GameEvent.REPAINT, "");
     publishEvent(GameEvent.BOX_DOWN, "");
 

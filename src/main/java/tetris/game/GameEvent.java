@@ -6,6 +6,7 @@ package tetris.game;
  * @author Ray
  */
 public enum GameEvent {
+  GAME_START,
   /** 重畫畫面的全部方塊陣列 */
   REPAINT,
   /** 方塊旋轉 */
@@ -18,6 +19,7 @@ public enum GameEvent {
   BOX_NEW,
   /** 建立完下一個方塊 */
   BOX_NEXT,
+  CLEAN_LINE_BEFORE,
   /** 有方塊可清除,將要清除方塊,可取得要消去的方塊資料 */
   CLEANING_LINE,
   /** 方塊清除完成 */

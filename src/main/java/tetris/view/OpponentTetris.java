@@ -4,12 +4,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import org.json.JSONObject;
 import tetris.Config;
-import tetris.game.Cube;
 import tetris.game.CubeMatrix;
 import tetris.game.GameFlow;
 import tetris.view.component.Role;
-import util.CountDownConsumer;
 
 /**
  * 映射對戰對手的畫面
@@ -41,12 +44,14 @@ public class OpponentTetris extends Role {
     new Color(255, 0, 255, 250),
     new Color(50, 100, 150, 250)
   };
-  private Color mShadowColor = new Color(0, 0, 0, 128);
+  private Color shadowColor = new Color(0, 0, 0, 128);
 
-  private InfoBar mInfoBar;
+  private InfoBar infoBar;
   private Zoomable zoomable;
-  private CountDownConsumer<Cube> checkClean;
-  private boolean isGameOver;
+  private Status status = Status.INIT;
+  private List<KeyCodeEvent> keyCodeQueue = Collections.synchronizedList(new LinkedList<>());
+  private Thread queueComsumerThread;
+  private boolean queueThreadRunning;
 
   public OpponentTetris(Zoomable zoomable) {
     scoreFont = null;
@@ -55,10 +60,80 @@ public class OpponentTetris extends Role {
     resetLocation(0, 0);
 
     // 分數、消除行數、等級
-    mInfoBar = new InfoBar();
-    checkClean = new CountDownConsumer<>();
-    checkClean.setConsumer(this::cleanLine);
-    checkClean.start();
+    infoBar = new InfoBar();
+
+    queueThreadRunning = true;
+    queueComsumerThread = new Thread(this::processKeyCodeEvent);
+    queueComsumerThread.start();
+  }
+
+  public void addkeyCode(int code, boolean simulation) {
+    JSONObject json = new JSONObject();
+    json.put("code", code);
+    json.put("simulation", simulation);
+    keyCodeQueue.add(new KeyCodeEvent(10, json));
+  }
+
+  public void addKeyCodeEvent(KeyCodeEvent event) {
+    keyCodeQueue.add(event);
+  }
+
+  public void addKeyCodeEvent(Consumer<KeyCodeEvent> consumer) {
+    KeyCodeEvent e = new KeyCodeEvent();
+    e.json = new JSONObject();
+
+    consumer.accept(e);
+
+    keyCodeQueue.add(e);
+  }
+
+  private void processKeyCodeEvent() {
+    while (queueThreadRunning) {
+
+      while (keyCodeQueue.size() > 0) {
+        KeyCodeEvent event = keyCodeQueue.remove(0);
+        if (event.getEvent() == 10) {
+          int code = event.getJson().getInt("code");
+          boolean simulation = event.getJson().getBoolean("simulation");
+
+          onKeyCode(code, simulation);
+        } else if (event.getEvent() == 2) {
+          // sync score
+        } else if (event.getEvent() == 20) {
+          createCube(event.getJson().getInt("style"));
+        } else if (event.getEvent() == 40) {
+          String cube = event.getJson().getString("cube");
+          int x = event.getJson().getInt("x");
+          int y = event.getJson().getInt("y");
+          int style = event.getJson().getInt("style");
+
+          cleanLine(toArray(cube), x, y, style);
+        } else if (event.getEvent() == 0) {
+          reset();
+        } else if (event.getEvent() == 30) {
+          status = Status.GAME_OVER;
+        } else if (event.getEvent() == 1) {
+          status = Status.PLAYING;
+        }
+        Thread.yield();
+      }
+    }
+  }
+
+  private int[][] toArray(String temp) {
+    String[] ary = temp.split("],");
+    String[] inner = null;
+    int[][] result = new int[ary.length][];
+
+    for (int i = 0; i < ary.length; i++) {
+      ary[i] = ary[i].replace("[", "").replace("]", "");
+      inner = ary[i].split("[,]");
+      result[i] = new int[inner.length];
+      for (int j = 0; j < inner.length; j++) {
+        result[i][j] = Integer.parseInt(inner[j].trim());
+      }
+    }
+    return result;
   }
 
   @Override
@@ -100,8 +175,8 @@ public class OpponentTetris extends Role {
     gameOverLocationY = Config.get().zoom(zoomable.zoom(250)) + y;
   }
 
-  private void cleanLine(Cube c) {
-    gameBox.addBox(c);
+  private void cleanLine(int[][] b, int x, int y, int style) {
+    gameBox.addBox(b, x, y, style);
     // 取得可消除的行數
     String lineData = gameBox.getClearLine();
 
@@ -111,14 +186,14 @@ public class OpponentTetris extends Role {
   }
 
   // 接收鍵盤事件
-  public void onKeyCode(int code, boolean simulation) {
+  private void onKeyCode(int code, boolean simulation) {
     if (!simulation) {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
           gameBox.turnRight();
           break;
         case KeyEvent.VK_DOWN: // 下,下移方塊
-          moveDown();
+          gameBox.moveDown();
           break;
         case KeyEvent.VK_LEFT: // 左,左移方塊
           gameBox.moveLeft();
@@ -127,44 +202,15 @@ public class OpponentTetris extends Role {
           gameBox.moveRight();
           break;
         case KeyEvent.VK_SPACE: // 空白鍵,快速掉落方塊
-          quickDown();
+          gameBox.quickDown();
           break;
         default:
       }
     } else {
       if (code == KeyEvent.VK_DOWN) {
         gameBox.moveDown();
-        if (!gameBox.tryMoveDown()) {
-          tryCleanLine();
-        }
       }
     }
-  }
-
-  private void moveDown() {
-    if (gameBox.moveDown()) {
-      mInfoBar.addScore(Config.get().getMoveDownScore());
-    } else {
-      tryCleanLine();
-    }
-  }
-
-  private void quickDown() {
-    int befor = gameBox.getNowBoxXY()[1];
-    gameBox.quickDown();
-    int after = gameBox.getNowBoxXY()[1];
-    // 若方塊快速落到底，再另外加分數
-    int quickDownScore = after - befor;
-
-    if (quickDownScore > 0) {
-      mInfoBar.addScore(quickDownScore * Config.get().getQuickDownScore());
-    }
-    tryCleanLine();
-  }
-
-  private void tryCleanLine() {
-    checkClean.set(gameBox.getCube());
-    checkClean.countDown();
   }
 
   // 雙緩衝區繪圖
@@ -174,20 +220,22 @@ public class OpponentTetris extends Role {
     int[][] boxAry = gameBox.getMatrix();
     showBacegroundBox(boxAry, canvas);
 
-    // 畫掉落中的方塊
-    int[] xy = gameBox.getNowBoxXY();
-    int[][] box = gameBox.getCurrentCube();
+    if (gameBox.getCube() != null) {
+      // 畫掉落中的方塊
+      int[] xy = gameBox.getNowBoxXY();
+      int[][] box = gameBox.getCurrentCube();
 
-    // 畫陰影
-    shadow(xy, box, canvas, gameBox.getDownY());
+      // 畫陰影
+      shadow(xy, box, canvas, gameBox.getDownY());
 
-    showDownBox(xy, box, canvas);
+      showDownBox(xy, box, canvas);
+    }
 
     // 顯示分數
-    showInfoBar(mInfoBar, canvas);
+    showInfoBar(infoBar, canvas);
 
     // 顯示遊戲結束
-    showGameOver(mInfoBar, canvas);
+    showGameOver(infoBar, canvas);
   }
 
   // 畫定住的方塊與其他背景格子
@@ -227,7 +275,7 @@ public class OpponentTetris extends Role {
   // 畫陰影
   private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
     int boxX = xy[0];
-    buffImg.setColor(mShadowColor);
+    buffImg.setColor(shadowColor);
     for (int i = 0; i < box.length; i++) {
       for (int j = 0; j < box[i].length; j++) {
         int style = box[i][j];
@@ -260,12 +308,8 @@ public class OpponentTetris extends Role {
     buffImg.drawString("LINES : " + info.getCleanedCount(), scoreLocationX, scoreLocationY);
   }
 
-  public void setGameOver(boolean gameOver) {
-    isGameOver = gameOver;
-  }
-
   private void showGameOver(InfoBar info, Graphics buffImg) {
-    if (!isGameOver) {
+    if (status != Status.GAME_OVER) {
       return;
     }
     buffImg.setColor(Color.DARK_GRAY);
@@ -317,19 +361,51 @@ public class OpponentTetris extends Role {
   }
 
   /** 重置遊戲頁面 */
-  public void reset() {
-    isGameOver = false;
+  private void reset() {
+    status = Status.INIT;
     // 重置分數
-    mInfoBar.initialize();
+    infoBar.initialize();
     // 清除全畫面方塊
     gameBox.clearAllCube();
   }
 
   public void close() {
-    checkClean.stop();
+    queueThreadRunning = false;
+    queueComsumerThread.interrupt();
   }
 
   public static interface Zoomable {
     int zoom(int n);
+  }
+
+  public static class KeyCodeEvent {
+    private int event; // 0:reset, 1:game start, 2:sync score, 10 : 建方塊, 20 : keycode, 30:game
+    // over,40:cleanLine
+    private JSONObject json;
+
+    public KeyCodeEvent() {}
+
+    public KeyCodeEvent(int event, JSONObject json) {
+      this.event = event;
+      this.json = json;
+    }
+
+    public void setEvent(int event) {
+      this.event = event;
+    }
+
+    public int getEvent() {
+      return event;
+    }
+
+    public JSONObject getJson() {
+      return json;
+    }
+  }
+
+  enum Status {
+    INIT,
+    PLAYING,
+    GAME_OVER
   }
 }

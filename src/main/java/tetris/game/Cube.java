@@ -28,28 +28,28 @@ public class Cube {
     STYLE1, STYLE2, STYLE3, STYLE4, STYLE5, STYLE6, STYLE7
   };
 
-  private int mNowX; // 目前的x位置
-  private int mNowY; // 目前的y位置
+  private int nowX; // 目前的x位置
+  private int nowY; // 目前的y位置
 
-  private int mNowturn; // 目前的轉向
-  private int mStyle; // 此方塊種類代碼
-  private int[][][] mBoxAry; // 此方塊轉向後的值
-  private int[][] mHW; // 此方塊轉向後的高、寬
+  private int nowturn; // 目前的轉向
+  private int style; // 此方塊種類代碼
+  private int[][][] boxAry; // 此方塊轉向後的值
+  private int[][] hw; // 此方塊轉向後的高、寬
 
   public Cube() {
     initialize();
   }
 
   public void initialize() {
-    mNowturn = 0;
-    mBoxAry = new int[0][0][0];
-    mStyle = 1;
-    mHW = new int[0][0];
+    nowturn = 0;
+    boxAry = new int[0][0][0];
+    style = 1;
+    hw = new int[0][0];
   }
 
   public void resetXY() {
-    mNowX = 0;
-    mNowY = 0;
+    nowX = 0;
+    nowY = 0;
   }
 
   /**
@@ -61,7 +61,7 @@ public class Cube {
    * 6.T型<br>
    * 7.反閃電 <br>
    *
-   * @param mStyle
+   * @param style
    */
   public void setBoxData(int s) {
     if (s < 0 || s > STYLE_LIST.length) {
@@ -69,7 +69,7 @@ public class Cube {
       return;
     }
     String data = STYLE_LIST[s - 1];
-    mStyle = s;
+    style = s;
     setStyleData(data);
   }
 
@@ -82,8 +82,8 @@ public class Cube {
    */
   public void setStyleData(String data) {
     String[] ary = data.split("[@]");
-    mBoxAry = new int[ary.length][][];
-    mHW = new int[ary.length][2];
+    boxAry = new int[ary.length][][];
+    hw = new int[ary.length][2];
 
     for (int i = 0; i < ary.length; i++) {
       String[] box = ary[i].split("[|]");
@@ -105,22 +105,22 @@ public class Cube {
       }
       h++;
       w++;
-      mHW[i][0] = h;
-      mHW[i][1] = w;
+      hw[i][0] = h;
+      hw[i][1] = w;
 
-      mBoxAry[i] = new int[h][w];
+      boxAry[i] = new int[h][w];
 
       for (int j = 0; j < box.length; j++) {
         String[] bAry = box[j].split("[,]");
         int x = bAry[0].charAt(0) - '0';
         int y = bAry[1].charAt(0) - '0';
-        mBoxAry[i][x][y] = mStyle;
+        boxAry[i][x][y] = style;
       }
     }
   }
 
   public int getStyle() {
-    return mStyle;
+    return style;
   }
 
   /**
@@ -138,7 +138,7 @@ public class Cube {
    * @param n
    */
   public void setTurn(int n) {
-    mNowturn = n;
+    nowturn = n;
   }
 
   /**
@@ -147,11 +147,11 @@ public class Cube {
    * @return
    */
   public int getTurn() {
-    return mNowturn;
+    return nowturn;
   }
 
   public int nextTurn(int n) {
-    int tmpTurn = mNowturn;
+    int tmpTurn = nowturn;
 
     tmpTurn += n;
     if (tmpTurn < 0) {
@@ -165,16 +165,16 @@ public class Cube {
 
   /** 逆時針轉向 */
   public void turnLeft() {
-    mNowturn--;
-    if (mNowturn < 0) {
-      mNowturn = getTrunKind() - 1;
+    nowturn--;
+    if (nowturn < 0) {
+      nowturn = getTrunKind() - 1;
     }
   }
 
   /** 順時針轉向 */
   public void turnRight() {
-    mNowturn++;
-    mNowturn %= getTrunKind();
+    nowturn++;
+    nowturn %= getTrunKind();
   }
 
   /**
@@ -183,7 +183,7 @@ public class Cube {
    * @return
    */
   public int getTrunKind() {
-    return mBoxAry.length;
+    return boxAry.length;
   }
 
   /**
@@ -193,8 +193,8 @@ public class Cube {
    * @return
    */
   public int getWight(int n) {
-    if (n >= 0 && n < mHW.length) {
-      return mHW[n][1];
+    if (n >= 0 && n < hw.length) {
+      return hw[n][1];
     }
     return 0;
   }
@@ -205,7 +205,7 @@ public class Cube {
    * @return
    */
   public int getNowTurnWight() {
-    return getWight(mNowturn);
+    return getWight(nowturn);
   }
 
   /**
@@ -215,8 +215,8 @@ public class Cube {
    * @return
    */
   public int getHeight(int n) {
-    if (n >= 0 && n < mHW.length) {
-      return mHW[n][0];
+    if (n >= 0 && n < hw.length) {
+      return hw[n][0];
     }
     return 0;
   }
@@ -227,7 +227,7 @@ public class Cube {
    * @return
    */
   public int getNowTurnHeight() {
-    return getHeight(mNowturn);
+    return getHeight(nowturn);
   }
 
   /**
@@ -236,7 +236,7 @@ public class Cube {
    * @return
    */
   public int[][] getNowturnBoxAry() {
-    return getBoxAry(mNowturn);
+    return getBoxAry(nowturn);
   }
 
   /**
@@ -245,7 +245,7 @@ public class Cube {
    * @return
    */
   public String getNowturnBoxStyleStr() {
-    return getBoxStyleStr(mNowturn);
+    return getBoxStyleStr(nowturn);
   }
 
   /**
@@ -255,8 +255,8 @@ public class Cube {
    * @return
    */
   public int[][] getBoxAry(int index) {
-    if (index >= 0 && index < mBoxAry.length) {
-      return mBoxAry[index];
+    if (index >= 0 && index < boxAry.length) {
+      return boxAry[index];
     }
     return null;
   }
@@ -268,8 +268,8 @@ public class Cube {
    * @return
    */
   public String getBoxStyleStr(int index) {
-    if (index >= 0 && index < mBoxAry.length) {
-      String data = STYLE_LIST[mStyle - 1];
+    if (index >= 0 && index < boxAry.length) {
+      String data = STYLE_LIST[style - 1];
       String[] ary = data.split("[@]");
       return ary[index];
     }
@@ -283,19 +283,19 @@ public class Cube {
    * @param y
    */
   public void move(int x, int y) {
-    mNowY += y;
-    mNowX += x;
+    nowY += y;
+    nowX += x;
   }
 
   public void setNowX(int x) {
-    mNowX = x;
+    nowX = x;
   }
 
   public int getNowX() {
-    return mNowX;
+    return nowX;
   }
 
   public int getNowY() {
-    return mNowY;
+    return nowY;
   }
 }

@@ -516,6 +516,16 @@ public class CubeMatrix {
     }
   }
 
+  public void addBox(int[][] b, int x, int y, int style) {
+    int[][] tempBoxAry = cube;
+
+    for (int i = 0; i < b.length; i++) {
+      for (int j = 0; j < b[i].length; j++) {
+        if (b[i][j] > 0) tempBoxAry[i + y][j + x] = style;
+      }
+    }
+  }
+
   /**
    * @param lineData
    * @param isGap
