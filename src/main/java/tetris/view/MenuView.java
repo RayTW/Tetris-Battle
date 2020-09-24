@@ -3,8 +3,6 @@ package tetris.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
-import java.util.concurrent.TimeUnit;
-
 import tetris.Config;
 import tetris.view.component.RepaintView;
 import util.Pair;
@@ -19,8 +17,6 @@ public class MenuView extends RepaintView {
   private Label singleText; // 單人遊玩選項
   private Label battleText; // 單人遊玩選項
   private FlashLabel pressEnter;
-  private boolean isRepain = true;
-  private Thread repainThread;
   private int arrow;
 
   @SuppressWarnings("unchecked")
@@ -32,22 +28,10 @@ public class MenuView extends RepaintView {
 
   public MenuView(int width, int height) {
     super(width, height);
-    repainThread =
-        new Thread(
-            () -> {
-              while (isRepain) {
-                try {
-                  TimeUnit.MILLISECONDS.sleep(33);
-                  repaint();
-                } catch (InterruptedException e) {
-                }
-              }
-            });
-    repainThread.start();
   }
 
   @Override
-  public void initialize() {
+  public void init() {
     Config config = Config.get();
 
     menuTitle =
@@ -114,7 +98,6 @@ public class MenuView extends RepaintView {
 
   @Override
   public void release() {
-    isRepain = false;
-    repainThread.interrupt();
+    super.release();
   }
 }

@@ -40,6 +40,13 @@ public class Config {
   // 可顯示將要的掉落方塊個數(畫面右側)
   private int nextBoxs = 3;
 
+  // 是否顯示目前畫面的fps
+  private boolean displayFps;
+  // 設定fps上限
+  private int maxFps;
+  // 畫面刷新間隔ms
+  private int repainMills;
+
   private Config() {}
 
   public static Config get() {
@@ -53,6 +60,41 @@ public class Config {
    */
   public String getVersion() {
     return version;
+  }
+
+  /**
+   * 設定遊戲畫面縮放比
+   *
+   * @param scale 縮放比 0.0 ~ 2.0，預設1.3
+   */
+  public void setScreenScale(double scale) {
+    screenScale = scale;
+  }
+
+  public void setMaxFps(int fps) {
+    if (fps > 60) {
+      fps = 60;
+    } else if (fps < 1) {
+      fps = 1;
+    }
+    this.maxFps = fps;
+    repainMills = 1000 / fps;
+  }
+
+  public int getMaxFps() {
+    return maxFps;
+  }
+
+  public int getRepainMills() {
+    return repainMills;
+  }
+
+  public void setDisplayFps(boolean enable) {
+    displayFps = enable;
+  }
+
+  public boolean isDisplayFps() {
+    return displayFps;
   }
 
   /**

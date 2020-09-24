@@ -1,10 +1,17 @@
 package tetris.view.component;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.swing.SwingUtilities;
+
+import tetris.Config;
+import util.FpsCounter;
 
 /**
  * 可繪圖的view.
@@ -18,6 +25,10 @@ public class RepaintView extends ComponentView {
   private int screenWidth;
   private int screenHeight;
   private List<Role> rolePool;
+  private boolean isRepain = true;
+  private Font fpsFont;
+  private Thread repainThread;
+  private FpsCounter fpsCounter;
 
   public RepaintView(int width, int height) {
     rolePool = new CopyOnWriteArrayList<>();
@@ -25,7 +36,17 @@ public class RepaintView extends ComponentView {
     screenHeight = height;
     // 設定畫面大小
     setSize(width, height);
+    repainThread = new Thread(this::doRepain);
+    fpsCounter = new FpsCounter();
   }
+
+  public final void initialize() {
+    init();
+    repainThread.start();
+    fpsCounter.start();
+  }
+
+  public void init() {}
 
   // 雙緩衝區繪圖
   @Override
@@ -40,6 +61,21 @@ public class RepaintView extends ComponentView {
     canvas = canvasBuffer.getGraphics();
 
     onPaintComponent(canvas);
+    fpsCounter.frame();
+
+    if (Config.get().isDisplayFps()) {
+      if (fpsFont == null) {
+        Font currentFont = canvas.getFont();
+        Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().zoom(14));
+        fpsFont = newFont;
+      }
+      canvas.setColor(Color.BLACK);
+      canvas.setFont(fpsFont);
+      canvas.drawString(
+          "FPS:" + fpsCounter.get() + "/" + Config.get().getMaxFps(),
+          getWidth() - Config.get().zoom(80),
+          Config.get().zoom(20));
+    }
 
     // 將暫存的圖，畫到前景
     g.drawImage(canvasBuffer, 0, 0, this);
@@ -63,5 +99,25 @@ public class RepaintView extends ComponentView {
         .filter(o -> (o instanceof ClickableRole) && o.hitTest(e.getX(), e.getY(), 2, 2))
         .map(ClickableRole.class::cast)
         .forEach(r -> r.onClick());
+  }
+
+  private void doRepain() {
+    while (isRepain) {
+      try {
+        Thread.sleep(Config.get().getRepainMills());
+        try {
+          SwingUtilities.invokeAndWait(super::repaint);
+        } catch (InvocationTargetException e) {
+          e.printStackTrace();
+        }
+      } catch (InterruptedException e) {
+      }
+    }
+  }
+
+  public void release() {
+    isRepain = false;
+    repainThread.interrupt();
+    fpsCounter.stop();
   }
 }

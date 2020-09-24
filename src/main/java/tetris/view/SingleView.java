@@ -59,7 +59,7 @@ public class SingleView extends RepaintView implements GameEventListener {
   }
 
   @Override
-  public void initialize() {
+  public void init() {
     scoreFont = null;
     Config config = Config.get();
 
@@ -160,9 +160,6 @@ public class SingleView extends RepaintView implements GameEventListener {
         gameFlow.rusme();
       }
     }
-
-    // 每次按了鍵盤就將畫面重繪
-    repaint();
   }
 
   private void moveDown() {
@@ -438,6 +435,7 @@ public class SingleView extends RepaintView implements GameEventListener {
 
   @Override
   public void release() {
+    super.release();
     backgroundMusic.stop();
     gameFlow.stop();
   }

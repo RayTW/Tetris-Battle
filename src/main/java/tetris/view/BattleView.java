@@ -62,7 +62,7 @@ public class BattleView extends RepaintView implements GameEventListener {
   }
 
   @Override
-  public void initialize() {
+  public void init() {
     scoreFont = null;
     Config config = Config.get();
 
@@ -494,6 +494,7 @@ public class BattleView extends RepaintView implements GameEventListener {
 
   @Override
   public void release() {
+    super.release();
     backgroundMusic.stop();
     opponentTetris.close();
     gameFlow.stop();
