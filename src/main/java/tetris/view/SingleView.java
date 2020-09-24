@@ -5,8 +5,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-
 import tetris.Config;
+import tetris.game.AudioManager;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
 import tetris.view.component.Label;
@@ -58,7 +58,7 @@ public class SingleView extends RepaintView implements GameEventListener {
 
   public SingleView(int width, int height) {
     super(width, height);
-    backgroundMusic = playMusic("sound/music.wav");
+    backgroundMusic = AudioManager.get().playMusic("sound/music.wav");
   }
 
   @Override
@@ -125,25 +125,6 @@ public class SingleView extends RepaintView implements GameEventListener {
     gameFlow.start();
   }
 
-  private AudioPlayer playMusic(String path) {
-    return playAudio(path, 0, 1);
-  }
-
-  private AudioPlayer playSound(String path) {
-    return playAudio(path, 1, Config.get().getSoundCacheCount());
-  }
-
-  private AudioPlayer playAudio(String path, int playCount, int cacheCount) {
-    AudioPlayer audio = new AudioPlayer();
-    path = "/" + path;
-    audio.loadAudio(path, this);
-    audio.setCacheCount(cacheCount);
-
-    audio.setPlayCount(playCount); // 播放次數
-    audio.play();
-    return audio;
-  }
-
   @Override
   public void onMouseClicked(MouseEvent e) {}
 
@@ -161,7 +142,7 @@ public class SingleView extends RepaintView implements GameEventListener {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
           if (gameFlow.turnRight()) {
-            playSound("sound/turn.wav");
+            AudioManager.get().playSound("sound/turn.wav");
           }
           break;
         case KeyEvent.VK_DOWN: // 下,下移方塊
@@ -374,7 +355,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     // 方塊落到底
     if (GameEvent.BOX_DOWN == code) {
       // 播放方塊掉落音效
-      playSound("sound/down.wav");
+      AudioManager.get().playSound("sound/down.wav");
       return;
     }
     // 建立完下一個方塊
