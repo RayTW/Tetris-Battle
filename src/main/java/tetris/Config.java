@@ -42,12 +42,14 @@ public class Config {
 
   // 是否顯示目前畫面的fps
   private boolean displayFps;
-  // 設定fps上限
+  // 設定fps上限(預設30)
   private int maxFps;
   // 畫面刷新間隔ms
   private int repainMills;
 
-  private Config() {}
+  private Config() {
+    setMaxFps(30);
+  }
 
   public static Config get() {
     return instance;
