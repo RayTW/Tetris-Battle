@@ -6,11 +6,11 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
-
 import tetris.Config;
 import tetris.game.Cube;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
+import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
 import util.AudioPlayer;
@@ -23,6 +23,10 @@ import util.Debug;
  */
 public class BattleView extends RepaintView implements GameEventListener {
   private static final long serialVersionUID = 1L;
+  private static String SCORE = "SCORE : ";
+  private static String LEVEL = "LEVEL : ";
+  private static String LINES = "LINES : ";
+
   private int nextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
   private int[][][] boxBuffer; // 下次要出現的方塊style
   private int boxStartX; // 掉落方塊的初始位置x
@@ -31,14 +35,13 @@ public class BattleView extends RepaintView implements GameEventListener {
   private int singleBoxHeight; // 每個方塊格高
   private int rightNextBoxesX; // 右側方塊的位置x
   private int rightNextBoxesHeightSpacing; // 右側方塊的位置y間距
-  private int scoreLocationY; // 分數顯示位置
-  private int levelLocationY; // 等級顯示位置
+  private Label scoreLabel; // 分數顯示
+  private Label levelLabel; // 等級顯示
+  private Label linesLabel; // 方塊消除累計行數顯示
   private int gameOverLocationX; // 遊戲結束顯示位置x
   private int gameOverLocationY; // 遊戲結束顯示位置y
   private int nextRoundCountdownSecondLocationX; // 下局倒數秒數顯示位置x
   private int nextRoundCountdownSecondLocationY; // 下局倒數秒數顯示位置y
-  private int linesLocationY; // 方塊消除累計行數顯示位置
-  private Font scoreFont;
   private Color[] color = {
     null,
     new Color(0, 255, 255, 250),
@@ -63,7 +66,6 @@ public class BattleView extends RepaintView implements GameEventListener {
 
   @Override
   public void init() {
-    scoreFont = null;
     Config config = Config.get();
 
     boxStartX = config.zoom(62);
@@ -73,10 +75,26 @@ public class BattleView extends RepaintView implements GameEventListener {
     rightNextBoxesX = config.zoom(160);
     rightNextBoxesHeightSpacing = config.zoom(50);
 
-    // 分數位置
-    levelLocationY = Config.get().zoom(20);
-    linesLocationY = Config.get().zoom(45);
-    scoreLocationY = Config.get().zoom(70);
+    scoreLabel = new Label();
+    scoreLabel.setLocation(config.zoom(5), config.zoom(20));
+    scoreLabel.setFont(Font.BOLD, config.zoom(20));
+    scoreLabel.setColor(Color.RED);
+    scoreLabel.setText(SCORE + 0);
+    add(scoreLabel);
+
+    levelLabel = new Label();
+    levelLabel.setLocation(config.zoom(5), config.zoom(45));
+    levelLabel.setFont(Font.BOLD, config.zoom(20));
+    levelLabel.setColor(Color.BLACK);
+    levelLabel.setText(LEVEL + 0);
+    add(levelLabel);
+
+    linesLabel = new Label();
+    linesLabel.setLocation(config.zoom(5), config.zoom(70));
+    linesLabel.setFont(Font.BOLD, config.zoom(20));
+    linesLabel.setColor(Color.BLUE);
+    linesLabel.setText(LINES + 0);
+    add(linesLabel);
 
     // 遊戲結束
     gameOverLocationX = Config.get().zoom(100);
@@ -172,7 +190,7 @@ public class BattleView extends RepaintView implements GameEventListener {
 
   private void moveDown() {
     if (gameFlow.moveDown()) {
-      infoBar.addScore(Config.get().getMoveDownScore());
+      addScore(Config.get().getMoveDownScore());
     }
   }
 
@@ -184,8 +202,23 @@ public class BattleView extends RepaintView implements GameEventListener {
     int quickDownScore = after - befor;
 
     if (quickDownScore > 0) {
-      infoBar.addScore(quickDownScore * Config.get().getQuickDownScore());
+      addScore(quickDownScore * Config.get().getQuickDownScore());
     }
+  }
+
+  private void addScore(int score) {
+    infoBar.addScore(score);
+    scoreLabel.setText(SCORE + infoBar.getScore());
+  }
+
+  private void setLevel(int level) {
+    infoBar.setLevel(level);
+    levelLabel.setText(LEVEL + infoBar.getLevel());
+  }
+
+  private void addCleanedCount(int lines) {
+    infoBar.addCleanedCount(lines);
+    linesLabel.setText(LINES + infoBar.getCleanedCount());
   }
 
   // 雙緩衝區繪圖
@@ -211,11 +244,10 @@ public class BattleView extends RepaintView implements GameEventListener {
     // 畫右邊下次要出現的方塊
     showBufferBox(boxBuffer, canvas);
 
-    // 顯示分數
-    showInfoBar(infoBar, canvas);
-
     // 顯示遊戲結束，並倒數秒數
     showGameOver(infoBar, canvas);
+
+    super.onPaintComponent(canvas);
   }
 
   // 畫定住的方塊與其他背景格子
@@ -290,23 +322,6 @@ public class BattleView extends RepaintView implements GameEventListener {
         }
       }
     }
-  }
-
-  private void showInfoBar(InfoBar info, Graphics buffImg) {
-    if (scoreFont == null) {
-      Font currentFont = buffImg.getFont();
-      Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().zoom(20));
-      scoreFont = newFont;
-    }
-    // 調整分數字型
-    buffImg.setFont(scoreFont);
-
-    buffImg.setColor(Color.RED);
-    buffImg.drawString("LEVEL : " + info.getLevel(), 2, levelLocationY);
-    buffImg.setColor(Color.BLACK);
-    buffImg.drawString("SCORE : " + info.getScore(), 2, linesLocationY);
-    buffImg.setColor(Color.BLUE);
-    buffImg.drawString("LINES : " + info.getCleanedCount(), 2, scoreLocationY);
   }
 
   private void showGameOver(InfoBar info, Graphics buffImg) {
@@ -415,8 +430,8 @@ public class BattleView extends RepaintView implements GameEventListener {
     if (GameEvent.CLEANED_LINE == code) {
       Debug.get().println("方塊清除完成" + data);
       String[] lines = ((String) data).split("[,]", -1);
-      infoBar.addCleanedCount(lines.length);
-      infoBar.addScore(Config.get().getCleanLinesScore(lines.length));
+      addCleanedCount(lines.length);
+      addScore(Config.get().getCleanLinesScore(lines.length));
 
       if (tryLevelUp()) {
         Debug.get().println("提升等級!!");
@@ -459,7 +474,7 @@ public class BattleView extends RepaintView implements GameEventListener {
         }
       }
       // 重置分數
-      infoBar.initialize();
+      infoBar.reset();
       // 清除全畫面方塊
       gameFlow.clearBox();
 
@@ -485,7 +500,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     int newLevel = Config.get().linesConvertLevel(infoBar.getCleanedCount());
 
     if (currentLevel != newLevel) {
-      infoBar.setLevel(newLevel);
+      setLevel(newLevel);
       gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
       return true;
     }

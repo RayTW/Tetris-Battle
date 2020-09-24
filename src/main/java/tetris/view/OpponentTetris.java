@@ -226,7 +226,7 @@ public class OpponentTetris extends Role {
       int[][] box = gameBox.getCurrentCube();
 
       // 畫陰影
-      shadow(xy, box, canvas, gameBox.getDownY());
+      //      shadow(xy, box, canvas, gameBox.getDownY());
 
       showDownBox(xy, box, canvas);
     }
@@ -364,7 +364,7 @@ public class OpponentTetris extends Role {
   private void reset() {
     status = Status.INIT;
     // 重置分數
-    infoBar.initialize();
+    infoBar.reset();
     // 清除全畫面方塊
     gameBox.clearAllCube();
   }

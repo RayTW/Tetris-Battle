@@ -77,7 +77,7 @@ public class MenuView extends RepaintView {
         changeView(ViewName.SINGLE);
       } else if (mode == ViewName.BATTLE) {
         // 對戰
-        changeView(ViewName.BATTLE);
+        changeView(ViewName.CONNECTING);
       }
     } else if (code == KeyEvent.VK_UP) { // 遊標上移
       arrow--;

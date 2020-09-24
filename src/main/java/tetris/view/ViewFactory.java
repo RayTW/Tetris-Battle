@@ -13,6 +13,9 @@ public class ViewFactory {
       case SINGLE:
         view = new SingleView(width, height);
         break;
+      case CONNECTING:
+        view = new ConnectingView(width, height);
+        break;
       case BATTLE:
         view = new BattleView(width, height);
         break;

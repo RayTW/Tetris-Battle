@@ -14,6 +14,7 @@ public class Label extends Role {
   private String text = "";
   private int fontStyle = Font.PLAIN;
   private int fontSize = 10;
+  private boolean hidden = false;
 
   public Label() {
     setColor(Color.BLACK);
@@ -27,6 +28,9 @@ public class Label extends Role {
 
   @Override
   public void onDraw(Graphics canvas) {
+    if (hidden) {
+      return;
+    }
     canvas.setColor(getColor());
     Font currentFont = canvas.getFont();
 
@@ -34,6 +38,7 @@ public class Label extends Role {
       font = currentFont.deriveFont(fontStyle, fontSize);
     }
     canvas.setFont(font);
+
     int x = getX();
     int y = getY();
 
@@ -41,6 +46,14 @@ public class Label extends Role {
     canvas.drawString(text, x, y);
 
     canvas.setFont(currentFont);
+  }
+
+  public void setHidden(boolean hidden) {
+    this.hidden = hidden;
+  }
+
+  public boolean isHidden() {
+    return this.hidden;
   }
 
   public void setText(String text) {
