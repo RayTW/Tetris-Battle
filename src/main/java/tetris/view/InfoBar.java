@@ -15,10 +15,10 @@ public class InfoBar {
   private int waitNextRoundSecond; // 遊戲結束後倒數秒數
 
   public InfoBar() {
-    initialize();
+    reset();
   }
 
-  public void initialize() {
+  public void reset() {
     score = 0;
     level = 0;
     cleanedCount = 0;
