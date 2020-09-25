@@ -1,5 +1,6 @@
 package tetris.game;
 
+import java.util.List;
 import tetris.Config;
 import util.AudioPlayer;
 
@@ -15,22 +16,23 @@ public class AudioManager {
   /**
    * 預戴音樂
    *
-   * @param completed
+   * @param listener
    * @param path
    */
-  public void preloadMusic(Runnable completed, String... path) {
-    new Thread(
-            () -> {
-              for (String p : path) {
-                AudioPlayer audio = new AudioPlayer();
-                audio.loadAudio("/" + p, this);
-                audio.stop();
-              }
-              if (completed != null) {
-                completed.run();
-              }
-            })
-        .start();
+  public void preload(List<String> path, OnPreloadListener listener) {
+    path.forEach(
+        p -> {
+          if (listener != null) {
+            listener.onLoaded(p);
+          }
+          AudioPlayer audio = new AudioPlayer();
+          audio.loadAudio(p, AudioManager.this);
+          audio.stop();
+        });
+
+    if (listener != null) {
+      listener.onCompleted();
+    }
   }
 
   public AudioPlayer playMusic(String path) {
@@ -50,5 +52,11 @@ public class AudioManager {
     audio.setPlayCount(playCount); // 播放次數
     audio.play();
     return audio;
+  }
+
+  public static interface OnPreloadListener {
+    public void onLoaded(String path);
+
+    public void onCompleted();
   }
 }
