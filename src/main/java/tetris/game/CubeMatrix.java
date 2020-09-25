@@ -26,7 +26,7 @@ public class CubeMatrix {
   public boolean createNewCube(int style) {
     boolean b = true;
     Cube nb = new Cube();
-    nb.setBoxData(style);
+    nb.setStyle(style);
     nb.setNowX((cubeColumnCount / 2) - 1);
     currentCube = nb;
 
@@ -38,20 +38,20 @@ public class CubeMatrix {
 
   public int[][] createCube(int style) {
     Cube b = new Cube();
-    b.setBoxData(style);
-    return b.getBoxAry(0);
+    b.setStyle(style);
+    return b.toArray(0);
   }
 
   public boolean tryMoveDown() {
     Cube tempNowBox = currentCube;
 
     // 判斷方塊撞到底部
-    int boxY = tempNowBox.getNowY() + tempNowBox.getNowTurnHeight();
+    int boxY = tempNowBox.getNowY() + tempNowBox.getTurnHeight();
     if (boxY >= cubeRowCount) {
       return false;
     }
 
-    int[][] nbAry = tempNowBox.getNowturnBoxAry();
+    int[][] nbAry = tempNowBox.toArray();
     int nx = tempNowBox.getNowX();
     int ny = tempNowBox.getNowY();
 
@@ -82,14 +82,14 @@ public class CubeMatrix {
     boolean b = true;
     Cube tempNowBox = currentCube;
     // 取得目前方塊右移後的x位置+上方塊的寬度
-    int x = tempNowBox.getNowX() + tempNowBox.getNowTurnWight() + 1; // 假設右移1格
+    int x = tempNowBox.getNowX() + tempNowBox.getTurnWight() + 1; // 假設右移1格
 
     if (x > cubeColumnCount) { // 判斷方塊位置是否會超過boxAry的寬度
       b = false;
     } else { // 沒超過牆，判斷是否撞到其他方塊
       if (hitTest(
           cube,
-          tempNowBox.getNowturnBoxAry(),
+          tempNowBox.toArray(),
           tempNowBox.getNowX() + 1,
           tempNowBox.getNowY())) { // 判斷目前位置的方塊是否撞到其他在大boxAry裡的方塊格
         b = false;
@@ -109,7 +109,7 @@ public class CubeMatrix {
   public boolean moveLeft() {
     boolean b = true;
     Cube tempNowBox = currentCube;
-    int[][] nowturnBoxAry = tempNowBox.getNowturnBoxAry();
+    int[][] nowturnBoxAry = tempNowBox.toArray();
     int x = tempNowBox.getNowX() - 1;
 
     // 判斷當方塊移到最左邊格子時，方塊本身是否可再左移
@@ -161,7 +161,7 @@ public class CubeMatrix {
     int ny = tempNowBox.getNowY();
     int nx = tempNowBox.getNowX();
     int w = tempNowBox.getNowX() + turnW;
-    int[][] turnAry = tempNowBox.getBoxAry(rightTurn);
+    int[][] turnAry = tempNowBox.toArray(rightTurn);
 
     if (h > cubeRowCount) { // 判斷順轉後的方塊位置是否會超過boxAry的寬度或底部
       return false;
@@ -218,7 +218,7 @@ public class CubeMatrix {
     int w = tempNowBox.getNowX() + turnW;
     int nx = tempNowBox.getNowX();
     int ny = tempNowBox.getNowY();
-    int[][] turnAry = tempNowBox.getBoxAry(leftTurn);
+    int[][] turnAry = tempNowBox.toArray(leftTurn);
 
     if (turnH > cubeRowCount) { // 判斷轉向是否超出高度
       return false;
@@ -430,7 +430,7 @@ public class CubeMatrix {
    * @return
    */
   public int[][] getCurrentCube() {
-    return currentCube.getNowturnBoxAry();
+    return currentCube.toArray();
   }
 
   /**
@@ -448,7 +448,7 @@ public class CubeMatrix {
    * @return
    */
   public String getCurrentCubeStyleString() {
-    return currentCube.getNowturnBoxStyleStr();
+    return currentCube.toTurnCubeString();
   }
 
   public int getCurrentCubeStyle() {
@@ -465,8 +465,8 @@ public class CubeMatrix {
     int[] xy = new int[4];
     xy[0] = tempNowBox.getNowX();
     xy[1] = tempNowBox.getNowY();
-    xy[2] = tempNowBox.getNowTurnWight();
-    xy[3] = tempNowBox.getNowTurnHeight();
+    xy[2] = tempNowBox.getTurnWight();
+    xy[3] = tempNowBox.getTurnHeight();
 
     return xy;
   }
@@ -480,11 +480,11 @@ public class CubeMatrix {
     Cube tempNowBox = currentCube;
     int nx = tempNowBox.getNowX();
     int ny = tempNowBox.getNowY();
-    int[][] nbAry = tempNowBox.getNowturnBoxAry();
+    int[][] nbAry = tempNowBox.toArray();
 
     while (true) {
       // 判斷方塊撞到底部
-      int boxY = ny + tempNowBox.getNowTurnHeight();
+      int boxY = ny + tempNowBox.getTurnHeight();
       if (boxY >= cubeRowCount) {
         return ny;
       }
@@ -507,7 +507,7 @@ public class CubeMatrix {
     int[][] tempBoxAry = cube;
     int x = c.getNowX();
     int y = c.getNowY();
-    int[][] b = c.getNowturnBoxAry();
+    int[][] b = c.toArray();
 
     for (int i = 0; i < b.length; i++) {
       for (int j = 0; j < b[i].length; j++) {
@@ -538,7 +538,7 @@ public class CubeMatrix {
     String[] lineAry = lineData.split("[,]");
 
     if (isGap) {
-      int[][] downBox = nb.getNowturnBoxAry();
+      int[][] downBox = nb.toArray();
       int nx = nb.getNowX();
       int ny = nb.getNowY();
       for (int i = 0; i < downBox.length; i++) {
@@ -588,7 +588,7 @@ public class CubeMatrix {
    * @return
    */
   protected boolean hitTest(int[][] tempBoxAry, Cube nb) {
-    int[][] newBox = nb.getNowturnBoxAry();
+    int[][] newBox = nb.toArray();
     int ny = nb.getNowY();
     int nx = nb.getNowX();
 

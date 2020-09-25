@@ -15,12 +15,13 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import tetris.game.AudioManager;
-import tetris.game.AudioManager.OnPreloadListener;
+
 import tetris.view.ViewFactory;
 import tetris.view.ViewName;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.OnChangeViewListener;
+import util.AudioManager;
+import util.AudioManager.OnPreloadListener;
 import tetris.view.component.ComponentView;
 import tetris.view.component.JDialogLabel;
 
@@ -158,8 +159,8 @@ public class Tetris extends JFrame implements OnChangeViewListener {
 
     // 遊戲啟動後畫面會置中
     Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-    double x = (1 - (screen.getHeight() / (double) tetris.getHeight())) / 2;
-    double y = (1 - (screen.getWidth() / (double) tetris.getWidth())) / 2;
+    double x = (1 - (screen.getHeight() / tetris.getHeight())) / 2;
+    double y = (1 - (screen.getWidth() / tetris.getWidth())) / 2;
     tetris.setLocation((int) x, (int) y);
 
     tetris.setLocationRelativeTo(null);

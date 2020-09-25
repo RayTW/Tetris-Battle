@@ -7,13 +7,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import tetris.Config;
-import tetris.game.AudioManager;
 import tetris.game.Cube;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
+import util.AudioManager;
 import util.AudioPlayer;
 import util.Debug;
 
@@ -28,14 +28,14 @@ public class BattleView extends RepaintView implements GameEventListener {
   private static String LEVEL = "LEVEL : ";
   private static String LINES = "LINES : ";
 
-  private int nextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
-  private int[][][] boxBuffer; // 下次要出現的方塊style
+  private int nextCubeSize = Config.get().getNextCubeSize(); // 下次要出現的方塊可顯示個數
+  private int[][][] cubeBuffer; // 下次要出現的方塊style
   private int boxStartX; // 掉落方塊的初始位置x
   private int boxStartY; // 掉落方塊的初始位置y
-  private int singleBoxWidth; // 每個方塊格寬
-  private int singleBoxHeight; // 每個方塊格高
-  private int rightNextBoxesX; // 右側方塊的位置x
-  private int rightNextBoxesHeightSpacing; // 右側方塊的位置y間距
+  private int singleCubeWidth; // 每個方塊格寬
+  private int singleCubeHeight; // 每個方塊格高
+  private int rightNextCubeX; // 右側方塊的位置x
+  private int rightNextCubeHeightSpacing; // 右側方塊的位置y間距
   private Label scoreLabel; // 分數顯示
   private Label levelLabel; // 等級顯示
   private Label linesLabel; // 方塊消除累計行數顯示
@@ -71,10 +71,10 @@ public class BattleView extends RepaintView implements GameEventListener {
 
     boxStartX = config.zoom(62);
     boxStartY = config.zoom(79);
-    singleBoxWidth = config.zoom(19);
-    singleBoxHeight = config.zoom(19);
-    rightNextBoxesX = config.zoom(160);
-    rightNextBoxesHeightSpacing = config.zoom(50);
+    singleCubeWidth = config.zoom(19);
+    singleCubeHeight = config.zoom(19);
+    rightNextCubeX = config.zoom(160);
+    rightNextCubeHeightSpacing = config.zoom(50);
 
     scoreLabel = new Label();
     scoreLabel.setLocation(config.zoom(5), config.zoom(20));
@@ -121,7 +121,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
 
     // 設定下次要出現的方塊style個數為顯示3個
-    boxBuffer = getBufBox(gameFlow, nextBoxCount);
+    cubeBuffer = getBufBox(gameFlow, nextCubeSize);
 
     // 啟動遊戲邏輯執行緒
     gameFlow.start();
@@ -224,7 +224,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     showDownBox(xy, box, canvas);
 
     // 畫右邊下次要出現的方塊
-    showBufferBox(boxBuffer, canvas);
+    showBufferBox(cubeBuffer, canvas);
 
     // 顯示遊戲結束，並倒數秒數
     showGameOver(infoBar, canvas);
@@ -241,10 +241,10 @@ public class BattleView extends RepaintView implements GameEventListener {
           drawBox(style, j, i, buffImg);
         } else { // 畫其他背景格子
           buffImg.drawRect(
-              boxStartX + (singleBoxWidth * j),
-              boxStartY + (singleBoxHeight * i),
-              singleBoxWidth,
-              singleBoxHeight);
+              boxStartX + (singleCubeWidth * j),
+              boxStartY + (singleCubeHeight * i),
+              singleCubeWidth,
+              singleCubeHeight);
         }
       }
     }
@@ -275,10 +275,10 @@ public class BattleView extends RepaintView implements GameEventListener {
           if (style > 0) {
             buffImg.setColor(color[style]);
             buffImg.fill3DRect(
-                rightNextBoxesX + (singleBoxWidth * (j + 5)),
-                (n * rightNextBoxesHeightSpacing) + (singleBoxHeight * (i + 5)),
-                singleBoxWidth,
-                singleBoxHeight,
+                rightNextCubeX + (singleCubeWidth * (j + 5)),
+                (n * rightNextCubeHeightSpacing) + (singleCubeHeight * (i + 5)),
+                singleCubeWidth,
+                singleCubeHeight,
                 true);
           }
         }
@@ -296,10 +296,10 @@ public class BattleView extends RepaintView implements GameEventListener {
         int style = box[i][j];
         if (style > 0) {
           buffImg.fill3DRect(
-              boxStartX + (singleBoxWidth * (j + boxX)),
-              boxStartY + (singleBoxHeight * (i + index)),
-              singleBoxWidth,
-              singleBoxHeight,
+              boxStartX + (singleCubeWidth * (j + boxX)),
+              boxStartY + (singleCubeHeight * (i + index)),
+              singleCubeWidth,
+              singleCubeHeight,
               true);
         }
       }
@@ -329,10 +329,10 @@ public class BattleView extends RepaintView implements GameEventListener {
   public void drawBox(int style, int x, int y, Graphics buffImg) {
     buffImg.setColor(color[style]);
     buffImg.fill3DRect(
-        boxStartX + (singleBoxWidth * x),
-        boxStartY + (singleBoxHeight * y),
-        singleBoxWidth,
-        singleBoxHeight,
+        boxStartX + (singleCubeWidth * x),
+        boxStartY + (singleCubeHeight * y),
+        singleCubeWidth,
+        singleCubeHeight,
         true);
     buffImg.setColor(Color.BLACK);
   }
@@ -388,7 +388,7 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     // 建立完下一個方塊
     if (GameEvent.BOX_NEXT == code) {
-      boxBuffer = getBufBox(gameFlow, nextBoxCount);
+      cubeBuffer = getBufBox(gameFlow, nextCubeSize);
       return;
     }
     if (GameEvent.CLEAN_LINE_BEFORE == code) {
@@ -399,7 +399,7 @@ public class BattleView extends RepaintView implements GameEventListener {
             event.getJson().put("x", cube.getNowX());
             event.getJson().put("y", cube.getNowY());
             event.getJson().put("style", cube.getStyle());
-            event.getJson().put("cube", Arrays.deepToString(cube.getNowturnBoxAry()));
+            event.getJson().put("cube", Arrays.deepToString(cube.toArray()));
           });
       return;
     }

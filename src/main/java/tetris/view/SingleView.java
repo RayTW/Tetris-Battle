@@ -6,12 +6,12 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import tetris.Config;
-import tetris.game.AudioManager;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
+import util.AudioManager;
 import util.AudioPlayer;
 import util.Debug;
 
@@ -22,14 +22,14 @@ import util.Debug;
  */
 public class SingleView extends RepaintView implements GameEventListener {
   private static final long serialVersionUID = 1L;
-  private int nextBoxCount = Config.get().getNextBoxs(); // 下次要出現的方塊可顯示個數
-  private int[][][] boxBuffer; // 下次要出現的方塊style
+  private int nextCubeCount = Config.get().getNextCubeSize(); // 下次要出現的方塊可顯示個數
+  private int[][][] cubeBuffer; // 下次要出現的方塊style
   private int boxStartX; // 掉落方塊的初始位置x
   private int boxStartY; // 掉落方塊的初始位置y
-  private int singleBoxWidth; // 每個方塊格寬
-  private int singleBoxHeight; // 每個方塊格高
-  private int rightNextBoxesX; // 右側方塊的位置x
-  private int rightNextBoxesHeightSpacing; // 右側方塊的位置y間距
+  private int singleCubeWidth; // 每個方塊格寬
+  private int singleCubeHeight; // 每個方塊格高
+  private int rightNextCubeX; // 右側方塊的位置x
+  private int rightNextCubeHeightSpacing; // 右側方塊的位置y間距
   private static String SCORE = "SCORE : ";
   private static String LEVEL = "LEVEL : ";
   private static String LINES = "LINES : ";
@@ -67,10 +67,10 @@ public class SingleView extends RepaintView implements GameEventListener {
 
     boxStartX = config.zoom(62);
     boxStartY = config.zoom(79);
-    singleBoxWidth = config.zoom(19);
-    singleBoxHeight = config.zoom(19);
-    rightNextBoxesX = config.zoom(160);
-    rightNextBoxesHeightSpacing = config.zoom(50);
+    singleCubeWidth = config.zoom(19);
+    singleCubeHeight = config.zoom(19);
+    rightNextCubeX = config.zoom(160);
+    rightNextCubeHeightSpacing = config.zoom(50);
 
     // 分數位置
     scoreLabel = new Label();
@@ -119,7 +119,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
 
     // 設定下次要出現的方塊style個數為顯示3個
-    boxBuffer = getBufBox(gameFlow, nextBoxCount);
+    cubeBuffer = getBufBox(gameFlow, nextCubeCount);
 
     // 啟動遊戲邏輯執行緒
     gameFlow.start();
@@ -222,7 +222,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     showDownBox(xy, box, canvas);
 
     // 畫右邊下次要出現的方塊
-    showBufferBox(boxBuffer, canvas);
+    showBufferBox(cubeBuffer, canvas);
 
     super.onPaintComponent(canvas);
   }
@@ -238,10 +238,10 @@ public class SingleView extends RepaintView implements GameEventListener {
           drawBox(style, j, i, buffImg);
         } else { // 畫其他背景格子
           buffImg.drawRect(
-              boxStartX + (singleBoxWidth * j),
-              boxStartY + (singleBoxHeight * i),
-              singleBoxWidth,
-              singleBoxHeight);
+              boxStartX + (singleCubeWidth * j),
+              boxStartY + (singleCubeHeight * i),
+              singleCubeWidth,
+              singleCubeHeight);
         }
       }
     }
@@ -277,10 +277,10 @@ public class SingleView extends RepaintView implements GameEventListener {
               buffImg.setColor(color[style]);
             }
             buffImg.fill3DRect(
-                rightNextBoxesX + (singleBoxWidth * (j + 5)),
-                (n * rightNextBoxesHeightSpacing) + (singleBoxHeight * (i + 5)),
-                singleBoxWidth,
-                singleBoxHeight,
+                rightNextCubeX + (singleCubeWidth * (j + 5)),
+                (n * rightNextCubeHeightSpacing) + (singleCubeHeight * (i + 5)),
+                singleCubeWidth,
+                singleCubeHeight,
                 true);
           }
         }
@@ -298,10 +298,10 @@ public class SingleView extends RepaintView implements GameEventListener {
         int style = box[i][j];
         if (style > 0) {
           buffImg.fill3DRect(
-              boxStartX + (singleBoxWidth * (j + boxX)),
-              boxStartY + (singleBoxHeight * (i + index)),
-              singleBoxWidth,
-              singleBoxHeight,
+              boxStartX + (singleCubeWidth * (j + boxX)),
+              boxStartY + (singleCubeHeight * (i + index)),
+              singleCubeWidth,
+              singleCubeHeight,
               true);
         }
       }
@@ -320,10 +320,10 @@ public class SingleView extends RepaintView implements GameEventListener {
     buffImg.setColor(color[style]);
 
     buffImg.fill3DRect(
-        boxStartX + (singleBoxWidth * x),
-        boxStartY + (singleBoxHeight * y),
-        singleBoxWidth,
-        singleBoxHeight,
+        boxStartX + (singleCubeWidth * x),
+        boxStartY + (singleCubeHeight * y),
+        singleCubeWidth,
+        singleCubeHeight,
         true);
     buffImg.setColor(Color.BLACK);
   }
@@ -360,7 +360,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     }
     // 建立完下一個方塊
     if (GameEvent.BOX_NEXT == code) {
-      boxBuffer = getBufBox(gameFlow, nextBoxCount);
+      cubeBuffer = getBufBox(gameFlow, nextCubeCount);
       return;
     }
     // 有方塊可清除,將要清除方塊,可取得要消去的方塊資料

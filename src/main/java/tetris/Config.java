@@ -38,7 +38,7 @@ public class Config {
   private int quickDownScore = 10;
 
   // 可顯示將要的掉落方塊個數(畫面右側)
-  private int nextBoxs = 3;
+  private int nextCubeSize = 3;
 
   // 是否顯示目前畫面的fps
   private boolean displayFps;
@@ -202,7 +202,7 @@ public class Config {
    *
    * @return
    */
-  public int getNextBoxs() {
-    return nextBoxs;
+  public int getNextCubeSize() {
+    return nextCubeSize;
   }
 }

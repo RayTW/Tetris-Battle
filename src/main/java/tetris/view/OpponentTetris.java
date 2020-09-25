@@ -20,11 +20,11 @@ import tetris.view.component.Role;
  * @author Ray
  */
 public class OpponentTetris extends Role {
-  private CubeMatrix gameBox;
+  private CubeMatrix cubeMatrix;
   private int boxStartX; // 掉落方塊的初始位置x
   private int boxStartY; // 掉落方塊的初始位置y
-  private int singleBoxWidth; // 每個方塊格寬
-  private int singleBoxHeight; // 每個方塊格高
+  private int singleCubeWidth; // 每個方塊格寬
+  private int singleCubeHeight; // 每個方塊格高
   private int scoreLocationX;
   private int scoreLocationY; // 分數顯示位置
   private int levelLocationX;
@@ -56,7 +56,7 @@ public class OpponentTetris extends Role {
   public OpponentTetris(Zoomable zoomable) {
     scoreFont = null;
     this.zoomable = zoomable;
-    gameBox = new CubeMatrix();
+    cubeMatrix = new CubeMatrix();
     resetLocation(0, 0);
 
     // 分數、消除行數、等級
@@ -159,8 +159,8 @@ public class OpponentTetris extends Role {
     boxStartX = x;
     boxStartY = Config.get().zoom(zoomable.zoom(80)) + y;
 
-    singleBoxWidth = zoomable.zoom(getWidth());
-    singleBoxHeight = zoomable.zoom(getHeight());
+    singleCubeWidth = zoomable.zoom(getWidth());
+    singleCubeHeight = zoomable.zoom(getHeight());
 
     // 分數位置
     levelLocationX = x;
@@ -176,12 +176,12 @@ public class OpponentTetris extends Role {
   }
 
   private void cleanLine(int[][] b, int x, int y, int style) {
-    gameBox.addBox(b, x, y, style);
+    cubeMatrix.addBox(b, x, y, style);
     // 取得可消除的行數
-    String lineData = gameBox.getClearLine();
+    String lineData = cubeMatrix.getClearLine();
 
     if (!lineData.isEmpty()) {
-      gameBox.clearLine(lineData); // 實際將可消除的方塊行數移除
+      cubeMatrix.clearLine(lineData); // 實際將可消除的方塊行數移除
     }
   }
 
@@ -190,25 +190,25 @@ public class OpponentTetris extends Role {
     if (!simulation) {
       switch (code) {
         case KeyEvent.VK_UP: // 上,順轉方塊
-          gameBox.turnRight();
+          cubeMatrix.turnRight();
           break;
         case KeyEvent.VK_DOWN: // 下,下移方塊
-          gameBox.moveDown();
+          cubeMatrix.moveDown();
           break;
         case KeyEvent.VK_LEFT: // 左,左移方塊
-          gameBox.moveLeft();
+          cubeMatrix.moveLeft();
           break;
         case KeyEvent.VK_RIGHT: // 右,右移方塊
-          gameBox.moveRight();
+          cubeMatrix.moveRight();
           break;
         case KeyEvent.VK_SPACE: // 空白鍵,快速掉落方塊
-          gameBox.quickDown();
+          cubeMatrix.quickDown();
           break;
         default:
       }
     } else {
       if (code == KeyEvent.VK_DOWN) {
-        gameBox.moveDown();
+        cubeMatrix.moveDown();
       }
     }
   }
@@ -217,13 +217,13 @@ public class OpponentTetris extends Role {
   @Override
   public void onDraw(Graphics canvas) {
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
-    int[][] boxAry = gameBox.getMatrix();
+    int[][] boxAry = cubeMatrix.getMatrix();
     showBacegroundBox(boxAry, canvas);
 
-    if (gameBox.getCube() != null) {
+    if (cubeMatrix.getCube() != null) {
       // 畫掉落中的方塊
-      int[] xy = gameBox.getNowBoxXY();
-      int[][] box = gameBox.getCurrentCube();
+      int[] xy = cubeMatrix.getNowBoxXY();
+      int[][] box = cubeMatrix.getCurrentCube();
 
       // 畫陰影
       //      shadow(xy, box, canvas, gameBox.getDownY());
@@ -249,10 +249,10 @@ public class OpponentTetris extends Role {
           drawBox(style, j, i, buffImg);
         } else { // 畫其他背景格子
           buffImg.drawRect(
-              boxStartX + (singleBoxWidth * j),
-              boxStartY + (singleBoxHeight * i),
-              singleBoxWidth,
-              singleBoxHeight);
+              boxStartX + (singleCubeWidth * j),
+              boxStartY + (singleCubeHeight * i),
+              singleCubeWidth,
+              singleCubeHeight);
         }
       }
     }
@@ -281,10 +281,10 @@ public class OpponentTetris extends Role {
         int style = box[i][j];
         if (style > 0) {
           buffImg.fill3DRect(
-              boxStartX + (singleBoxWidth * (j + boxX)),
-              boxStartY + (singleBoxHeight * (i + index)),
-              singleBoxWidth,
-              singleBoxHeight,
+              boxStartX + (singleCubeWidth * (j + boxX)),
+              boxStartY + (singleCubeHeight * (i + index)),
+              singleCubeWidth,
+              singleCubeHeight,
               true);
         }
       }
@@ -327,10 +327,10 @@ public class OpponentTetris extends Role {
   public void drawBox(int style, int x, int y, Graphics buffImg) {
     buffImg.setColor(color[style]);
     buffImg.fill3DRect(
-        boxStartX + (singleBoxWidth * x),
-        boxStartY + (singleBoxHeight * y),
-        singleBoxWidth,
-        singleBoxHeight,
+        boxStartX + (singleCubeWidth * x),
+        boxStartY + (singleCubeHeight * y),
+        singleCubeWidth,
+        singleCubeHeight,
         true);
     buffImg.setColor(Color.BLACK);
   }
@@ -357,7 +357,7 @@ public class OpponentTetris extends Role {
    * @param style
    */
   public void createCube(int style) {
-    gameBox.createNewCube(style);
+    cubeMatrix.createNewCube(style);
   }
 
   /** 重置遊戲頁面 */
@@ -366,7 +366,7 @@ public class OpponentTetris extends Role {
     // 重置分數
     infoBar.reset();
     // 清除全畫面方塊
-    gameBox.clearAllCube();
+    cubeMatrix.clearAllCube();
   }
 
   public void close() {

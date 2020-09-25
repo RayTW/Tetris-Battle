@@ -8,11 +8,11 @@ import java.util.concurrent.Callable;
  * @author Ray Lee Created on 2017/10/18
  * @param <T>
  */
-public class CacheReuseList<T> {
+public class CacheReusePool<T> {
   private List<T> objects;
   private int index;
 
-  public CacheReuseList(int size, Callable<T> generatorObj) throws Exception {
+  public CacheReusePool(int size, Callable<T> generatorObj) throws Exception {
     objects = new ArrayList<T>(size);
 
     for (int i = 0; i < size; i++) {

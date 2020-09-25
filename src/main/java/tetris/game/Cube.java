@@ -33,8 +33,8 @@ public class Cube {
 
   private int nowturn; // 目前的轉向
   private int style; // 此方塊種類代碼
-  private int[][][] boxAry; // 此方塊轉向後的值
-  private int[][] hw; // 此方塊轉向後的高、寬
+  private int[][][] cubeMatrix; // 此方塊轉向後的值
+  private int[][] sizeMatrix; // 此方塊轉向後的高、寬
 
   public Cube() {
     initialize();
@@ -42,9 +42,9 @@ public class Cube {
 
   public void initialize() {
     nowturn = 0;
-    boxAry = new int[0][0][0];
+    cubeMatrix = new int[0][0][0];
     style = 1;
-    hw = new int[0][0];
+    sizeMatrix = new int[0][0];
   }
 
   public void resetXY() {
@@ -63,14 +63,14 @@ public class Cube {
    *
    * @param style
    */
-  public void setBoxData(int s) {
+  public void setStyle(int s) {
     if (s < 0 || s > STYLE_LIST.length) {
       System.out.println("設定的方塊型別不存在");
       return;
     }
     String data = STYLE_LIST[s - 1];
     style = s;
-    setStyleData(data);
+    createMatrix(data);
   }
 
   /**
@@ -80,10 +80,10 @@ public class Cube {
    *
    * @param data STYLE1 or STYLE2, STYLE3...
    */
-  public void setStyleData(String data) {
+  private void createMatrix(String data) {
     String[] ary = data.split("[@]");
-    boxAry = new int[ary.length][][];
-    hw = new int[ary.length][2];
+    cubeMatrix = new int[ary.length][][];
+    sizeMatrix = new int[ary.length][2];
 
     for (int i = 0; i < ary.length; i++) {
       String[] box = ary[i].split("[|]");
@@ -105,16 +105,16 @@ public class Cube {
       }
       h++;
       w++;
-      hw[i][0] = h;
-      hw[i][1] = w;
+      sizeMatrix[i][0] = h;
+      sizeMatrix[i][1] = w;
 
-      boxAry[i] = new int[h][w];
+      cubeMatrix[i] = new int[h][w];
 
       for (int j = 0; j < box.length; j++) {
         String[] bAry = box[j].split("[,]");
         int x = bAry[0].charAt(0) - '0';
         int y = bAry[1].charAt(0) - '0';
-        boxAry[i][x][y] = style;
+        cubeMatrix[i][x][y] = style;
       }
     }
   }
@@ -183,7 +183,7 @@ public class Cube {
    * @return
    */
   public int getTrunKind() {
-    return boxAry.length;
+    return cubeMatrix.length;
   }
 
   /**
@@ -193,8 +193,8 @@ public class Cube {
    * @return
    */
   public int getWight(int n) {
-    if (n >= 0 && n < hw.length) {
-      return hw[n][1];
+    if (n >= 0 && n < sizeMatrix.length) {
+      return sizeMatrix[n][1];
     }
     return 0;
   }
@@ -204,7 +204,7 @@ public class Cube {
    *
    * @return
    */
-  public int getNowTurnWight() {
+  public int getTurnWight() {
     return getWight(nowturn);
   }
 
@@ -215,8 +215,8 @@ public class Cube {
    * @return
    */
   public int getHeight(int n) {
-    if (n >= 0 && n < hw.length) {
-      return hw[n][0];
+    if (n >= 0 && n < sizeMatrix.length) {
+      return sizeMatrix[n][0];
     }
     return 0;
   }
@@ -226,7 +226,7 @@ public class Cube {
    *
    * @return
    */
-  public int getNowTurnHeight() {
+  public int getTurnHeight() {
     return getHeight(nowturn);
   }
 
@@ -235,8 +235,8 @@ public class Cube {
    *
    * @return
    */
-  public int[][] getNowturnBoxAry() {
-    return getBoxAry(nowturn);
+  public int[][] toArray() {
+    return toArray(nowturn);
   }
 
   /**
@@ -244,8 +244,8 @@ public class Cube {
    *
    * @return
    */
-  public String getNowturnBoxStyleStr() {
-    return getBoxStyleStr(nowturn);
+  public String toTurnCubeString() {
+    return toCubeString(nowturn);
   }
 
   /**
@@ -254,9 +254,9 @@ public class Cube {
    * @param index
    * @return
    */
-  public int[][] getBoxAry(int index) {
-    if (index >= 0 && index < boxAry.length) {
-      return boxAry[index];
+  public int[][] toArray(int index) {
+    if (index >= 0 && index < cubeMatrix.length) {
+      return cubeMatrix[index];
     }
     return null;
   }
@@ -267,8 +267,8 @@ public class Cube {
    * @param index
    * @return
    */
-  public String getBoxStyleStr(int index) {
-    if (index >= 0 && index < boxAry.length) {
+  public String toCubeString(int index) {
+    if (index >= 0 && index < cubeMatrix.length) {
       String data = STYLE_LIST[style - 1];
       String[] ary = data.split("[@]");
       return ary[index];

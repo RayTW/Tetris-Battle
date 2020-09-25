@@ -21,9 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Ray
  */
 public class AudioPlayer {
-  private static ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream, Clip>>>
-      sCacheAudioClip =
-          new ConcurrentHashMap<String, CacheReuseList<Pair<AudioInputStream, Clip>>>();
+  private static ConcurrentHashMap<String, CacheReusePool<Pair<AudioInputStream, Clip>>>
+      cacheAudioClip =
+          new ConcurrentHashMap<String, CacheReusePool<Pair<AudioInputStream, Clip>>>();
 
   private Clip clip;
 
@@ -168,11 +168,11 @@ public class AudioPlayer {
 
   /** load完音檔後，進行播放設定 */
   private <T> void doLoadingAudio(String key, final Callable<T> callable) throws Exception {
-    CacheReuseList<Pair<AudioInputStream, Clip>> audioClipList = sCacheAudioClip.get(key);
+    CacheReusePool<Pair<AudioInputStream, Clip>> audioClipList = cacheAudioClip.get(key);
 
     if (audioClipList == null) {
       audioClipList =
-          new CacheReuseList<Pair<AudioInputStream, Clip>>(
+          new CacheReusePool<Pair<AudioInputStream, Clip>>(
               cacheCount,
               new Callable<Pair<AudioInputStream, Clip>>() {
                 @Override
@@ -196,7 +196,7 @@ public class AudioPlayer {
                           if (event.getType().equals(LineEvent.Type.STOP)) {
                             if (!isPause) {
                               if (callbackTartet != null) {
-                                callbackTartet.onAudioPlayEnd(callbackObj);
+                                callbackTartet.onAudioPlayed(callbackObj);
                               }
                             }
                           }
@@ -205,7 +205,7 @@ public class AudioPlayer {
                   return new Pair<AudioInputStream, Clip>(audio, clip);
                 }
               });
-      sCacheAudioClip.put(key, audioClipList);
+      cacheAudioClip.put(key, audioClipList);
 
       clip = audioClipList.next().getSecond();
     } else {

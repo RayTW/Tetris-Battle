@@ -1,8 +1,7 @@
-package tetris.game;
+package util;
 
 import java.util.List;
 import tetris.Config;
-import util.AudioPlayer;
 
 public class AudioManager {
   private static AudioManager instance = new AudioManager();

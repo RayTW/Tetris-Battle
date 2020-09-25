@@ -40,6 +40,7 @@ public class RepaintView extends ComponentView {
     fpsCounter = new FpsCounter();
   }
 
+  @Override
   public final void initialize() {
     init();
     repainThread.start();
@@ -115,6 +116,7 @@ public class RepaintView extends ComponentView {
     }
   }
 
+  @Override
   public void release() {
     isRepain = false;
     repainThread.interrupt();
