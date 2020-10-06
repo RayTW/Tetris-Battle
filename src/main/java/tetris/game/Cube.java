@@ -1,7 +1,7 @@
 package tetris.game;
 
 /**
- * 各種方塊，目前設定有7種形狀可設定
+ * 各種方塊，目前設定有7種形狀可設定.
  *
  * @author Ray
  */
@@ -36,11 +36,8 @@ public class Cube {
   private int[][][] cubeMatrix; // 此方塊轉向後的值
   private int[][] sizeMatrix; // 此方塊轉向後的高、寬
 
+  /** 初始化方塊. */
   public Cube() {
-    initialize();
-  }
-
-  public void initialize() {
     nowturn = 0;
     cubeMatrix = new int[0][0][0];
     style = 1;
@@ -61,7 +58,7 @@ public class Cube {
    * 6.T型<br>
    * 7.反閃電 <br>
    *
-   * @param style
+   * @param s 方塊種類
    */
   public void setStyle(int s) {
     if (s < 0 || s > STYLE_LIST.length) {
@@ -92,9 +89,9 @@ public class Cube {
 
       // 找尋方塊各方裡x最大格數與y的最大格數來當寬與高,找完之後因設定值為從0開始，需要再將高、寬各+1
       for (int j = 0; j < box.length; j++) {
-        String[] bAry = box[j].split("[,]");
-        int x = bAry[0].charAt(0) - '0';
-        int y = bAry[1].charAt(0) - '0';
+        String[] bary = box[j].split("[,]");
+        int x = bary[0].charAt(0) - '0';
+        int y = bary[1].charAt(0) - '0';
 
         if (x > h) {
           h = x;
@@ -111,9 +108,9 @@ public class Cube {
       cubeMatrix[i] = new int[h][w];
 
       for (int j = 0; j < box.length; j++) {
-        String[] bAry = box[j].split("[,]");
-        int x = bAry[0].charAt(0) - '0';
-        int y = bAry[1].charAt(0) - '0';
+        String[] bary = box[j].split("[,]");
+        int x = bary[0].charAt(0) - '0';
+        int y = bary[1].charAt(0) - '0';
         cubeMatrix[i][x][y] = style;
       }
     }
@@ -124,7 +121,7 @@ public class Cube {
   }
 
   /**
-   * 取得目前有幾種方塊種類
+   * 取得目前有幾種方塊種類.
    *
    * @return
    */
@@ -133,16 +130,16 @@ public class Cube {
   }
 
   /**
-   * 設定目前轉向
+   * 設定目前轉向.
    *
-   * @param n
+   * @param n 方向
    */
   public void setTurn(int n) {
     nowturn = n;
   }
 
   /**
-   * 取得目前轉向
+   * 取得目前轉向.
    *
    * @return
    */
@@ -150,6 +147,12 @@ public class Cube {
     return nowturn;
   }
 
+  /**
+   * 方塊下個轉向.
+   *
+   * @param n 方向
+   * @return
+   */
   public int nextTurn(int n) {
     int tmpTurn = nowturn;
 
@@ -163,7 +166,7 @@ public class Cube {
     return tmpTurn;
   }
 
-  /** 逆時針轉向 */
+  /** 逆時針轉向. */
   public void turnLeft() {
     nowturn--;
     if (nowturn < 0) {
@@ -171,14 +174,14 @@ public class Cube {
     }
   }
 
-  /** 順時針轉向 */
+  /** 順時針轉向. */
   public void turnRight() {
     nowturn++;
     nowturn %= getTrunKind();
   }
 
   /**
-   * 取得方塊有幾種轉向
+   * 取得方塊有幾種轉向.
    *
    * @return
    */
@@ -187,9 +190,9 @@ public class Cube {
   }
 
   /**
-   * 取得指定轉向的寬
+   * 取得指定轉向的寬.
    *
-   * @param n
+   * @param n 方向
    * @return
    */
   public int getWight(int n) {
@@ -200,7 +203,7 @@ public class Cube {
   }
 
   /**
-   * 取得目前轉向的寬
+   * 取得目前轉向的寬.
    *
    * @return
    */
@@ -209,9 +212,9 @@ public class Cube {
   }
 
   /**
-   * 取得指定轉向的高
+   * 取得指定轉向的高.
    *
-   * @param n
+   * @param n 方向
    * @return
    */
   public int getHeight(int n) {
@@ -222,7 +225,7 @@ public class Cube {
   }
 
   /**
-   * 取得目前轉向的高
+   * 取得目前轉向的高.
    *
    * @return
    */
@@ -231,7 +234,7 @@ public class Cube {
   }
 
   /**
-   * 取得目前方塊形狀
+   * 取得目前方塊形狀.
    *
    * @return
    */
@@ -240,18 +243,9 @@ public class Cube {
   }
 
   /**
-   * 取得目前方塊形狀
+   * 取得指定轉向的方塊形狀.
    *
-   * @return
-   */
-  public String toTurnCubeString() {
-    return toCubeString(nowturn);
-  }
-
-  /**
-   * 取得指定轉向的方塊形狀
-   *
-   * @param index
+   * @param index 指定轉向
    * @return
    */
   public int[][] toArray(int index) {
@@ -262,9 +256,18 @@ public class Cube {
   }
 
   /**
-   * 取得指定轉向的方塊形狀(以字串格式)，例如:"[形狀1]_高,寬@[形狀2]_高,寬
+   * 取得目前方塊形狀.
    *
-   * @param index
+   * @return
+   */
+  public String toTurnCubeString() {
+    return toCubeString(nowturn);
+  }
+
+  /**
+   * 取得指定轉向的方塊形狀(以字串格式)，例如:"[形狀1]_高,寬@[形狀2]_高,寬.
+   *
+   * @param index 指定轉向
    * @return
    */
   public String toCubeString(int index) {
@@ -277,10 +280,10 @@ public class Cube {
   }
 
   /**
-   * 移動x幾格，y幾格,並將舊的位置記下
+   * 移動x幾格，y幾格,並將舊的位置記下.
    *
-   * @param x
-   * @param y
+   * @param x 座標x
+   * @param y 座標y
    */
   public void move(int x, int y) {
     nowY += y;

@@ -18,9 +18,9 @@ public class CubeMatrix {
   // ----------------------------public
   // method------------begin--------------------
   /**
-   * 建立新的方塊,回傳:true:建立成功，方塊未撞到其他方塊,false:建立失敗，方塊撞到其他方塊
+   * 建立新的方塊,回傳:true:建立成功，方塊未撞到其他方塊,false:建立失敗，方塊撞到其他方塊.
    *
-   * @param style
+   * @param style 方塊種類
    * @return
    */
   public boolean createNewCube(int style) {
@@ -59,7 +59,7 @@ public class CubeMatrix {
   }
 
   /**
-   * 向下移1格,回傳是否可再往下移 true:可繼續下移,false:不可往下移
+   * 向下移1格,回傳是否可再往下移 true:可繼續下移,false:不可往下移.
    *
    * @return
    */
