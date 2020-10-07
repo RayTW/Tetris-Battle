@@ -157,7 +157,7 @@ public class SingleView extends RepaintView implements GameEventListener {
         case KeyEvent.VK_SPACE: // 空白鍵,快速掉落方塊
           quickDown();
           break;
-        case KeyEvent.VK_S: // S鍵,暫停
+        case KeyEvent.VK_ENTER: // ENTER鍵,暫停
           gameFlow.pause();
           gameoverLabel.setHidden(false);
           gameoverLabel.setText(PAUSE);
@@ -165,7 +165,7 @@ public class SingleView extends RepaintView implements GameEventListener {
         default:
       }
     } else {
-      if (code == KeyEvent.VK_R) { // R鍵,回到遊戲繼續
+      if (code == KeyEvent.VK_ENTER) { // ENTER鍵,回到遊戲繼續
         gameoverLabel.setHidden(true);
         gameFlow.rusme();
       }
