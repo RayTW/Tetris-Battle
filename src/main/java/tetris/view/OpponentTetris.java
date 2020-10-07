@@ -7,7 +7,6 @@ import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 import org.json.JSONObject;
 import tetris.Config;
 import tetris.game.CubeMatrix;
@@ -44,7 +43,6 @@ public class OpponentTetris extends Role {
     new Color(255, 0, 255, 250),
     new Color(50, 100, 150, 250)
   };
-  private Color shadowColor = new Color(0, 0, 0, 128);
 
   private InfoBar infoBar;
   private Zoomable zoomable;
@@ -67,24 +65,8 @@ public class OpponentTetris extends Role {
     queueComsumerThread.start();
   }
 
-  public void addkeyCode(int code, boolean simulation) {
-    JSONObject json = new JSONObject();
-    json.put("code", code);
-    json.put("simulation", simulation);
-    keyCodeQueue.add(new KeyCodeEvent(10, json));
-  }
-
   public void addKeyCodeEvent(KeyCodeEvent event) {
     keyCodeQueue.add(event);
-  }
-
-  public void addKeyCodeEvent(Consumer<KeyCodeEvent> consumer) {
-    KeyCodeEvent e = new KeyCodeEvent();
-    e.json = new JSONObject();
-
-    consumer.accept(e);
-
-    keyCodeQueue.add(e);
   }
 
   private void processKeyCodeEvent() {
@@ -93,7 +75,7 @@ public class OpponentTetris extends Role {
       while (keyCodeQueue.size() > 0) {
         KeyCodeEvent event = keyCodeQueue.remove(0);
         if (event.getEvent() == 10) {
-          int code = event.getJson().getInt("code");
+          int code = event.getJson().getInt("keyCode");
           boolean simulation = event.getJson().getBoolean("simulation");
 
           onKeyCode(code, simulation);
@@ -267,25 +249,6 @@ public class OpponentTetris extends Role {
         int style = box[i][j];
         if (style > 0) {
           drawBox(style, (j + boxX), (i + boxY), buffImg);
-        }
-      }
-    }
-  }
-
-  // 畫陰影
-  private void shadow(int[] xy, int[][] box, Graphics buffImg, int index) {
-    int boxX = xy[0];
-    buffImg.setColor(shadowColor);
-    for (int i = 0; i < box.length; i++) {
-      for (int j = 0; j < box[i].length; j++) {
-        int style = box[i][j];
-        if (style > 0) {
-          buffImg.fill3DRect(
-              boxStartX + (singleCubeWidth * (j + boxX)),
-              boxStartY + (singleCubeHeight * (i + index)),
-              singleCubeWidth,
-              singleCubeHeight,
-              true);
         }
       }
     }

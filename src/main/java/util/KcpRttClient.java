@@ -1,4 +1,4 @@
-package tetris.game.battle;
+package util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -30,7 +30,6 @@ public class KcpRttClient {
   private int conv;
   private String host;
   private int port;
-  private int rttInterval;
   private ChannelFuture channelFuture;
   private EventLoopGroup group;
   private OnConnectedListener onConnectedListener;
@@ -43,17 +42,15 @@ public class KcpRttClient {
     private int conv;
     private String host;
     private int port;
-    private int rttInterval;
 
     public KcpRttClient build() {
-      Objects.requireNonNull(this.host, "this.host == null");
+      Objects.requireNonNull(this.host, "host == null");
 
       KcpRttClient client = new KcpRttClient();
 
       client.conv = this.conv > 0 ? this.conv : 10;
       client.host = this.host;
       client.port = this.port;
-      client.rttInterval = this.rttInterval;
 
       return client;
     }
@@ -72,11 +69,6 @@ public class KcpRttClient {
       this.port = port;
       return this;
     }
-
-    public Builder setRttInterval(int rttInterval) {
-      this.rttInterval = rttInterval;
-      return this;
-    }
   }
 
   public void connect() throws InterruptedException {
@@ -92,6 +84,10 @@ public class KcpRttClient {
                 ChannelPipeline p = ch.pipeline();
                 p.addLast(
                     new ChannelInboundHandlerAdapter() {
+                      @Override
+                      public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+                        System.out.println("channelRegistered");
+                      }
 
                       @Override
                       public void channelActive(final ChannelHandlerContext ctx) {
@@ -128,14 +124,18 @@ public class KcpRttClient {
                         buf.release();
 
                         if (onReadedListener != null) {
-                          onReadedListener.onReaded(str);
+                          onReadedListener.onReaded(str.toString());
                         }
                       }
 
                       @Override
                       public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
                         // Close the connection when an exception is raised.
-                        System.out.println("exceptionCaught,ctx=" + ctx);
+                        System.out.println(
+                            "client.exceptionCaught,ctx="
+                                + ctx
+                                + ",\n"
+                                + Debug.get().toString(cause));
                         ctx.close();
                       }
                     });
@@ -150,7 +150,7 @@ public class KcpRttClient {
   public void close() throws InterruptedException {
     try {
       // Wait until the connection is closed.
-      channelFuture.channel().closeFuture().sync();
+      channelFuture.channel().closeFuture();
     } finally {
       // Shut down the event loop to terminate all threads.
       group.shutdownGracefully();
@@ -166,12 +166,28 @@ public class KcpRttClient {
     channelFuture.channel().writeAndFlush(buf);
   }
 
+  public void write(ByteBuf buf) {
+    channelFuture.channel().writeAndFlush(buf);
+  }
+
+  public void setOnConnectedListener(OnConnectedListener listener) {
+    onConnectedListener = listener;
+  }
+
+  public void setOnReadedListener(OnReadedListener listener) {
+    onReadedListener = listener;
+  }
+
+  public void setOnDisconnectedListener(OnDisconnectedListener listener) {
+    onDisconnectedListener = listener;
+  }
+
   public static interface OnConnectedListener {
     void onConnected();
   }
 
   public static interface OnReadedListener {
-    void onReaded(CharSequence msg);
+    void onReaded(String msg);
   }
 
   public static interface OnDisconnectedListener {

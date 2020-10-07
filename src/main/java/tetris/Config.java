@@ -47,6 +47,10 @@ public class Config {
   // 畫面刷新間隔ms
   private int repainMills;
 
+  private String host = "127.0.0.1";
+  private int port = 8009;
+  private String userName = "user" + Math.random() * Integer.MAX_VALUE;
+
   private Config() {
     setMaxFps(30);
   }
@@ -204,5 +208,26 @@ public class Config {
    */
   public int getNextCubeSize() {
     return nextCubeSize;
+  }
+
+  public void setHostPort(String host, int port) {
+    this.host = host;
+    this.port = port;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public void setUserName(String name) {
+    userName = name;
+  }
+
+  public String getUserName() {
+    return userName;
   }
 }

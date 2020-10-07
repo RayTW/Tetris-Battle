@@ -3,10 +3,12 @@ package tetris.view;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.util.concurrent.TimeUnit;
-
+import org.json.JSONObject;
 import tetris.Config;
+import tetris.game.battle.Client;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
+import util.Debug;
 
 /**
  * 對戰連線畫面
@@ -50,21 +52,38 @@ public class ConnectingView extends RepaintView {
               }
             });
     thread.start();
-    new Thread(
-            () -> {
-              try {
-                TimeUnit.SECONDS.sleep(1);
-              } catch (InterruptedException e) {
-                e.printStackTrace();
-              }
-              changeView(ViewName.BATTLE);
-            })
-        .start();
+    Debug.get().println("connect " + Config.get().getHost() + "/" + Config.get().getPort());
+    Client.get().connect(Config.get().getHost(), Config.get().getPort());
+
+    Client.get()
+        .getKcp()
+        .ifPresent(
+            k -> {
+              k.setOnReadedListener(
+                  msg -> {
+                    JSONObject json = new JSONObject(msg);
+                    if (json.getInt("code") == 300) {
+                      Client.get().setRoomId(json.getString("roomId"));
+                      return;
+                    }
+                    if (json.getInt("code") == 400) {
+                      changeView(ViewName.BATTLE);
+                    }
+                  });
+            });
+
+    JSONObject json = new JSONObject();
+
+    json.put("code", 1);
+    json.put("name", Config.get().getUserName());
+
+    Client.get().write(json);
   }
 
   @Override
   public void onKeyCode(int code) {
     if (code == KeyEvent.VK_ESCAPE) {
+      Client.get().close();
       changeView(ViewName.MENU);
       return;
     }

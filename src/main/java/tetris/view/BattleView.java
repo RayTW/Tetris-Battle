@@ -6,10 +6,16 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
+import java.util.function.Consumer;
+
+import org.json.JSONObject;
+
 import tetris.Config;
 import tetris.game.Cube;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
+import tetris.game.battle.Client;
+import tetris.view.OpponentTetris.KeyCodeEvent;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
@@ -123,8 +129,40 @@ public class BattleView extends RepaintView implements GameEventListener {
     // 設定下次要出現的方塊style個數為顯示3個
     cubeBuffer = getBufBox(gameFlow, nextCubeSize);
 
+    Client.get()
+        .getKcp()
+        .ifPresent(
+            k -> {
+              k.setOnReadedListener(this::processServerMessage);
+            });
+
     // 啟動遊戲邏輯執行緒
     gameFlow.start();
+  }
+
+  private void processServerMessage(String msg) {
+    System.out.println("processServerMessage=" + msg);
+    JSONObject json = new JSONObject(msg);
+    int code = json.getInt("code");
+
+    /*
+     * {
+     *   "code": 412,
+     *   "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
+     *   "operation": {
+     *      "event": 2,
+     *      "style":false
+     *  }
+     * }
+     */
+    if (code == 412) {
+      JSONObject operation = json.getJSONObject("operation");
+      int event = operation.getInt("event");
+      KeyCodeEvent e = new KeyCodeEvent(event, operation);
+
+      opponentTetris.addKeyCodeEvent(e);
+      return;
+    }
   }
 
   @Override
@@ -161,9 +199,12 @@ public class BattleView extends RepaintView implements GameEventListener {
           break;
         default:
       }
-      // TODO ---test---begin
-      opponentTetris.addkeyCode(code, false);
-      // TODO ---test---end
+      sendOperation(
+          10,
+          json -> {
+            json.put("keyCode", code);
+            json.put("simulation", false);
+          });
     }
 
     // 每次按了鍵盤就將畫面重繪
@@ -363,9 +404,12 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     // 方塊下移
     if (GameEvent.BOX_MOVE_DOWN == code) {
-      // TODO ---test---begin
-      opponentTetris.addkeyCode(KeyEvent.VK_DOWN, true);
-      // TODO ---test---end
+      sendOperation(
+          10,
+          json -> {
+            json.put("keyCode", KeyEvent.VK_DOWN);
+            json.put("simulation", true);
+          });
       return;
     }
     // 方塊落到底
@@ -376,14 +420,11 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     // 建立完下一個方塊
     if (GameEvent.BOX_NEW == code) {
-      // TODO ---test---begin
-      opponentTetris.addKeyCodeEvent(
-          event -> {
-            event.setEvent(20);
-            event.getJson().put("style", Integer.parseInt((String) data));
+      sendOperation(
+          20,
+          json -> {
+            json.put("style", Integer.parseInt((String) data));
           });
-
-      // TODO ---test---end
       return;
     }
     // 建立完下一個方塊
@@ -393,13 +434,13 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     if (GameEvent.CLEAN_LINE_BEFORE == code) {
       Cube cube = (Cube) data;
-      opponentTetris.addKeyCodeEvent(
-          event -> {
-            event.setEvent(40);
-            event.getJson().put("x", cube.getNowX());
-            event.getJson().put("y", cube.getNowY());
-            event.getJson().put("style", cube.getStyle());
-            event.getJson().put("cube", Arrays.deepToString(cube.toArray()));
+      sendOperation(
+          40,
+          json -> {
+            json.put("x", cube.getNowX());
+            json.put("y", cube.getNowY());
+            json.put("style", cube.getStyle());
+            json.put("cube", Arrays.deepToString(cube.toArray()));
           });
       return;
     }
@@ -426,22 +467,12 @@ public class BattleView extends RepaintView implements GameEventListener {
       return;
     }
     if (GameEvent.GAME_START == code) {
-      // TODO ---test---begin
-      opponentTetris.addKeyCodeEvent(
-          event -> {
-            event.setEvent(1);
-          });
-      // TODO ---test---end
+      sendOperation(1);
       return;
     }
     // 方塊頂到最高處，遊戲結束
     if (GameEvent.GAME_OVER == code) {
-      // TODO ---test---begin
-      opponentTetris.addKeyCodeEvent(
-          event -> {
-            event.setEvent(30);
-          });
-      // TODO ---test---end
+      sendOperation(30);
       infoBar.setWaitNextRoundSecond(Config.get().getNextRoundDelaySecond());
 
       while (infoBar.getWaitNextRoundSecond() > 0) {
@@ -460,12 +491,7 @@ public class BattleView extends RepaintView implements GameEventListener {
       // 清除全畫面方塊
       gameFlow.clearBox();
 
-      // TODO ---test---begin
-      opponentTetris.addKeyCodeEvent(
-          event -> {
-            event.setEvent(0);
-          });
-      // TODO ---test---end
+      sendOperation(0);
 
       // 設定方塊掉落秒數
       gameFlow.setSecond(Config.get().getBoxFallSpeed(infoBar.getLevel()));
@@ -487,6 +513,58 @@ public class BattleView extends RepaintView implements GameEventListener {
       return true;
     }
     return false;
+  }
+
+  //  public void sendOperation(int event, boolean simulation) {
+  //    JSONObject operation = new JSONObject();
+  //
+  //    operation.put("simulation", simulation);
+  //    operation.put("event", event);
+  //
+  //    JSONObject json = new JSONObject();
+  //    json.put("code", 411);
+  //    json.put("roomId", Client.get().getRoomId());
+  //    json.put("operation", operation);
+  //
+  //    /*
+  //     * {
+  //     *   "code": 411,
+  //     *   "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
+  //     *   "operation": {
+  //     *      "event": 2,
+  //     *      "simulation":false
+  //     *  }
+  //     * }
+  //     */
+  //    Client.get().write(json);
+  //  }
+
+  public void sendOperation(int event) {
+    sendOperation(event, o -> {});
+  }
+
+  public void sendOperation(int event, Consumer<JSONObject> consumer) {
+    JSONObject operation = new JSONObject();
+
+    operation.put("event", event);
+    consumer.accept(operation);
+
+    JSONObject json = new JSONObject();
+    json.put("code", 411);
+    json.put("roomId", Client.get().getRoomId());
+    json.put("operation", operation);
+
+    /*
+     * {
+     *   "code": 411,
+     *   "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
+     *   "operation": {
+     *      "event": 2,
+     *      "style":false
+     *  }
+     * }
+     */
+    Client.get().write(json);
   }
 
   @Override

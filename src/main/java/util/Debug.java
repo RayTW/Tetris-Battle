@@ -1,6 +1,7 @@
 package util;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -26,5 +27,14 @@ public class Debug {
 
   public void println(String str) {
     System.out.println(simpleDateFormat.format(new Date()) + " " + str);
+  }
+
+  public String toString(Throwable cause) {
+    return cause.toString()
+        + System.lineSeparator()
+        + Arrays.stream(cause.getStackTrace())
+            .map(String::valueOf)
+            .reduce((a, b) -> a.concat(b).concat(System.lineSeparator()))
+            .get();
   }
 }

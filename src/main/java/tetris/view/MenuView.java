@@ -3,8 +3,13 @@ package tetris.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import tetris.Config;
 import tetris.view.component.RepaintView;
+import util.Debug;
 import util.Pair;
 import tetris.view.component.FlashLabel;
 import tetris.view.component.Label;
@@ -76,8 +81,10 @@ public class MenuView extends RepaintView {
         // 單機
         changeView(ViewName.SINGLE);
       } else if (mode == ViewName.BATTLE) {
-        // 對戰
-        changeView(ViewName.CONNECTING);
+        if (doConnectSettings()) {
+          // 對戰
+          changeView(ViewName.CONNECTING);
+        }
       }
     } else if (code == KeyEvent.VK_UP) { // 遊標上移
       arrow--;
@@ -94,6 +101,34 @@ public class MenuView extends RepaintView {
   private void setModeArrow(int r) {
     singleText.setText(options[r].getSecond()[0]);
     battleText.setText(options[r].getSecond()[1]);
+  }
+
+  private boolean doConnectSettings() {
+    JTextField name = new JTextField();
+    JTextField host = new JTextField();
+    JTextField port = new JTextField();
+
+    final JComponent[] inputs =
+        new JComponent[] {
+          new JLabel("User Name"), name, new JLabel("Host"), host, new JLabel("Port"), port
+        };
+
+    int result =
+        JOptionPane.showConfirmDialog(null, inputs, "Connect settings", JOptionPane.PLAIN_MESSAGE);
+    if (result == JOptionPane.OK_OPTION) {
+      Debug.get()
+          .println("You entered " + name.getText() + ", " + host.getText() + ", " + port.getText());
+
+      Config.get().setHostPort(host.getText(), Integer.parseInt(port.getText()));
+      Config.get().setUserName(name.getText());
+
+      // TODO 需驗證host、port、user name格式
+      // JOptionPane.showMessageDialog(this, "settings error", "error", JOptionPane.ERROR_MESSAGE);
+      return true;
+    } else {
+      Debug.get().println("User canceled / closed the dialog, result = " + result);
+      return false;
+    }
   }
 
   @Override
