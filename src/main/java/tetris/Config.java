@@ -49,7 +49,7 @@ public class Config {
 
   private String host = "127.0.0.1";
   private int port = 8009;
-  private String userName = "user" + Math.random() * Integer.MAX_VALUE;
+  private String userName = "user" + (int) (Math.random() * Integer.MAX_VALUE);
 
   private Config() {
     setMaxFps(30);
