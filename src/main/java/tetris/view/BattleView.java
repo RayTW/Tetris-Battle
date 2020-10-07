@@ -141,7 +141,6 @@ public class BattleView extends RepaintView implements GameEventListener {
   }
 
   private void processServerMessage(String msg) {
-    System.out.println("processServerMessage=" + msg);
     JSONObject json = new JSONObject(msg);
     int code = json.getInt("code");
 

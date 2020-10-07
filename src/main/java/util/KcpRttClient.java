@@ -85,24 +85,13 @@ public class KcpRttClient {
                 p.addLast(
                     new ChannelInboundHandlerAdapter() {
                       @Override
-                      public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
-                        System.out.println("channelRegistered");
-                      }
+                      public void channelRegistered(ChannelHandlerContext ctx) throws Exception {}
 
                       @Override
                       public void channelActive(final ChannelHandlerContext ctx) {
                         UkcpChannel kcpCh = (UkcpChannel) ctx.channel();
-                        kcpCh.conv(conv); // set conv
-                        //                        System.out.println("xx11channelActive,ctx=" +
-                        // ctx);
-                        //
-                        //                        ByteBuf obj =
-                        //
-                        // Unpooled.wrappedBuffer("name".getBytes(StandardCharsets.UTF_8));
-                        //
-                        //                        ctx.writeAndFlush(obj);
-                        //                        System.out.println("xx22channelActive,ctx=" +
-                        // ctx);
+                        kcpCh.conv(conv);
+
                         if (onConnectedListener != null) {
                           onConnectedListener.onConnected();
                         }
@@ -110,7 +99,6 @@ public class KcpRttClient {
 
                       @Override
                       public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-                        //                        System.out.println("channelInactive,ctx=" + ctx);
                         if (onDisconnectedListener != null) {
                           onDisconnectedListener.onDisconnected();
                         }
@@ -131,11 +119,12 @@ public class KcpRttClient {
                       @Override
                       public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
                         // Close the connection when an exception is raised.
-                        System.out.println(
-                            "client.exceptionCaught,ctx="
-                                + ctx
-                                + ",\n"
-                                + Debug.get().toString(cause));
+                        Debug.get()
+                            .println(
+                                "client.exceptionCaught,ctx="
+                                    + ctx
+                                    + ",\n"
+                                    + Debug.get().toString(cause));
                         ctx.close();
                       }
                     });
