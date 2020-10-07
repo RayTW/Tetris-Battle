@@ -7,6 +7,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import tetris.Config;
 import tetris.view.component.RepaintView;
 import util.Debug;
@@ -113,20 +116,53 @@ public class MenuView extends RepaintView {
           new JLabel("User Name"), name, new JLabel("Host"), host, new JLabel("Port"), port
         };
 
+    name.setText(Config.get().getUserName());
+    // 讓user name輸入框取得focus
+    name.addAncestorListener(
+        new AncestorListener() {
+
+          @Override
+          public void ancestorAdded(AncestorEvent event) {}
+
+          @Override
+          public void ancestorRemoved(AncestorEvent event) {}
+
+          @Override
+          public void ancestorMoved(AncestorEvent event) {
+            SwingUtilities.invokeLater(
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    name.requestFocusInWindow();
+                  }
+                });
+          }
+        });
+
     int result =
         JOptionPane.showConfirmDialog(null, inputs, "Connect settings", JOptionPane.PLAIN_MESSAGE);
     if (result == JOptionPane.OK_OPTION) {
       Debug.get()
           .println("You entered " + name.getText() + ", " + host.getText() + ", " + port.getText());
 
+      if (host.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "host error", "error", JOptionPane.ERROR_MESSAGE);
+        return false;
+      }
+      if (port.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "port error", "error", JOptionPane.ERROR_MESSAGE);
+        return false;
+      }
+      if (name.getText().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "user name error", "error", JOptionPane.ERROR_MESSAGE);
+        return false;
+      }
+
       Config.get().setHostPort(host.getText(), Integer.parseInt(port.getText()));
       Config.get().setUserName(name.getText());
-
-      // TODO 需驗證host、port、user name格式
-      // JOptionPane.showMessageDialog(this, "settings error", "error", JOptionPane.ERROR_MESSAGE);
       return true;
     } else {
-      Debug.get().println("User canceled / closed the dialog, result = " + result);
+      Debug.get().println("User canceled / closed the dialog");
       return false;
     }
   }
