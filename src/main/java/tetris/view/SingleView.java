@@ -104,7 +104,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     gameoverLabel.setLocation(config.zoom(100), config.zoom(250));
     gameoverLabel.setFont(Font.BOLD, config.zoom(20));
     gameoverLabel.setHidden(true);
-    gameoverLabel.setColor(Color.DARK_GRAY);
+    gameoverLabel.setColor(Color.RED);
     add(gameoverLabel);
 
     // 分數、消除行數、等級

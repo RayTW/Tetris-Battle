@@ -344,7 +344,7 @@ public class BattleView extends RepaintView implements GameEventListener {
 
   private void showGameOver(InfoBar info, Graphics buffImg) {
     if (gameFlow.isGameOver()) {
-      buffImg.setColor(Color.DARK_GRAY);
+      buffImg.setColor(Color.RED);
       buffImg.drawString("GAME OVER", gameOverLocationX, gameOverLocationY);
 
       buffImg.drawString(
