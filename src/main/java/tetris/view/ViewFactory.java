@@ -1,34 +1,61 @@
 package tetris.view;
 
+import javax.swing.JFrame;
+
+import org.json.JSONObject;
+import tetris.Config;
 import tetris.view.component.ComponentView;
 
 public class ViewFactory {
+  private Integer width = null;
+  private Integer height = null;
 
   public ViewFactory() {}
 
-  public ComponentView create(ViewName name, int width, int height, boolean darkMode) {
+  public ComponentView create(JFrame jframe, Config config, ViewName name) {
+    return create(jframe, config, name, new JSONObject());
+  }
+
+  public ComponentView create(JFrame jframe, Config config, ViewName name, JSONObject params) {
     ComponentView view = null;
+    if (width == null) {
+      width = jframe.getWidth();
+    }
+    if (height == null) {
+      height = jframe.getHeight();
+    }
+    // 將變寬的畫面原還原始大小
+    if (jframe.getWidth() != width) {
+      jframe.setSize(width, height);
+    }
+
+    params.put("width", width);
+    params.put("height", height);
 
     switch (name) {
       case SINGLE:
-        view = new SingleView(width, height);
+        view = new SingleView(params);
         break;
       case MATCHING:
-        view = new MatchingView(width, height);
+        view = new MatchingView(params);
         break;
       case BATTLE:
-        view = new BattleView(width, height);
+        // 讓對戰頁變寬，右邊要畫對手的遊戲畫面
+        int newWidth = (int) (width * 1.8);
+        params.put("width", newWidth);
+        view = new BattleView(params);
+        jframe.setSize(newWidth, height);
         break;
       case MENU:
-        view = new MenuView(width, height);
+        view = new MenuView(params);
         break;
       case HOW_TO_PLAY:
-        view = new HowToPlayView(width, height);
+        view = new HowToPlayView(params);
         break;
       default:
     }
 
-    view.setDarkMode(darkMode);
+    view.setDarkMode(config.isDarkMode());
     return view;
   }
 }

@@ -21,8 +21,8 @@ public class MatchingView extends RepaintView {
   private Thread thread;
   private boolean isConnecting = true;;
 
-  public MatchingView(int width, int height) {
-    super(width, height);
+  public MatchingView(JSONObject params) {
+    super(params);
   }
 
   @Override
@@ -55,6 +55,8 @@ public class MatchingView extends RepaintView {
     Debug.get().println("connect " + Config.get().getHost() + "/" + Config.get().getPort());
     Client.get().connect(Config.get().getHost(), Config.get().getPort());
 
+    JSONObject params = new JSONObject();
+
     Client.get()
         .getKcp()
         .ifPresent(
@@ -63,11 +65,13 @@ public class MatchingView extends RepaintView {
                   msg -> {
                     JSONObject json = new JSONObject(msg);
                     if (json.getInt("code") == 300) {
-                      Client.get().setRoomId(json.getString("roomId"));
+                      params.put("position", json.getInt("position"));
                       return;
                     }
                     if (json.getInt("code") == 400) {
-                      changeView(ViewName.BATTLE);
+
+                      params.put("users", json.getJSONArray("users"));
+                      changeView(ViewName.BATTLE, params);
                     }
                   });
             });

@@ -22,19 +22,32 @@ message : 失敗原因
 
 ----------------------------------
 ----------------------------------
-通知user加入的遊戲房id
+通知user加入的遊戲房id、及遊戲房全部玩家資訊
 {
   "code": 300,
-  "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7"
+  "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
+  "position": 0
 }
 roomId : 遊戲房id
+position : 玩家所在位置
+users : 玩家位置及名稱
 ----------------------------------
 ----------------------------------
 
-通知user遊戲開始
+遊戲室相關資訊
 {
   "code": 400,
-  "message": "game start"
+  "message": "room information",
+  "users": [
+    {
+      "position": 0,
+      "name": "user1"
+    },
+    {
+      "position": 1,
+      "name": "user2"
+    }
+  ]
 }
 
 ----------------------------------
@@ -43,7 +56,6 @@ roomId : 遊戲房id
 發送client遊戲操作
 {
   "code": 411,
-  "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
   "operation": {
     "event": 2,
     "style": false
@@ -56,7 +68,7 @@ operation : 遊戲操作
     1:game start
     2:sync score
     10 : 建方塊
-    20 : keycode
+    20 : key code
     30:game over
     40:cleanLine
 
@@ -65,7 +77,7 @@ operation : 遊戲操作
 server轉發玩家遊戲操作
 {
   "code": 412,
-  "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
+  "position": 0,
   "operation": {
     "event": 2,
     "style": false

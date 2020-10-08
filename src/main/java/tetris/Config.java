@@ -107,7 +107,7 @@ public class Config {
   }
 
   /**
-   * 單列 100 雙列 300 三列 500 四列 800
+   * 單列 100 雙列 300 三列 500 四列 800.
    *
    * @param cleanLines 消除行數
    * @return

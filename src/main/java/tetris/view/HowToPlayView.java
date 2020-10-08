@@ -2,6 +2,9 @@ package tetris.view;
 
 import java.awt.Font;
 import java.awt.event.KeyEvent;
+
+import org.json.JSONObject;
+
 import tetris.Config;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
@@ -15,8 +18,8 @@ public class HowToPlayView extends RepaintView {
   private static final long serialVersionUID = 1L;
   private Label text;
 
-  public HowToPlayView(int width, int height) {
-    super(width, height);
+  public HowToPlayView(JSONObject params) {
+    super(params);
   }
 
   @Override

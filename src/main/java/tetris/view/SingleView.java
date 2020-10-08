@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import org.json.JSONObject;
 import tetris.Config;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
@@ -56,8 +57,8 @@ public class SingleView extends RepaintView implements GameEventListener {
   private AudioPlayer backgroundMusic; // 播放背景音樂
   private InfoBar infoBar;
 
-  public SingleView(int width, int height) {
-    super(width, height);
+  public SingleView(JSONObject params) {
+    super(params);
     backgroundMusic = AudioManager.get().playMusic("sound/music.wav");
   }
 

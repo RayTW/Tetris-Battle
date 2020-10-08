@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-
+import org.json.JSONObject;
 import tetris.view.ViewFactory;
 import tetris.view.ViewName;
 import tetris.view.component.RepaintView;
@@ -40,7 +40,7 @@ public class Tetris extends JFrame implements OnChangeViewListener {
   public void initialize() {
     Container pane = getContentPane();
     viewFactory = new ViewFactory();
-    view = viewFactory.create(ViewName.MENU, getWidth(), getHeight(), Config.get().isDarkMode());
+    view = viewFactory.create(this, Config.get(), ViewName.MENU);
 
     pane.addContainerListener(
         new ContainerListener() {
@@ -94,10 +94,11 @@ public class Tetris extends JFrame implements OnChangeViewListener {
   }
 
   @Override
-  public void onChangeView(ViewName event) {
+  public void onChangeView(ViewName event, JSONObject params) {
     getContentPane().remove(view);
     view.setOnChangeViewListener(null);
-    view = viewFactory.create(event, getWidth(), getHeight(), Config.get().isDarkMode());
+    view = viewFactory.create(this, Config.get(), event, params);
+
     view.setOnChangeViewListener(this);
     getContentPane().add(view);
   }

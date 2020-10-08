@@ -9,6 +9,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.SwingUtilities;
+
+import org.json.JSONObject;
+
 import tetris.Config;
 import util.FpsCounter;
 
@@ -29,7 +32,9 @@ public class RepaintView extends ComponentView {
   private Thread repainThread;
   private FpsCounter fpsCounter;
 
-  public RepaintView(int width, int height) {
+  public RepaintView(JSONObject params) {
+    int width = params.getInt("width");
+    int height = params.getInt("height");
     rolePool = new CopyOnWriteArrayList<>();
     screenWidth = width;
     screenHeight = height;

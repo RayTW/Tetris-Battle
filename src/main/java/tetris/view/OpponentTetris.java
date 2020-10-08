@@ -26,12 +26,10 @@ public class OpponentTetris extends Role {
   private int singleCubeHeight; // 每個方塊格高
   private int scoreLocationX;
   private int scoreLocationY; // 分數顯示位置
-  private int levelLocationX;
-  private int levelLocationY; // 等級顯示位置
   private int gameOverLocationX; // 遊戲結束顯示位置x
   private int gameOverLocationY; // 遊戲結束顯示位置y
-  private int linesLocationX;
-  private int linesLocationY; // 方塊消除累計行數顯示位置
+  private int nameLocationX;
+  private int nameLocationY; // 方塊消除累計行數顯示位置
   private Font scoreFont;
   private Color[] color = {
     null,
@@ -44,7 +42,8 @@ public class OpponentTetris extends Role {
     new Color(50, 100, 150, 250)
   };
 
-  private InfoBar infoBar;
+  private int score;
+  private String userName = "";
   private Zoomable zoomable;
   private Status status = Status.INIT;
   private List<JSONObject> operationQueue = Collections.synchronizedList(new LinkedList<>());
@@ -57,12 +56,13 @@ public class OpponentTetris extends Role {
     cubeMatrix = new CubeMatrix();
     resetLocation(0, 0);
 
-    // 分數、消除行數、等級
-    infoBar = new InfoBar();
-
     queueThreadRunning = true;
     queueComsumerThread = new Thread(this::processOperation);
     queueComsumerThread.start();
+  }
+
+  public void setUserName(String name) {
+    userName = name;
   }
 
   public void addOperation(JSONObject operation) {
@@ -99,7 +99,7 @@ public class OpponentTetris extends Role {
 
           onKeyCode(code, simulation);
         } else if (event == 2) {
-          // sync score
+          score = operation.getInt("score");
         } else if (event == 20) {
           createCube(operation.getInt("style"));
         } else if (event == 40) {
@@ -158,18 +158,16 @@ public class OpponentTetris extends Role {
 
   private void resetLocation(int x, int y) {
     boxStartX = x;
-    boxStartY = Config.get().zoom(zoomable.zoom(80)) + y;
+    boxStartY = Config.get().zoom(zoomable.zoom(60)) + y;
 
     singleCubeWidth = zoomable.zoom(getWidth());
     singleCubeHeight = zoomable.zoom(getHeight());
 
     // 分數位置
-    levelLocationX = x;
-    levelLocationY = Config.get().zoom(zoomable.zoom(20)) + y;
-    linesLocationX = x;
-    linesLocationY = Config.get().zoom(zoomable.zoom(45)) + y;
+    nameLocationX = x;
+    nameLocationY = Config.get().zoom(zoomable.zoom(25)) + y;
     scoreLocationX = x;
-    scoreLocationY = Config.get().zoom(zoomable.zoom(70)) + y;
+    scoreLocationY = Config.get().zoom(zoomable.zoom(50)) + y;
 
     // 遊戲結束
     gameOverLocationX = Config.get().zoom(zoomable.zoom(30)) + x;
@@ -219,7 +217,7 @@ public class OpponentTetris extends Role {
   public void onDraw(Graphics canvas) {
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
     int[][] boxAry = cubeMatrix.getMatrix();
-    showBacegroundBox(boxAry, canvas);
+    drawBacegroundBox(boxAry, canvas);
 
     if (cubeMatrix.getCube() != null) {
       // 畫掉落中的方塊
@@ -229,18 +227,18 @@ public class OpponentTetris extends Role {
       // 畫陰影
       //      shadow(xy, box, canvas, gameBox.getDownY());
 
-      showDownBox(xy, box, canvas);
+      drawDownBox(xy, box, canvas);
     }
 
     // 顯示分數
-    showInfoBar(infoBar, canvas);
+    drawInfoBar(canvas);
 
     // 顯示遊戲結束
-    showGameOver(infoBar, canvas);
+    drawGameOver(canvas);
   }
 
   // 畫定住的方塊與其他背景格子
-  private void showBacegroundBox(int[][] boxAry, Graphics buffImg) {
+  private void drawBacegroundBox(int[][] boxAry, Graphics buffImg) {
     buffImg.setColor(Color.BLACK);
 
     for (int i = 0; i < boxAry.length; i++) {
@@ -260,7 +258,7 @@ public class OpponentTetris extends Role {
   }
 
   // 畫掉落中的方塊
-  private void showDownBox(int[] xy, int[][] box, Graphics buffImg) {
+  private void drawDownBox(int[] xy, int[][] box, Graphics buffImg) {
     int boxX = xy[0];
     int boxY = xy[1];
     for (int i = 0; i < box.length; i++) {
@@ -273,24 +271,22 @@ public class OpponentTetris extends Role {
     }
   }
 
-  private void showInfoBar(InfoBar info, Graphics buffImg) {
+  private void drawInfoBar(Graphics buffImg) {
     if (scoreFont == null) {
       Font currentFont = buffImg.getFont();
-      Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().zoom(zoomable.zoom(20)));
+      Font newFont = currentFont.deriveFont(Font.BOLD, Config.get().zoom(zoomable.zoom(16)));
       scoreFont = newFont;
     }
     // 調整分數字型
     buffImg.setFont(scoreFont);
 
-    buffImg.setColor(Color.RED);
-    buffImg.drawString("LEVEL : " + info.getLevel(), levelLocationX, levelLocationY);
     buffImg.setColor(Color.BLACK);
-    buffImg.drawString("SCORE : " + info.getScore(), linesLocationX, linesLocationY);
-    buffImg.setColor(Color.BLUE);
-    buffImg.drawString("LINES : " + info.getCleanedCount(), scoreLocationX, scoreLocationY);
+    buffImg.drawString(userName, nameLocationX, nameLocationY);
+    buffImg.setColor(Color.RED);
+    buffImg.drawString("SCORE : " + score, scoreLocationX, scoreLocationY);
   }
 
-  private void showGameOver(InfoBar info, Graphics buffImg) {
+  private void drawGameOver(Graphics buffImg) {
     if (status != Status.GAME_OVER) {
       return;
     }
@@ -345,8 +341,7 @@ public class OpponentTetris extends Role {
   /** 重置遊戲頁面 */
   private void reset() {
     status = Status.INIT;
-    // 重置分數
-    infoBar.reset();
+    score = 0;
     // 清除全畫面方塊
     cubeMatrix.clearAllCube();
   }

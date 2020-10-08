@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.stream.StreamSupport;
 import org.json.JSONObject;
 import tetris.Config;
 import tetris.game.Cube;
@@ -62,9 +63,11 @@ public class BattleView extends RepaintView implements GameEventListener {
   private AudioPlayer backgroundMusic; // 播放背景音樂
   private InfoBar infoBar;
   private OpponentTetris opponentTetris;
+  private JSONObject roomData;
 
-  public BattleView(int width, int height) {
-    super(width, height);
+  public BattleView(JSONObject params) {
+    super(params);
+    roomData = params;
     backgroundMusic = AudioManager.get().playMusic("sound/music.wav");
   }
 
@@ -106,10 +109,20 @@ public class BattleView extends RepaintView implements GameEventListener {
     nextRoundCountdownSecondLocationX = Config.get().zoom(155);
     nextRoundCountdownSecondLocationY = Config.get().zoom(270);
 
-    opponentTetris = new OpponentTetris(value -> (int) (value * 0.5));
+    opponentTetris = new OpponentTetris(value -> (int) (value * 1.3));
     opponentTetris.setWidth(Config.get().zoom(15));
     opponentTetris.setHeight(Config.get().zoom(15));
-    opponentTetris.setLocation(Config.get().zoom(260), Config.get().zoom(270));
+    opponentTetris.setLocation(Config.get().zoom((int) (getWidth() * 0.45)), Config.get().zoom(0));
+    System.out.println("roomData=>" + roomData);
+    int position = roomData.getInt("position");
+    String userName =
+        StreamSupport.stream(roomData.getJSONArray("users").spliterator(), false)
+            .map(JSONObject.class::cast)
+            .filter(o -> (o.getInt("position") != position))
+            .findFirst()
+            .get()
+            .getString("name");
+    opponentTetris.setUserName(userName);
     add(opponentTetris);
 
     // 分數、消除行數、等級
@@ -227,6 +240,7 @@ public class BattleView extends RepaintView implements GameEventListener {
   private void addScore(int score) {
     infoBar.addScore(score);
     scoreLabel.setText(SCORE + infoBar.getScore());
+    sendOperation(2, json -> json.put("score", infoBar.getScore()));
   }
 
   private void setLevel(int level) {
@@ -482,7 +496,8 @@ public class BattleView extends RepaintView implements GameEventListener {
         }
       }
       // 重置分數
-      infoBar.reset();
+      resetScore();
+
       // 清除全畫面方塊
       gameFlow.clearBox();
 
@@ -522,7 +537,6 @@ public class BattleView extends RepaintView implements GameEventListener {
 
     JSONObject json = new JSONObject();
     json.put("code", 411);
-    json.put("roomId", Client.get().getRoomId());
     json.put("operation", operation);
 
     /*
@@ -536,6 +550,13 @@ public class BattleView extends RepaintView implements GameEventListener {
      * }
      */
     Client.get().write(json);
+  }
+
+  private void resetScore() {
+    infoBar.reset();
+    scoreLabel.setText(SCORE + infoBar.getScore());
+    levelLabel.setText(LEVEL + infoBar.getLevel());
+    linesLabel.setText(LINES + infoBar.getCleanedCount());
   }
 
   @Override

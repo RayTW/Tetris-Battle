@@ -2,6 +2,9 @@ package tetris.view.component;
 
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
+
+import org.json.JSONObject;
+
 import tetris.view.ViewName;
 import tetris.view.listener.OnChangeViewListener;
 
@@ -20,8 +23,12 @@ public abstract class ComponentView extends JComponent {
   }
 
   public void changeView(ViewName name) {
+    changeView(name, new JSONObject());
+  }
+
+  public void changeView(ViewName name, JSONObject params) {
     if (changeViewListener != null) {
-      changeViewListener.onChangeView(name);
+      changeViewListener.onChangeView(name, params);
     }
   }
 

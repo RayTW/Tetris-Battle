@@ -13,6 +13,8 @@ import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.plaf.ColorUIResource;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import tetris.Config;
 import tetris.view.component.RepaintView;
 import util.Debug;
@@ -39,8 +41,8 @@ public class MenuView extends RepaintView {
         new Pair<>(ViewName.HOW_TO_PLAY, new String[] {"SINGLE", "BATTLE", ">HOW TO PLAY"})
       };
 
-  public MenuView(int width, int height) {
-    super(width, height);
+  public MenuView(JSONObject params) {
+    super(params);
   }
 
   @Override
@@ -187,6 +189,26 @@ public class MenuView extends RepaintView {
       Debug.get().println("User canceled / closed the dialog");
       return false;
     }
+  }
+
+  private void debug() {
+    JSONObject json = new JSONObject();
+    JSONArray ary = new JSONArray();
+
+    json.put("position", 1);
+
+    JSONObject userInfo1 = new JSONObject();
+    userInfo1.put("position", 0);
+    userInfo1.put("name", "debug");
+    ary.put(userInfo1);
+
+    JSONObject userInfo2 = new JSONObject();
+    userInfo2.put("position", 1);
+    userInfo2.put("name", "debug2");
+    ary.put(userInfo2);
+    json.put("users", ary);
+
+    changeView(ViewName.BATTLE, json); // TODO test
   }
 
   @Override

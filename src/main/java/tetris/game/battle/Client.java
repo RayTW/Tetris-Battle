@@ -7,7 +7,6 @@ import util.KcpRttClient;
 public class Client {
   private static Client instance;
   private Optional<KcpRttClient> kcp;
-  private String roomId;
 
   private Client() {
     kcp = Optional.ofNullable(null);
@@ -56,14 +55,6 @@ public class Client {
 
   public void write(String msg) {
     kcp.ifPresent(k -> k.write(msg));
-  }
-
-  public void setRoomId(String roomId) {
-    this.roomId = roomId;
-  }
-
-  public String getRoomId() {
-    return roomId;
   }
 
   /** 關閉連線. */
