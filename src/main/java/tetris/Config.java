@@ -47,6 +47,9 @@ public class Config {
   // 畫面刷新間隔ms
   private int repainMills;
 
+  // 深色模式
+  private boolean isDarkMode = false;
+
   private String host = "127.0.0.1";
   private int port = 8009;
   private String userName = "user" + (int) (Math.random() * Integer.MAX_VALUE);
@@ -229,5 +232,18 @@ public class Config {
 
   public String getUserName() {
     return userName;
+  }
+
+  /**
+   * 是否啟用濚色模式.
+   *
+   * @param enable
+   */
+  public void setDarkMode(boolean enable) {
+    isDarkMode = enable;
+  }
+
+  public boolean isDarkMode() {
+    return isDarkMode;
   }
 }

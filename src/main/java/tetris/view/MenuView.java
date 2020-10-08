@@ -3,13 +3,16 @@ package tetris.view;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
+import java.util.Arrays;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.plaf.ColorUIResource;
 import tetris.Config;
 import tetris.view.component.RepaintView;
 import util.Debug;
@@ -115,6 +118,15 @@ public class MenuView extends RepaintView {
         new JComponent[] {
           new JLabel("User Name"), name, new JLabel("Host"), host, new JLabel("Port"), port
         };
+
+    if (Config.get().isDarkMode()) {
+      UIManager.put("OptionPane.background", new ColorUIResource(Color.DARK_GRAY));
+      UIManager.put("Panel.background", new ColorUIResource(Color.DARK_GRAY));
+      Arrays.stream(inputs).forEach(o -> o.setForeground(Color.WHITE));
+      name.setForeground(Color.BLACK);
+      host.setForeground(Color.BLACK);
+      port.setForeground(Color.BLACK);
+    }
 
     name.setText(Config.get().getUserName());
     // 讓user name輸入框取得focus

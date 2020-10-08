@@ -40,7 +40,7 @@ public class Tetris extends JFrame implements OnChangeViewListener {
   public void initialize() {
     Container pane = getContentPane();
     viewFactory = new ViewFactory();
-    view = viewFactory.create(ViewName.MENU, getWidth(), getHeight());
+    view = viewFactory.create(ViewName.MENU, getWidth(), getHeight(), Config.get().isDarkMode());
 
     pane.addContainerListener(
         new ContainerListener() {
@@ -97,7 +97,7 @@ public class Tetris extends JFrame implements OnChangeViewListener {
   public void onChangeView(ViewName event) {
     getContentPane().remove(view);
     view.setOnChangeViewListener(null);
-    view = viewFactory.create(event, getWidth(), getHeight());
+    view = viewFactory.create(event, getWidth(), getHeight(), Config.get().isDarkMode());
     view.setOnChangeViewListener(this);
     getContentPane().add(view);
   }
@@ -151,6 +151,8 @@ public class Tetris extends JFrame implements OnChangeViewListener {
 
   /** @param args */
   public static void main(String[] args) {
+    Config.get().setDarkMode(true);
+
     Tetris tetris = new Tetris();
 
     tetris.setTitle("俄羅斯方塊-" + Config.get().getVersion());

@@ -2,7 +2,6 @@ package tetris.view.component;
 
 import java.awt.event.MouseEvent;
 import javax.swing.JComponent;
-
 import tetris.view.ViewName;
 import tetris.view.listener.OnChangeViewListener;
 
@@ -10,6 +9,7 @@ public abstract class ComponentView extends JComponent {
   private static final long serialVersionUID = 1L;
 
   private OnChangeViewListener changeViewListener;
+  private boolean darkMode = false;
 
   public ComponentView() {}
 
@@ -23,6 +23,14 @@ public abstract class ComponentView extends JComponent {
     if (changeViewListener != null) {
       changeViewListener.onChangeView(name);
     }
+  }
+
+  public void setDarkMode(boolean enable) {
+    darkMode = enable;
+  }
+
+  public boolean isDarkMode() {
+    return darkMode;
   }
 
   public void onKeyCode(int code) {}

@@ -9,7 +9,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.SwingUtilities;
-
 import tetris.Config;
 import util.FpsCounter;
 
@@ -34,6 +33,7 @@ public class RepaintView extends ComponentView {
     rolePool = new CopyOnWriteArrayList<>();
     screenWidth = width;
     screenHeight = height;
+
     // 設定畫面大小
     setSize(width, height);
     repainThread = new Thread(this::doRepain);
@@ -60,6 +60,11 @@ public class RepaintView extends ComponentView {
       canvasBuffer.getGraphics().clearRect(0, 0, screenWidth, screenHeight);
     }
     canvas = canvasBuffer.getGraphics();
+
+    if (isDarkMode()) {
+      canvas.setColor(Color.DARK_GRAY);
+      canvas.fillRect(0, 0, screenWidth, screenHeight);
+    }
 
     onPaintComponent(canvas);
     fpsCounter.frame();
