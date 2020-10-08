@@ -1,5 +1,8 @@
 # TetrisGame
-![](https://github.com/RayTW/TetrisGame/blob/master/privies-v1.4.png)
+![](https://github.com/RayTW/TetrisGame/blob/master/privies-v1.5/1.png)
+![](https://github.com/RayTW/TetrisGame/blob/master/privies-v1.5/2.png)
+![](https://github.com/RayTW/TetrisGame/blob/master/privies-v1.5/3.png)
+![](https://github.com/RayTW/TetrisGame/blob/master/privies-v1.5/4.png)
 
 ```text
 遊戲按鈕控制說明:
