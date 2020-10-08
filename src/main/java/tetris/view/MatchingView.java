@@ -15,13 +15,13 @@ import util.Debug;
  *
  * @author Ray
  */
-public class ConnectingView extends RepaintView {
+public class MatchingView extends RepaintView {
   private static final long serialVersionUID = 1L;
   private Label connectingText;
   private Thread thread;
   private boolean isConnecting = true;;
 
-  public ConnectingView(int width, int height) {
+  public MatchingView(int width, int height) {
     super(width, height);
   }
 
@@ -44,7 +44,7 @@ public class ConnectingView extends RepaintView {
                 }
                 String repeated = new String(new char[cnt]).replace("\0", ".");
 
-                connectingText.setText("Connecting" + repeated);
+                connectingText.setText("Matching" + repeated);
                 try {
                   TimeUnit.MILLISECONDS.sleep(300);
                 } catch (InterruptedException e) {

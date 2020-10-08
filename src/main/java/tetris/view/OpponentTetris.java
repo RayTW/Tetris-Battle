@@ -47,7 +47,7 @@ public class OpponentTetris extends Role {
   private InfoBar infoBar;
   private Zoomable zoomable;
   private Status status = Status.INIT;
-  private List<KeyCodeEvent> keyCodeQueue = Collections.synchronizedList(new LinkedList<>());
+  private List<JSONObject> operationQueue = Collections.synchronizedList(new LinkedList<>());
   private Thread queueComsumerThread;
   private boolean queueThreadRunning;
 
@@ -61,40 +61,59 @@ public class OpponentTetris extends Role {
     infoBar = new InfoBar();
 
     queueThreadRunning = true;
-    queueComsumerThread = new Thread(this::processKeyCodeEvent);
+    queueComsumerThread = new Thread(this::processOperation);
     queueComsumerThread.start();
   }
 
-  public void addKeyCodeEvent(KeyCodeEvent event) {
-    keyCodeQueue.add(event);
+  public void addOperation(JSONObject operation) {
+    operationQueue.add(operation);
   }
 
-  private void processKeyCodeEvent() {
+  /**
+   * 處理其他玩家遊戲操作同步
+   *
+   * <pre>
+   *   event :
+   *     0:reset
+   *     1:game start
+   *     2:sync score
+   *     10 : 建方塊
+   *     20 : keycode
+   *     30:game over
+   *     40:cleanLine
+   * </pre>
+   */
+  private void processOperation() {
+    JSONObject operation = null;
+    int event = 0;
+
     while (queueThreadRunning) {
 
-      while (keyCodeQueue.size() > 0) {
-        KeyCodeEvent event = keyCodeQueue.remove(0);
-        if (event.getEvent() == 10) {
-          int code = event.getJson().getInt("keyCode");
-          boolean simulation = event.getJson().getBoolean("simulation");
+      while (operationQueue.size() > 0) {
+        operation = operationQueue.remove(0);
+        event = operation.getInt("event");
+
+        if (event == 10) {
+          int code = operation.getInt("keyCode");
+          boolean simulation = operation.getBoolean("simulation");
 
           onKeyCode(code, simulation);
-        } else if (event.getEvent() == 2) {
+        } else if (event == 2) {
           // sync score
-        } else if (event.getEvent() == 20) {
-          createCube(event.getJson().getInt("style"));
-        } else if (event.getEvent() == 40) {
-          String cube = event.getJson().getString("cube");
-          int x = event.getJson().getInt("x");
-          int y = event.getJson().getInt("y");
-          int style = event.getJson().getInt("style");
+        } else if (event == 20) {
+          createCube(operation.getInt("style"));
+        } else if (event == 40) {
+          String cube = operation.getString("cube");
+          int x = operation.getInt("x");
+          int y = operation.getInt("y");
+          int style = operation.getInt("style");
 
           cleanLine(toArray(cube), x, y, style);
-        } else if (event.getEvent() == 0) {
+        } else if (event == 0) {
           reset();
-        } else if (event.getEvent() == 30) {
+        } else if (event == 30) {
           status = Status.GAME_OVER;
-        } else if (event.getEvent() == 1) {
+        } else if (event == 1) {
           status = Status.PLAYING;
         }
         Thread.yield();
@@ -339,31 +358,6 @@ public class OpponentTetris extends Role {
 
   public static interface Zoomable {
     int zoom(int n);
-  }
-
-  public static class KeyCodeEvent {
-    private int event; // 0:reset, 1:game start, 2:sync score, 10 : 建方塊, 20 : keycode, 30:game
-    // over,40:cleanLine
-    private JSONObject json;
-
-    public KeyCodeEvent() {}
-
-    public KeyCodeEvent(int event, JSONObject json) {
-      this.event = event;
-      this.json = json;
-    }
-
-    public void setEvent(int event) {
-      this.event = event;
-    }
-
-    public int getEvent() {
-      return event;
-    }
-
-    public JSONObject getJson() {
-      return json;
-    }
   }
 
   enum Status {

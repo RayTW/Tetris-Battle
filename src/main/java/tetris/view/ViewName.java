@@ -12,6 +12,8 @@ public enum ViewName {
   SINGLE,
   /** 對戰遊戲室 */
   BATTLE,
-  /** 對戰連線中 */
-  CONNECTING
+  /** 遊戲操作說明 */
+  HOW_TO_PLAY,
+  /** 對戰配對中 */
+  MATCHING
 }

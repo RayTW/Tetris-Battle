@@ -7,15 +7,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.function.Consumer;
-
 import org.json.JSONObject;
-
 import tetris.Config;
 import tetris.game.Cube;
 import tetris.game.GameEvent;
 import tetris.game.GameFlow;
 import tetris.game.battle.Client;
-import tetris.view.OpponentTetris.KeyCodeEvent;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.GameEventListener;
@@ -156,10 +153,8 @@ public class BattleView extends RepaintView implements GameEventListener {
      */
     if (code == 412) {
       JSONObject operation = json.getJSONObject("operation");
-      int event = operation.getInt("event");
-      KeyCodeEvent e = new KeyCodeEvent(event, operation);
 
-      opponentTetris.addKeyCodeEvent(e);
+      opponentTetris.addOperation(operation);
       return;
     }
   }
@@ -174,6 +169,7 @@ public class BattleView extends RepaintView implements GameEventListener {
       return;
     }
     if (code == KeyEvent.VK_ESCAPE) {
+      Client.get().close();
       changeView(ViewName.MENU);
       return;
     }
@@ -513,30 +509,6 @@ public class BattleView extends RepaintView implements GameEventListener {
     }
     return false;
   }
-
-  //  public void sendOperation(int event, boolean simulation) {
-  //    JSONObject operation = new JSONObject();
-  //
-  //    operation.put("simulation", simulation);
-  //    operation.put("event", event);
-  //
-  //    JSONObject json = new JSONObject();
-  //    json.put("code", 411);
-  //    json.put("roomId", Client.get().getRoomId());
-  //    json.put("operation", operation);
-  //
-  //    /*
-  //     * {
-  //     *   "code": 411,
-  //     *   "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
-  //     *   "operation": {
-  //     *      "event": 2,
-  //     *      "simulation":false
-  //     *  }
-  //     * }
-  //     */
-  //    Client.get().write(json);
-  //  }
 
   public void sendOperation(int event) {
     sendOperation(event, o -> {});

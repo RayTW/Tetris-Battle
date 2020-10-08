@@ -26,15 +26,17 @@ public class MenuView extends RepaintView {
 
   private MulticolorLabel menuTitle;
   private Label singleText; // 單人遊玩選項
-  private Label battleText; // 單人遊玩選項
+  private Label battleText; // 網路對戰選項
+  private Label howToPlayText;
   private FlashLabel pressEnter;
   private int arrow;
 
   @SuppressWarnings("unchecked")
   private Pair<ViewName, String[]>[] options =
       new Pair[] {
-        new Pair<>(ViewName.SINGLE, new String[] {">SINGLE", "BATTLE"}),
-        new Pair<>(ViewName.BATTLE, new String[] {"SINGLE", ">BATTLE"})
+        new Pair<>(ViewName.SINGLE, new String[] {">SINGLE", "BATTLE", "HOW TO PLAY"}),
+        new Pair<>(ViewName.BATTLE, new String[] {"SINGLE", ">BATTLE", "HOW TO PLAY"}),
+        new Pair<>(ViewName.HOW_TO_PLAY, new String[] {"SINGLE", "BATTLE", ">HOW TO PLAY"})
       };
 
   public MenuView(int width, int height) {
@@ -66,14 +68,19 @@ public class MenuView extends RepaintView {
     add(pressEnter);
 
     singleText = new Label();
-    singleText.setLocation(config.zoom(100), config.zoom(350));
+    singleText.setLocation(config.zoom(55), config.zoom(340));
     singleText.setFont(Font.BOLD, config.zoom(35));
     add(singleText);
 
     battleText = new Label();
-    battleText.setLocation(config.zoom(100), config.zoom(385));
+    battleText.setLocation(config.zoom(55), config.zoom(375));
     battleText.setFont(Font.BOLD, config.zoom(35));
     add(battleText);
+
+    howToPlayText = new Label();
+    howToPlayText.setLocation(config.zoom(55), config.zoom(410));
+    howToPlayText.setFont(Font.BOLD, config.zoom(35));
+    add(howToPlayText);
 
     setModeArrow(arrow);
   }
@@ -85,12 +92,14 @@ public class MenuView extends RepaintView {
 
       if (mode == ViewName.SINGLE) {
         // 單機
-        changeView(ViewName.SINGLE);
+        changeView(mode);
       } else if (mode == ViewName.BATTLE) {
         if (doConnectSettings()) {
           // 對戰
-          changeView(ViewName.CONNECTING);
+          changeView(ViewName.MATCHING);
         }
+      } else if (mode == ViewName.HOW_TO_PLAY) {
+        changeView(mode);
       }
     } else if (code == KeyEvent.VK_UP) { // 遊標上移
       arrow--;
@@ -107,6 +116,7 @@ public class MenuView extends RepaintView {
   private void setModeArrow(int r) {
     singleText.setText(options[r].getSecond()[0]);
     battleText.setText(options[r].getSecond()[1]);
+    howToPlayText.setText(options[r].getSecond()[2]);
   }
 
   private boolean doConnectSettings() {

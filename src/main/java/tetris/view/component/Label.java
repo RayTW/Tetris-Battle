@@ -2,7 +2,9 @@ package tetris.view.component;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.geom.Rectangle2D;
 
 /**
  * 顯示文字
@@ -43,7 +45,19 @@ public class Label extends Role {
     int y = getY();
 
     canvas.setColor(getColor());
-    canvas.drawString(text, x, y);
+
+    if (text.indexOf("\n") == -1) {
+      canvas.drawString(text, x, y);
+    } else {
+      String[] txt = text.split("\n");
+      FontMetrics fm = canvas.getFontMetrics(font);
+      Rectangle2D bounds = fm.getStringBounds(text, canvas);
+      int height = (int) bounds.getHeight();
+
+      for (int i = 0; i < txt.length; i++) {
+        canvas.drawString(txt[i], x, y + (height * i));
+      }
+    }
 
     canvas.setFont(currentFont);
   }
