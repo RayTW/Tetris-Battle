@@ -210,7 +210,7 @@ public class SingleView extends RepaintView implements GameEventListener {
   public void onPaintComponent(Graphics canvas) {
     // 把整個陣列要畫的圖，畫到暫存的畫布上去(即後景)
     int[][] boxAry = gameFlow.getBoxAry();
-    showBacegroundBox(boxAry, canvas);
+    drawBacegroundBox(boxAry, canvas);
 
     // 畫掉落中的方塊
     int[] xy = gameFlow.getNowBoxXY();
@@ -219,16 +219,16 @@ public class SingleView extends RepaintView implements GameEventListener {
     // 畫陰影
     shadow(xy, box, canvas, gameFlow.getDownY());
 
-    showDownBox(xy, box, canvas);
+    drawDownBox(xy, box, canvas);
 
     // 畫右邊下次要出現的方塊
-    showBufferBox(cubeBuffer, canvas);
+    drawBufferBox(cubeBuffer, canvas);
 
     super.onPaintComponent(canvas);
   }
 
   // 畫定住的方塊與其他背景格子
-  private void showBacegroundBox(int[][] boxAry, Graphics buffImg) {
+  private void drawBacegroundBox(int[][] boxAry, Graphics buffImg) {
     buffImg.setColor(Color.BLACK);
 
     for (int i = 0; i < boxAry.length; i++) {
@@ -248,7 +248,7 @@ public class SingleView extends RepaintView implements GameEventListener {
   }
 
   // 畫掉落中的方塊
-  private void showDownBox(int[] xy, int[][] box, Graphics buffImg) {
+  private void drawDownBox(int[] xy, int[][] box, Graphics buffImg) {
     int boxX = xy[0];
     int boxY = xy[1];
     for (int i = 0; i < box.length; i++) {
@@ -262,7 +262,7 @@ public class SingleView extends RepaintView implements GameEventListener {
   }
 
   // 畫右邊下次要出現的方塊
-  private void showBufferBox(int[][][] boxBuf, Graphics buffImg) {
+  private void drawBufferBox(int[][][] boxBuf, Graphics buffImg) {
     for (int n = 0; n < boxBuf.length; n++) {
       int[][] ary = boxBuf[n];
 
