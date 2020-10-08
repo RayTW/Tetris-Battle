@@ -1,0 +1,87 @@
+code:奇數為client發送，偶數為server發送
+
+----------------------------------
+----------------------------------
+client請求加入遊戲配對
+{
+  "code": 1,
+  "name": "user name"
+}
+
+----------------------------------
+
+server回應請求結果
+{
+  "code": 2,
+  "addUser": false,
+  "message": "repeat matching"
+}
+
+addUser : true成功加入配對佇列，false:加入失敗
+message : 失敗原因
+
+----------------------------------
+----------------------------------
+通知user加入的遊戲房id、及遊戲房全部玩家資訊
+{
+  "code": 300,
+  "roomId": "3b1848b0-fad0-4967-824a-ac9540f49be7",
+  "position": 0
+}
+roomId : 遊戲房id
+position : 玩家所在位置
+users : 玩家位置及名稱
+----------------------------------
+----------------------------------
+
+遊戲室相關資訊
+{
+  "code": 400,
+  "message": "room information",
+  "users": [
+    {
+      "position": 0,
+      "name": "user1"
+    },
+    {
+      "position": 1,
+      "name": "user2"
+    }
+  ]
+}
+
+----------------------------------
+----------------------------------
+
+發送client遊戲操作
+{
+  "code": 411,
+  "operation": {
+    "event": 2,
+    "style": false
+  }
+}
+roomId : 遊戲房id
+operation : 遊戲操作
+  event : 
+    0:reset
+    1:game start
+    2:sync score
+    10 : 建方塊
+    20 : key code
+    30:game over
+    40:cleanLine
+
+----------------------------------
+
+server轉發玩家遊戲操作
+{
+  "code": 412,
+  "position": 0,
+  "operation": {
+    "event": 2,
+    "style": false
+  }
+}
+----------------------------------
+----------------------------------

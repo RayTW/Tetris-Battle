@@ -9,8 +9,7 @@
 ←:左移方塊 Left
 →:右移方塊 Right
 space:快速掉落方塊至底 Quick down
-s:暫停 Game stop
-r:繼續遊戲 Game resume
+enter:暫停/繼續遊戲 Game stop/Game resume
 ```
 
 
