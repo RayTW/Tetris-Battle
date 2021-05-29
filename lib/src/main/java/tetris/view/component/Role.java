@@ -5,14 +5,14 @@ import java.awt.Graphics;
 import java.awt.Image;
 
 /**
- * 場景上的全部角色都要繼承的class
+ * 場景上的全部角色都要繼承的class.
  *
  * @author Ray Lee
  */
 public class Role {
   // 顯示出來的範圍
-  private int x;
-  private int y;
+  private int localX;
+  private int localY;
   private int width;
   private int height;
   private Color color;
@@ -28,10 +28,9 @@ public class Role {
   }
 
   /**
-   * 判斷其他物件是否碰撞到目前物件
+   * 判斷其他物件是否碰撞到目前物件.
    *
-   * @param obj
-   * @return
+   * @param obj 角色
    */
   public boolean hitTest(Role obj) {
     int hx = obj.getX();
@@ -45,6 +44,14 @@ public class Role {
         && (hy < getY() + height));
   }
 
+  /**
+   * 碰撞測試.
+   *
+   * @param x 位置x
+   * @param y 位置y
+   * @param w 高
+   * @param h 寬
+   */
   public boolean hitTest(int x, int y, int w, int h) {
     return (((x + w) > getX())
         && (x < getX() + width)
@@ -52,18 +59,20 @@ public class Role {
         && (y < getY() + height));
   }
 
+  /** 取得x. */
   public int getX() {
     if (enableCenter) {
-      return x - (width / 2);
+      return localX - (width / 2);
     }
-    return x;
+    return localX;
   }
 
+  /** 取得y. */
   public int getY() {
     if (enableCenter) {
-      return y - (height / 2);
+      return localY - (height / 2);
     }
-    return y;
+    return localY;
   }
 
   public int getHeight() {
@@ -74,19 +83,29 @@ public class Role {
     return width;
   }
 
+  /**
+   * 設定x.
+   *
+   * @param x 位置x
+   */
   public void setX(int x) {
     if (enableCenter) {
-      this.x = x + (width / 2);
+      this.localX = x + (width / 2);
     } else {
-      this.x = x;
+      this.localX = x;
     }
   }
 
+  /**
+   * 設定x.
+   *
+   * @param y 位置y
+   */
   public void setY(int y) {
     if (enableCenter) {
-      this.y = y + (height / 2);
+      this.localY = y + (height / 2);
     } else {
-      this.y = y;
+      this.localY = y;
     }
   }
 

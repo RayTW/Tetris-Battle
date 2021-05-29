@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 
 /**
- * 遊戲標題
+ * 遊戲標題.
  *
  * @author Ray Lee
  */
@@ -20,6 +20,13 @@ public class MulticolorLabel extends Role {
   private Color[] textColor = {};
   private boolean isFlash = false;
 
+  /**
+   * 建構.
+   *
+   * @param text 文字
+   * @param textColor 顏色
+   * @param textGap 間距
+   */
   public MulticolorLabel(String text, Color[] textColor, int textGap) {
     this.text = text;
     this.textColor = textColor;
@@ -32,9 +39,9 @@ public class MulticolorLabel extends Role {
   }
 
   /**
-   * 文字閃礫效果
+   * 文字閃礫效果.
    *
-   * @param enable
+   * @param enable 開關
    */
   public void setFlash(boolean enable) {
     isFlash = enable;

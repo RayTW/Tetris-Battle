@@ -1,7 +1,7 @@
 package tetris;
 
 /**
- * 遊戲設定
+ * 遊戲設定.
  *
  * @author Ray Lee Created on 2017/10/18
  */
@@ -62,17 +62,13 @@ public class Config {
     return instance;
   }
 
-  /**
-   * 取得遊戲版本
-   *
-   * @return
-   */
+  /** 取得遊戲版本. */
   public String getVersion() {
     return version;
   }
 
   /**
-   * 設定遊戲畫面縮放比
+   * 設定遊戲畫面縮放比.
    *
    * @param scale 縮放比 0.0 ~ 2.0，預設1.3
    */
@@ -80,6 +76,11 @@ public class Config {
     screenScale = scale;
   }
 
+  /**
+   * 設置fps.
+   *
+   * @param fps 每秒繪圖速度.
+   */
   public void setMaxFps(int fps) {
     if (fps > 60) {
       fps = 60;
@@ -110,7 +111,6 @@ public class Config {
    * 單列 100 雙列 300 三列 500 四列 800.
    *
    * @param cleanLines 消除行數
-   * @return
    */
   public int getCleanLinesScore(int cleanLines) {
     if (cleanLines > 0 && cleanLines < cleanLinesScore.length) {
@@ -120,38 +120,28 @@ public class Config {
   }
 
   /**
-   * 遊戲畫面縮放，將傳入的數值加乘畫面縮放比率後回傳
+   * 遊戲畫面縮放，將傳入的數值加乘畫面縮放比率後回傳.
    *
-   * @param value
-   * @return
+   * @param value 畫面縮放比率
    */
   public int zoom(int value) {
     return (int) (value * screenScale);
   }
 
-  /**
-   * 重新開始等待秒數
-   *
-   * @return
-   */
+  /** 重新開始等待秒數. */
   public int getNextRoundDelaySecond() {
     return nextRoundDelaySecond;
   }
 
-  /**
-   * 重用音效緩存的筆數
-   *
-   * @return
-   */
+  /** 重用音效緩存的筆數. */
   public int getSoundCacheCount() {
     return soundCacheCount;
   }
 
   /**
-   * 用等級取得方塊掉落速度
+   * 用等級取得方塊掉落速度.
    *
-   * @param level
-   * @return
+   * @param level 掉落等級.
    */
   public float getBoxFallSpeed(int level) {
     if (level >= 0 && level < boxFallSpeed.length) {
@@ -161,10 +151,9 @@ public class Config {
   }
 
   /**
-   * 已消除的方塊行數轉換為對應的等級
+   * 已消除的方塊行數轉換為對應的等級.
    *
-   * @param lines
-   * @return
+   * @param lines 已消除方塊行數
    */
   public int linesConvertLevel(int lines) {
     int level = 0;
@@ -186,29 +175,17 @@ public class Config {
     return level;
   }
 
-  /**
-   * 取得下移1格時可獲得的分數
-   *
-   * @return
-   */
+  /** 取得下移1格時可獲得的分數. */
   public int getMoveDownScore() {
     return moveDownScore;
   }
 
-  /**
-   * 取得快速下速方塊可獲得的分數
-   *
-   * @return
-   */
+  /** 取得快速下速方塊可獲得的分數. */
   public int getQuickDownScore() {
     return quickDownScore;
   }
 
-  /**
-   * 可顯示將要的掉落方塊個數(畫面右側)
-   *
-   * @return
-   */
+  /** 可顯示將要的掉落方塊個數(畫面右側). */
   public int getNextCubeSize() {
     return nextCubeSize;
   }
@@ -237,7 +214,7 @@ public class Config {
   /**
    * 是否啟用濚色模式.
    *
-   * @param enable
+   * @param enable 開關
    */
   public void setDarkMode(boolean enable) {
     isDarkMode = enable;

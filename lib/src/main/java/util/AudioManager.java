@@ -3,6 +3,11 @@ package util;
 import java.util.List;
 import tetris.Config;
 
+/**
+ * 音效/樂管理.
+ *
+ * @author ray
+ */
 public class AudioManager {
   private static AudioManager instance = new AudioManager();
 
@@ -13,10 +18,10 @@ public class AudioManager {
   }
 
   /**
-   * 預戴音樂
+   * 預戴音樂.
    *
-   * @param listener
-   * @param path
+   * @param path 路徑
+   * @param listener 事件
    */
   public void preload(List<String> path, OnPreloadListener listener) {
     path.forEach(
@@ -42,6 +47,13 @@ public class AudioManager {
     return playAudio(path, 1, Config.get().getSoundCacheCount());
   }
 
+  /**
+   * 播放音效.
+   *
+   * @param path 位置
+   * @param playCount 播放次數
+   * @param cacheCount 緩存次數
+   */
   public AudioPlayer playAudio(String path, int playCount, int cacheCount) {
     AudioPlayer audio = new AudioPlayer();
     path = "/" + path;
@@ -53,6 +65,11 @@ public class AudioManager {
     return audio;
   }
 
+  /**
+   * 預戴事件.
+   *
+   * @author ray
+   */
   public static interface OnPreloadListener {
     public void onLoaded(String path);
 

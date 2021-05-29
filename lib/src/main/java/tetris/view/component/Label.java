@@ -7,7 +7,7 @@ import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
 
 /**
- * 顯示文字
+ * 顯示文字.
  *
  * @author Ray Lee
  */
@@ -22,6 +22,12 @@ public class Label extends Role {
     setColor(Color.BLACK);
   }
 
+  /**
+   * 創建.
+   *
+   * @param width 寬
+   * @param height 高
+   */
   public Label(int width, int height) {
     setWidth(width);
     setHeight(height);

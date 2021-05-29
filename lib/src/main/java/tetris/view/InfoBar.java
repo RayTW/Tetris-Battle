@@ -1,7 +1,7 @@
 package tetris.view;
 
 /**
- * 分數、消除行數、遊戲等級等等資訊
+ * 分數、消除行數、遊戲等級等等資訊.
  *
  * @author Ray Lee Created on 2017/10/18
  */
@@ -18,6 +18,7 @@ public class InfoBar {
     reset();
   }
 
+  /** 重置. */
   public void reset() {
     score = 0;
     level = 0;
@@ -29,6 +30,11 @@ public class InfoBar {
     return score;
   }
 
+  /**
+   * 設置分數.
+   *
+   * @param score 分數
+   */
   public void setScore(int score) {
     if (score > scoreMax) {
       this.score = scoreMax;
@@ -37,6 +43,11 @@ public class InfoBar {
     }
   }
 
+  /**
+   * 加分數.
+   *
+   * @param score 分數
+   */
   public void addScore(int score) {
     if ((score + score) > scoreMax) {
       this.score = scoreMax;
@@ -49,6 +60,11 @@ public class InfoBar {
     return level;
   }
 
+  /**
+   * 設置等級.
+   *
+   * @param level 等級
+   */
   public void setLevel(int level) {
     if (level > levelMax) {
       this.level = levelMax;
@@ -57,6 +73,11 @@ public class InfoBar {
     }
   }
 
+  /**
+   * 加等級.
+   *
+   * @param level 等級
+   */
   public void addLevel(int level) {
     if ((level + level) > levelMax) {
       level = levelMax;
@@ -69,6 +90,11 @@ public class InfoBar {
     return cleanedCount;
   }
 
+  /**
+   * 設置已消除方塊行數.
+   *
+   * @param cleanedCount 消除行數
+   */
   public void setCleanedCount(int cleanedCount) {
     if (cleanedCount > cleanedCountMax) {
       this.cleanedCount = cleanedCountMax;
@@ -77,6 +103,11 @@ public class InfoBar {
     }
   }
 
+  /**
+   * 新增已消除方塊行數.
+   *
+   * @param cleanedCount 消除行數
+   */
   public void addCleanedCount(int cleanedCount) {
     if ((this.cleanedCount + cleanedCount) > cleanedCountMax) {
       this.cleanedCount = cleanedCountMax;

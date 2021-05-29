@@ -17,7 +17,7 @@ import util.AudioPlayer;
 import util.Debug;
 
 /**
- * 此類別只做畫面處理，不做方塊移動運算，所有GameLoop類別所觸發的事件會通知此類別的tetrisEvent() method
+ * 此類別只做畫面處理，不做方塊移動運算，所有GameLoop類別所觸發的事件會通知此類別的tetrisEvent() method.
  *
  * @author Ray
  */
@@ -180,9 +180,9 @@ public class SingleView extends RepaintView implements GameEventListener {
   }
 
   private void quickDown() {
-    int befor = gameFlow.getNowBoxXY()[1];
+    int befor = gameFlow.getNowBoxXy()[1];
     gameFlow.quickDown();
-    int after = gameFlow.getNowBoxXY()[1];
+    int after = gameFlow.getNowBoxXy()[1];
     // 若方塊快速落到底，再另外加分數
     int quickDownScore = after - befor;
 
@@ -214,7 +214,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     drawBacegroundBox(boxAry, canvas);
 
     // 畫掉落中的方塊
-    int[] xy = gameFlow.getNowBoxXY();
+    int[] xy = gameFlow.getNowBoxXy();
     int[][] box = gameFlow.getNowBoxAry();
 
     // 畫陰影
@@ -310,12 +310,12 @@ public class SingleView extends RepaintView implements GameEventListener {
   }
 
   /**
-   * 畫每個小格子
+   * 畫每個小格子.
    *
-   * @param style
-   * @param x
-   * @param y
-   * @param buffImg
+   * @param style 類型
+   * @param x x位置
+   * @param y y位置
+   * @param buffImg 圖
    */
   public void drawBox(int style, int x, int y, Graphics buffImg) {
     buffImg.setColor(color[style]);
@@ -330,11 +330,10 @@ public class SingleView extends RepaintView implements GameEventListener {
   }
 
   /**
-   * 將下個方塊字串轉成2維方塊陣列，以便繪圖
+   * 將下個方塊字串轉成2維方塊陣列，以便繪圖.
    *
-   * @param bufbox
-   * @param tetris
-   * @return
+   * @param tetris 流程
+   * @param cnt 類數
    */
   public int[][][] getBufBox(GameFlow tetris, int cnt) {
     String[] bufbox = tetris.getAnyCountBox(cnt);
@@ -345,7 +344,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     return ary;
   }
 
-  /** 所有 */
+  /** 事件處理. */
   @Override
   public void onEvent(GameEvent code, Object data) {
     // 收到重畫自己畫面的陣列
@@ -423,7 +422,7 @@ public class SingleView extends RepaintView implements GameEventListener {
     return;
   }
 
-  /** 試著計算是否提升等級1級，並重設方塊掉落速度 */
+  /** 試著計算是否提升等級1級，並重設方塊掉落速度. */
   private boolean tryLevelUp() {
     int currentLevel = infoBar.getLevel();
     int newLevel = Config.get().linesConvertLevel(infoBar.getCleanedCount());

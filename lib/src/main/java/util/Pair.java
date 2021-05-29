@@ -1,10 +1,6 @@
 package util;
 
-/**
- * @author Ray Lee Created on 2017/10/18
- * @param <F>
- * @param <S>
- */
+/** 存放成對物件. */
 public class Pair<F, S> {
   private F first;
   private S second;

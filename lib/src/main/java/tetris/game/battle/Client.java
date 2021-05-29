@@ -4,6 +4,11 @@ import java.util.Optional;
 import org.json.JSONObject;
 import util.KcpRttClient;
 
+/**
+ * 客戶端.
+ *
+ * @author ray
+ */
 public class Client {
   private static Client instance;
   private Optional<KcpRttClient> kcp;
@@ -12,11 +17,7 @@ public class Client {
     kcp = Optional.ofNullable(null);
   }
 
-  /**
-   * 取得單一Client物件.
-   *
-   * @return
-   */
+  /** 取得單一Client物件. */
   public static Client get() {
     if (instance == null) {
       synchronized (Client.class) {

@@ -2,15 +2,13 @@ package tetris.view;
 
 import java.awt.Font;
 import java.awt.event.KeyEvent;
-
 import org.json.JSONObject;
-
 import tetris.Config;
 import tetris.view.component.Label;
 import tetris.view.component.RepaintView;
 
 /**
- * 遊戲說明
+ * 遊戲說明.
  *
  * @author Ray
  */

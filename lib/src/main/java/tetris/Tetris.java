@@ -18,15 +18,16 @@ import javax.swing.WindowConstants;
 import org.json.JSONObject;
 import tetris.view.ViewFactory;
 import tetris.view.ViewName;
+import tetris.view.component.ComponentView;
+import tetris.view.component.DialogLabel;
 import tetris.view.component.RepaintView;
 import tetris.view.listener.OnChangeViewListener;
 import util.AudioManager;
 import util.AudioManager.OnPreloadListener;
-import tetris.view.component.ComponentView;
-import tetris.view.component.JDialogLabel;
+import util.Debug;
 
 /**
- * 俄羅斯方塊主程式,建立GameView並add之後執行
+ * 俄羅斯方塊主程式,建立GameView並add之後執行.
  *
  * @author Ray Lee
  */
@@ -37,6 +38,7 @@ public class Tetris extends JFrame implements OnChangeViewListener {
 
   public Tetris() {}
 
+  /** 初始化. */
   public void initialize() {
     Container pane = getContentPane();
     viewFactory = new ViewFactory();
@@ -104,7 +106,7 @@ public class Tetris extends JFrame implements OnChangeViewListener {
   }
 
   private void preload() {
-    JDialogLabel dialog = newLoadingDialog();
+    DialogLabel dialog = newLoadingDialog();
     ArrayList<String> audioPath = new ArrayList<>();
 
     dialog.setLabelText("loading...");
@@ -133,25 +135,32 @@ public class Tetris extends JFrame implements OnChangeViewListener {
             });
   }
 
-  public JDialogLabel newLoadingDialog() {
-    JDialogLabel jDialog = new JDialogLabel();
-    jDialog.setLayout(new GridBagLayout());
-    jDialog.setLableFont(new Font("Dialog", Font.ITALIC, 14));
-    jDialog.setSize(250, 50);
-    jDialog.setLocation(
-        getWidth() + (jDialog.getWidth() / 2), getHeight() + (jDialog.getHeight() / 2));
-    jDialog.setResizable(false);
-    jDialog.setModal(false);
-    jDialog.setUndecorated(true);
-    jDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-    jDialog.setLocationRelativeTo(null);
-    jDialog.setVisible(true);
+  /** 讀取視窗. */
+  public DialogLabel newLoadingDialog() {
+    DialogLabel dialog = new DialogLabel();
+    dialog.setLayout(new GridBagLayout());
+    dialog.setLableFont(new Font("Dialog", Font.ITALIC, 14));
+    dialog.setSize(250, 50);
+    dialog.setLocation(
+        getWidth() + (dialog.getWidth() / 2), getHeight() + (dialog.getHeight() / 2));
+    dialog.setResizable(false);
+    dialog.setModal(false);
+    dialog.setUndecorated(true);
+    dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    dialog.setLocationRelativeTo(null);
+    dialog.setVisible(true);
 
-    return jDialog;
+    return dialog;
   }
 
-  /** @param args */
+  /**
+   * 主程式.
+   *
+   * @param args 參數
+   */
   public static void main(String[] args) {
+    Debug.get().console(false);
+
     Config.get().setDarkMode(true);
 
     Tetris tetris = new Tetris();

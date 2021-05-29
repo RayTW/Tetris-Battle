@@ -1,9 +1,5 @@
 package util;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-
-import org.json.JSONObject;
 import io.jpower.kcp.netty.ChannelOptionHelper;
 import io.jpower.kcp.netty.UkcpChannel;
 import io.jpower.kcp.netty.UkcpChannelOption;
@@ -18,6 +14,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import org.json.JSONObject;
 
 /**
  * Measures RTT(Round-trip time) for KCP.
@@ -38,11 +37,17 @@ public class KcpRttClient {
 
   private KcpRttClient() {}
 
+  /**
+   * builder.
+   *
+   * @author ray
+   */
   public static class Builder {
     private int conv;
     private String host;
     private int port;
 
+    /** 創建. */
     public KcpRttClient build() {
       Objects.requireNonNull(this.host, "host == null");
 
@@ -71,6 +76,11 @@ public class KcpRttClient {
     }
   }
 
+  /**
+   * 連線.
+   *
+   * @throws InterruptedException 中斷例外
+   */
   public void connect() throws InterruptedException {
     // Configure the client.
     group = new NioEventLoopGroup();
@@ -136,6 +146,11 @@ public class KcpRttClient {
     channelFuture = b.connect(host, port).sync();
   }
 
+  /**
+   * 關閉連線.
+   *
+   * @throws InterruptedException 例外
+   */
   public void close() throws InterruptedException {
     try {
       // Wait until the connection is closed.
@@ -171,14 +186,29 @@ public class KcpRttClient {
     onDisconnectedListener = listener;
   }
 
+  /**
+   * 連線完成事件傾聽.
+   *
+   * @author ray
+   */
   public static interface OnConnectedListener {
     void onConnected();
   }
 
+  /**
+   * 讀取事件傾聽.
+   *
+   * @author ray
+   */
   public static interface OnReadedListener {
     void onReaded(String msg);
   }
 
+  /**
+   * 斷線事件傾聽.
+   *
+   * @author ray
+   */
   public static interface OnDisconnectedListener {
     void onDisconnected();
   }

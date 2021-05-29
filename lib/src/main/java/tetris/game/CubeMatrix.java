@@ -1,5 +1,10 @@
 package tetris.game;
 
+/**
+ * 方塊容器.
+ *
+ * @author ray
+ */
 public class CubeMatrix {
   public int cubeRowCount = 20; // 直的20個方塊
   public int cubeColumnCount = 10; // 橫的10個方塊
@@ -15,13 +20,10 @@ public class CubeMatrix {
     cube = new int[cubeRowCount][cubeColumnCount];
   }
 
-  // ----------------------------public
-  // method------------begin--------------------
   /**
    * 建立新的方塊,回傳:true:建立成功，方塊未撞到其他方塊,false:建立失敗，方塊撞到其他方塊.
    *
    * @param style 方塊種類
-   * @return
    */
   public boolean createNewCube(int style) {
     boolean b = true;
@@ -36,12 +38,18 @@ public class CubeMatrix {
     return b;
   }
 
+  /**
+   * 建立掉落方塊.
+   *
+   * @param style 方塊類型
+   */
   public int[][] createCube(int style) {
     Cube b = new Cube();
     b.setStyle(style);
     return b.toArray(0);
   }
 
+  /** 測諭掉落方塊是否可下移. */
   public boolean tryMoveDown() {
     Cube tempNowBox = currentCube;
 
@@ -58,11 +66,7 @@ public class CubeMatrix {
     return !hitTest(cube, nbAry, nx, ny + 1);
   }
 
-  /**
-   * 向下移1格,回傳是否可再往下移 true:可繼續下移,false:不可往下移.
-   *
-   * @return
-   */
+  /** 向下移1格,回傳是否可再往下移 true:可繼續下移,false:不可往下移. */
   public boolean moveDown() {
     Cube tempNowBox = currentCube;
 
@@ -73,11 +77,7 @@ public class CubeMatrix {
     return false;
   }
 
-  /**
-   * 方塊右移,回傳是否可再往右移 true:可繼續右移,false:不可往右移
-   *
-   * @return
-   */
+  /** 方塊右移,回傳是否可再往右移 true:可繼續右移,false:不可往右移. */
   public boolean moveRight() {
     boolean b = true;
     Cube tempNowBox = currentCube;
@@ -101,11 +101,7 @@ public class CubeMatrix {
     return b;
   }
 
-  /**
-   * 方塊左移1格,回傳是否可再往左移 true:可繼續左移,false:不可往左移
-   *
-   * @return
-   */
+  /** 方塊左移1格,回傳是否可再往左移 true:可繼續左移,false:不可往左移. */
   public boolean moveLeft() {
     boolean b = true;
     Cube tempNowBox = currentCube;
@@ -138,7 +134,7 @@ public class CubeMatrix {
     return b;
   }
 
-  /** 方塊直接掉落到定位 */
+  /** 方塊直接掉落到定位. */
   public void quickDown() {
     while (true) {
       if (!moveDown()) {
@@ -147,11 +143,7 @@ public class CubeMatrix {
     }
   }
 
-  /**
-   * 順時針轉,true:可繼續順轉,false:不能順轉
-   *
-   * @return
-   */
+  /** 順時針轉,true:可繼續順轉,false:不能順轉. */
   public boolean turnRight() {
     Cube tempNowBox = currentCube;
     int rightTurn = tempNowBox.nextTurn(1); // 取出順轉1次後的方塊位置索引值
@@ -205,11 +197,7 @@ public class CubeMatrix {
     }
   }
 
-  /**
-   * 逆時針轉,true:可繼續逆轉,false:不能逆轉
-   *
-   * @return
-   */
+  /** 逆時針轉,true:可繼續逆轉,false:不能逆轉. */
   public boolean turnLeft() {
     Cube tempNowBox = currentCube;
     int leftTurn = tempNowBox.nextTurn(-1); // 取出逆轉1次後的方塊位置索引值
@@ -263,12 +251,9 @@ public class CubeMatrix {
   }
 
   /**
-   * 真正清除整行滿的方塊
+   * 真正清除整行滿的方塊.
    *
-   * @param tempBoxAry
-   * @param startIndex
-   * @param line
-   * @return
+   * @param lineData 清除列
    */
   public void clearLine(String lineData) {
     if (!lineData.isEmpty()) {
@@ -281,7 +266,7 @@ public class CubeMatrix {
     }
   }
 
-  /** 清空整個可移動方塊區域的二維陣列 */
+  /** 清空整個可移動方塊區域的二維陣列. */
   public void clearAllCube() {
     for (int i = 0; i < cube.length; i++) {
       for (int j = 0; j < cube[i].length; j++) {
@@ -290,16 +275,14 @@ public class CubeMatrix {
     }
   }
 
-  /** 取得目前的整個遊戲畫面可移動方塊區域的二維陣列 */
+  /** 取得目前的整個遊戲畫面可移動方塊區域的二維陣列. */
   public int[][] getMatrix() {
     return cube;
   }
 
   /**
    * 取得目前二維陣列裡，疊的方塊到第幾個位置，0~20個單位<br>
-   * 必須在方塊落到底時呼叫(即GameLoop的cleanLine()被執行時)，才可得到正確的高度資料
-   *
-   * @return
+   * 必須在方塊落到底時呼叫(即GameLoop的cleanLine()被執行時)，才可得到正確的高度資料.
    */
   public int getCurrentCubeIndex() {
     int index = cube.length + 1;
@@ -314,24 +297,20 @@ public class CubeMatrix {
     return index;
   }
 
-  /**
-   * 取得可清除的行數資料,例如: "17,19" 表示可消除第17、19行,style為9表示不可消除的垃圾方塊
-   *
-   * @return
-   */
+  /** 取得可清除的行數資料,例如: "17,19" 表示可消除第17、19行,style為9表示不可消除的垃圾方塊. */
   public String getClearLine() {
     Cube nb = currentCube;
     StringBuffer lineList = new StringBuffer();
     int ny = nb.getNowY();
 
     for (int i = ny; i < cube.length; i++) {
-      int BW = cube[i].length;
+      int bw = cube[i].length;
       int checkCnt = 0;
-      for (int j = 0; j < BW; j++) {
+      for (int j = 0; j < bw; j++) {
         int boxStyle = cube[i][j];
         if (boxStyle > 0 && boxStyle != 9) {
           checkCnt++;
-          if (checkCnt == BW) {
+          if (checkCnt == bw) {
             if (lineList.length() > 0) {
               lineList.append(",");
             }
@@ -344,7 +323,7 @@ public class CubeMatrix {
   }
 
   /**
-   * 新增垃圾方塊,一次新增一排,同一種style
+   * 新增垃圾方塊,一次新增一排,同一種style.
    *
    * @param style 新增的方塊style
    */
@@ -365,7 +344,7 @@ public class CubeMatrix {
   }
 
   /**
-   * 新增垃圾方塊,一次新增一排,同一種style
+   * 新增垃圾方塊,一次新增一排,同一種style.
    *
    * @param styleList 新增的方塊style列表，格式為"1|2|3|4|5|6|0|0|2|3"
    */
@@ -392,10 +371,9 @@ public class CubeMatrix {
 
   /**
    * 拿自己這次清掉的方塊行數去移除垃圾方塊，回傳自己還剩幾行方塊可扣掉炸彈<br>
-   * 此method僅能消掉style為9的垃圾方塊
+   * 此method僅能消掉style為9的垃圾方塊.
    *
-   * @param count
-   * @return
+   * @param count 刪除行數
    */
   public int removeGarbageBoxOneLine(int count) {
     if (count == 0) {
@@ -424,29 +402,17 @@ public class CubeMatrix {
     return lineCount;
   }
 
-  /**
-   * 取得掉落中方塊二維陣列
-   *
-   * @return
-   */
+  /** 取得掉落中方塊二維陣列. */
   public int[][] getCurrentCube() {
     return currentCube.toArray();
   }
 
-  /**
-   * 取得掉落中方塊物件
-   *
-   * @return
-   */
+  /** 取得掉落中方塊物件. */
   public Cube getCube() {
     return currentCube;
   }
 
-  /**
-   * 取得掉落中方塊
-   *
-   * @return
-   */
+  /** 取得掉落中方塊. */
   public String getCurrentCubeStyleString() {
     return currentCube.toTurnCubeString();
   }
@@ -455,12 +421,8 @@ public class CubeMatrix {
     return currentCube.getStyle();
   }
 
-  /**
-   * 取得掉落中方塊目前的x、y位置,w,h寬高
-   *
-   * @return
-   */
-  public int[] getNowBoxXY() {
+  /** 取得掉落中方塊目前的x、y位置,w,h寬高. */
+  public int[] getNowBoxXy() {
     Cube tempNowBox = currentCube;
     int[] xy = new int[4];
     xy[0] = tempNowBox.getNowX();
@@ -471,11 +433,7 @@ public class CubeMatrix {
     return xy;
   }
 
-  /**
-   * 取得到第Y個位置會撞到方塊,回傳目前掉落中的方塊會撞到的底或其他方塊之後定格位置
-   *
-   * @return
-   */
+  /** 取得到第Y個位置會撞到方塊,回傳目前掉落中的方塊會撞到的底或其他方塊之後定格位置. */
   public int getDownY() {
     Cube tempNowBox = currentCube;
     int nx = tempNowBox.getNowX();
@@ -499,9 +457,9 @@ public class CubeMatrix {
   }
 
   /**
-   * 畫上新位置方塊
+   * 畫上新位置方塊.
    *
-   * @param c
+   * @param c 方塊
    */
   public void addBox(Cube c) {
     int[][] tempBoxAry = cube;
@@ -511,25 +469,38 @@ public class CubeMatrix {
 
     for (int i = 0; i < b.length; i++) {
       for (int j = 0; j < b[i].length; j++) {
-        if (b[i][j] > 0) tempBoxAry[i + y][j + x] = c.getStyle();
-      }
-    }
-  }
-
-  public void addBox(int[][] b, int x, int y, int style) {
-    int[][] tempBoxAry = cube;
-
-    for (int i = 0; i < b.length; i++) {
-      for (int j = 0; j < b[i].length; j++) {
-        if (b[i][j] > 0) tempBoxAry[i + y][j + x] = style;
+        if (b[i][j] > 0) {
+          tempBoxAry[i + y][j + x] = c.getStyle();
+        }
       }
     }
   }
 
   /**
-   * @param lineData
-   * @param isGap
-   * @return
+   * 新增方塊.
+   *
+   * @param b 方塊
+   * @param x x位置
+   * @param y y位置
+   * @param style 方塊類型
+   */
+  public void addBox(int[][] b, int x, int y, int style) {
+    int[][] tempBoxAry = cube;
+
+    for (int i = 0; i < b.length; i++) {
+      for (int j = 0; j < b[i].length; j++) {
+        if (b[i][j] > 0) {
+          tempBoxAry[i + y][j + x] = style;
+        }
+      }
+    }
+  }
+
+  /**
+   * 取得方塊行.
+   *
+   * @param lineData 行
+   * @param isGap 保留空白格
    */
   public String getLineList(String lineData, boolean isGap) {
     Cube nb = currentCube;
@@ -575,17 +546,11 @@ public class CubeMatrix {
     return lineListStr.toString();
   }
 
-  // ------------------------------public
-  // method--------------end--------------------
-
-  // ------------------------------private method----begin-------------------
-
   /**
-   * 判斷目前的方塊，是否碰撞到boxAry裡其他的方塊
+   * 判斷目前的方塊，是否碰撞到boxAry裡其他的方塊.
    *
-   * @param tempBoxAry
-   * @param nb
-   * @return
+   * @param tempBoxAry 方塊容器
+   * @param nb 掉落中方塊
    */
   protected boolean hitTest(int[][] tempBoxAry, Cube nb) {
     int[][] newBox = nb.toArray();
@@ -596,13 +561,12 @@ public class CubeMatrix {
   }
 
   /**
-   * 檢查方塊碰撞
+   * 檢查方塊碰撞.
    *
    * @param tempBoxAry 20 x 10的大陣列
    * @param boxBaseAry 要新增上去的方塊陣列
    * @param nx 方塊目前的x位置
    * @param ny 方塊目前的y位置
-   * @return
    */
   protected boolean hitTest(int[][] tempBoxAry, int[][] boxBaseAry, int nx, int ny) {
     for (int i = 0; i < boxBaseAry.length; i++) {
@@ -620,9 +584,9 @@ public class CubeMatrix {
   }
 
   /**
-   * 清除整橫排滿的方塊
+   * 清除整橫排滿的方塊.
    *
-   * @param tmpAry
+   * @param tmpAry 方塊容器
    * @param startIndex 開始的位置
    * @param endIndex 結束的位置
    */
@@ -638,11 +602,7 @@ public class CubeMatrix {
     }
   }
 
-  // ------------------------------private method----end-------------------
-
-  // 測試用---------------------begin-----------------
-
-  /** 一開始時的預設地圖 */
+  /** 一開始時的預設地圖. */
   public void defaultMap() {
     addGarbageBoxOneLine(9);
     addGarbageBoxOneLine(9);
@@ -653,7 +613,4 @@ public class CubeMatrix {
     addGarbageBoxOneLine(9);
     addGarbageBoxOneLine(9);
   }
-
-  // 測試用---------------------end-----------------
-
 }

@@ -4,12 +4,17 @@ import java.awt.Font;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
-public class JDialogLabel extends JDialog {
+/**
+ * 彈跳視窗.
+ *
+ * @author ray
+ */
+public class DialogLabel extends JDialog {
   private static final long serialVersionUID = 1L;
 
   private JLabel lable;
 
-  public JDialogLabel() {
+  public DialogLabel() {
     lable = new JLabel();
     add(lable);
   }

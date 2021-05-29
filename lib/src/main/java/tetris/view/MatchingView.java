@@ -11,7 +11,7 @@ import tetris.view.component.RepaintView;
 import util.Debug;
 
 /**
- * 對戰連線畫面
+ * 對戰連線畫面.
  *
  * @author Ray
  */
@@ -19,7 +19,7 @@ public class MatchingView extends RepaintView {
   private static final long serialVersionUID = 1L;
   private Label connectingText;
   private Thread thread;
-  private boolean isConnecting = true;;
+  private boolean isConnecting = true;
 
   public MatchingView(JSONObject params) {
     super(params);
@@ -48,6 +48,7 @@ public class MatchingView extends RepaintView {
                 try {
                   TimeUnit.MILLISECONDS.sleep(300);
                 } catch (InterruptedException e) {
+                  e.printStackTrace();
                 }
               }
             });

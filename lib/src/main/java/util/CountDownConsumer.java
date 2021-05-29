@@ -4,6 +4,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+/**
+ * 多緒條件達成後會回傳事件.
+ *
+ * @author ray
+ */
 public class CountDownConsumer<T> {
   private CountDownLatch latch;
   private T object;
@@ -22,6 +27,7 @@ public class CountDownConsumer<T> {
     object = obj;
   }
 
+  /** 啟動. */
   public void start() {
     latch = new CountDownLatch(1);
     new Thread() {
@@ -44,6 +50,7 @@ public class CountDownConsumer<T> {
     latch.countDown();
   }
 
+  /** 停止. */
   public void stop() {
     isStop.set(true);
     while (latch.getCount() > 0) {

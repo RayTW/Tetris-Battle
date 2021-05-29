@@ -1,11 +1,10 @@
 package tetris.view.listener;
 
 import org.json.JSONObject;
-
 import tetris.view.ViewName;
 
 /**
- * view切換事件
+ * view切換事件.
  *
  * @author Ray Lee
  */

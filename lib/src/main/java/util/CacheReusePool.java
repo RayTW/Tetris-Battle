@@ -5,13 +5,21 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
- * @author Ray Lee Created on 2017/10/18
- * @param <T>
+ * 緩存重用.
+ *
+ * @author ray
  */
 public class CacheReusePool<T> {
   private List<T> objects;
   private int index;
 
+  /**
+   * 初始化.
+   *
+   * @param size 個數
+   * @param generatorObj 物件
+   * @throws Exception 例外
+   */
   public CacheReusePool(int size, Callable<T> generatorObj) throws Exception {
     objects = new ArrayList<T>(size);
 
@@ -20,6 +28,7 @@ public class CacheReusePool<T> {
     }
   }
 
+  /** 取得下一個元素. */
   public T next() {
     int index = 0;
     synchronized (objects) {

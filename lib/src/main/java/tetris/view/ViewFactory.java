@@ -1,11 +1,15 @@
 package tetris.view;
 
 import javax.swing.JFrame;
-
 import org.json.JSONObject;
 import tetris.Config;
 import tetris.view.component.ComponentView;
 
+/**
+ * 產出view工廠.
+ *
+ * @author ray
+ */
 public class ViewFactory {
   private Integer width = null;
   private Integer height = null;
@@ -16,6 +20,14 @@ public class ViewFactory {
     return create(jframe, config, name, new JSONObject());
   }
 
+  /**
+   * 創建遊戲場景.
+   *
+   * @param jframe 主場
+   * @param config 設定
+   * @param name 場景名稱
+   * @param params 參數
+   */
   public ComponentView create(JFrame jframe, Config config, ViewName name, JSONObject params) {
     ComponentView view = null;
     if (width == null) {

@@ -9,10 +9,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.SwingUtilities;
-
 import org.json.JSONObject;
-
 import tetris.Config;
+import util.Debug;
 import util.FpsCounter;
 
 /**
@@ -32,6 +31,11 @@ public class RepaintView extends ComponentView {
   private Thread repainThread;
   private FpsCounter fpsCounter;
 
+  /**
+   * 建構.
+   *
+   * @param params 參數
+   */
   public RepaintView(JSONObject params) {
     int width = params.getInt("width");
     int height = params.getInt("height");
@@ -116,12 +120,11 @@ public class RepaintView extends ComponentView {
     while (isRepain) {
       try {
         Thread.sleep(Config.get().getRepainMills());
-        try {
-          SwingUtilities.invokeAndWait(super::repaint);
-        } catch (InvocationTargetException e) {
-          e.printStackTrace();
-        }
+        SwingUtilities.invokeAndWait(super::repaint);
       } catch (InterruptedException e) {
+        Debug.get().println(Debug.get().toString(e));
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
       }
     }
   }

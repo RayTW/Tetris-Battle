@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 
 /**
- * 遊戲標題
+ * 遊戲標題.
  *
  * @author Ray Lee
  */
@@ -18,6 +18,12 @@ public class Button extends ClickableRole {
   private int fontSize = 10;
   private boolean textFlash = false;
 
+  /**
+   * 建構.
+   *
+   * @param width 寬
+   * @param height 高
+   */
   public Button(int width, int height) {
     setWidth(width);
     setHeight(height);
@@ -70,9 +76,9 @@ public class Button extends ClickableRole {
   }
 
   /**
-   * 文字閃礫效果
+   * 文字閃礫效果.
    *
-   * @param enable
+   * @param enable 開關
    */
   public void setTextFlash(boolean enable) {
     textFlash = enable;

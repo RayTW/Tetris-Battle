@@ -3,14 +3,21 @@ package util;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * fps計數器.
+ *
+ * @author ray
+ */
 public class FpsCounter extends TimerTask {
   private final Timer resetTimer;
-  private int current, last;
+  private int current;
+  private int last;
 
   public FpsCounter() {
     resetTimer = new Timer();
   }
 
+  /** 啟動. */
   public synchronized void start() {
     resetTimer.schedule(this, 0, 1000);
     current = 0;

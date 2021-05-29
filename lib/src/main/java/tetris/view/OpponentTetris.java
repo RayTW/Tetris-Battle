@@ -14,7 +14,7 @@ import tetris.game.GameFlow;
 import tetris.view.component.Role;
 
 /**
- * 映射對戰對手的畫面
+ * 映射對戰對手的畫面.
  *
  * @author Ray
  */
@@ -50,6 +50,11 @@ public class OpponentTetris extends Role {
   private Thread queueComsumerThread;
   private boolean queueThreadRunning;
 
+  /**
+   * 建構.
+   *
+   * @param zoomable 縮放比
+   */
   public OpponentTetris(Zoomable zoomable) {
     scoreFont = null;
     this.zoomable = zoomable;
@@ -70,7 +75,7 @@ public class OpponentTetris extends Role {
   }
 
   /**
-   * 處理其他玩家遊戲操作同步
+   * 處理其他玩家遊戲操作同步.
    *
    * <pre>
    *   event :
@@ -221,7 +226,7 @@ public class OpponentTetris extends Role {
 
     if (cubeMatrix.getCube() != null) {
       // 畫掉落中的方塊
-      int[] xy = cubeMatrix.getNowBoxXY();
+      int[] xy = cubeMatrix.getNowBoxXy();
       int[][] box = cubeMatrix.getCurrentCube();
 
       // 畫陰影
@@ -295,12 +300,12 @@ public class OpponentTetris extends Role {
   }
 
   /**
-   * 畫每個小格子
+   * 畫每個小格子.
    *
-   * @param style
-   * @param x
-   * @param y
-   * @param buffImg
+   * @param style 類型
+   * @param x x位置
+   * @param y y位置
+   * @param buffImg 圖
    */
   public void drawBox(int style, int x, int y, Graphics buffImg) {
     buffImg.setColor(color[style]);
@@ -314,11 +319,10 @@ public class OpponentTetris extends Role {
   }
 
   /**
-   * 將下個方塊字串轉成2維方塊陣列，以便繪圖
+   * 將下個方塊字串轉成2維方塊陣列，以便繪圖.
    *
-   * @param bufbox
-   * @param tetris
-   * @return
+   * @param tetris 流程
+   * @param cnt 類數
    */
   public int[][][] getBufBox(GameFlow tetris, int cnt) {
     String[] bufbox = tetris.getAnyCountBox(cnt);
@@ -330,15 +334,15 @@ public class OpponentTetris extends Role {
   }
 
   /**
-   * 創建新的掉落方塊
+   * 創建新的掉落方塊.
    *
-   * @param style
+   * @param style 方塊類型
    */
   public void createCube(int style) {
     cubeMatrix.createNewCube(style);
   }
 
-  /** 重置遊戲頁面 */
+  /** 重置遊戲頁面. */
   private void reset() {
     status = Status.INIT;
     score = 0;
@@ -351,6 +355,11 @@ public class OpponentTetris extends Role {
     queueComsumerThread.interrupt();
   }
 
+  /**
+   * 縮放.
+   *
+   * @author ray
+   */
   public static interface Zoomable {
     int zoom(int n);
   }

@@ -44,7 +44,7 @@ public class Cube {
     sizeMatrix = new int[0][0];
   }
 
-  public void resetXY() {
+  public void resetXy() {
     nowX = 0;
     nowY = 0;
   }
@@ -120,11 +120,7 @@ public class Cube {
     return style;
   }
 
-  /**
-   * 取得目前有幾種方塊種類.
-   *
-   * @return
-   */
+  /** 取得目前有幾種方塊種類. */
   public static int getStyleCount() {
     return STYLE_LIST.length;
   }
@@ -138,11 +134,7 @@ public class Cube {
     nowturn = n;
   }
 
-  /**
-   * 取得目前轉向.
-   *
-   * @return
-   */
+  /** 取得目前轉向. */
   public int getTurn() {
     return nowturn;
   }
@@ -151,7 +143,6 @@ public class Cube {
    * 方塊下個轉向.
    *
    * @param n 方向
-   * @return
    */
   public int nextTurn(int n) {
     int tmpTurn = nowturn;
@@ -180,11 +171,7 @@ public class Cube {
     nowturn %= getTrunKind();
   }
 
-  /**
-   * 取得方塊有幾種轉向.
-   *
-   * @return
-   */
+  /** 取得方塊有幾種轉向. */
   public int getTrunKind() {
     return cubeMatrix.length;
   }
@@ -193,7 +180,6 @@ public class Cube {
    * 取得指定轉向的寬.
    *
    * @param n 方向
-   * @return
    */
   public int getWight(int n) {
     if (n >= 0 && n < sizeMatrix.length) {
@@ -202,11 +188,7 @@ public class Cube {
     return 0;
   }
 
-  /**
-   * 取得目前轉向的寬.
-   *
-   * @return
-   */
+  /** 取得目前轉向的寬. */
   public int getTurnWight() {
     return getWight(nowturn);
   }
@@ -215,7 +197,6 @@ public class Cube {
    * 取得指定轉向的高.
    *
    * @param n 方向
-   * @return
    */
   public int getHeight(int n) {
     if (n >= 0 && n < sizeMatrix.length) {
@@ -224,20 +205,12 @@ public class Cube {
     return 0;
   }
 
-  /**
-   * 取得目前轉向的高.
-   *
-   * @return
-   */
+  /** 取得目前轉向的高. */
   public int getTurnHeight() {
     return getHeight(nowturn);
   }
 
-  /**
-   * 取得目前方塊形狀.
-   *
-   * @return
-   */
+  /** 取得目前方塊形狀. */
   public int[][] toArray() {
     return toArray(nowturn);
   }
@@ -246,7 +219,6 @@ public class Cube {
    * 取得指定轉向的方塊形狀.
    *
    * @param index 指定轉向
-   * @return
    */
   public int[][] toArray(int index) {
     if (index >= 0 && index < cubeMatrix.length) {
@@ -255,11 +227,7 @@ public class Cube {
     return null;
   }
 
-  /**
-   * 取得目前方塊形狀.
-   *
-   * @return
-   */
+  /** 取得目前方塊形狀. */
   public String toTurnCubeString() {
     return toCubeString(nowturn);
   }
@@ -268,7 +236,6 @@ public class Cube {
    * 取得指定轉向的方塊形狀(以字串格式)，例如:"[形狀1]_高,寬@[形狀2]_高,寬.
    *
    * @param index 指定轉向
-   * @return
    */
   public String toCubeString(int index) {
     if (index >= 0 && index < cubeMatrix.length) {

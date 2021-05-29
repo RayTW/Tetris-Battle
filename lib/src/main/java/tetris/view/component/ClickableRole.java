@@ -1,11 +1,10 @@
 package tetris.view.component;
 
 import java.awt.Graphics;
-
 import tetris.view.listener.OnClickListener;
 
 /**
- * 在畫面上可以被點擊的遊戲角色
+ * 在畫面上可以被點擊的遊戲角色.
  *
  * @author Ray Lee
  */
@@ -18,6 +17,7 @@ public abstract class ClickableRole extends Role {
     canvas.fillRect(getX(), getY(), getWidth(), getHeight());
   }
 
+  /** 點擊事件. */
   public void onClick() {
     if (onClickListener != null) {
       onClickListener.onClick();

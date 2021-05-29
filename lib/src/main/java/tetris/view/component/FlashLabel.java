@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 
 /**
- * 遊戲標題
+ * 遊戲標題.
  *
  * @author Ray Lee
  */
@@ -68,9 +68,9 @@ public class FlashLabel extends Role {
   }
 
   /**
-   * 文字閃礫效果
+   * 文字閃礫效果.
    *
-   * @param enable
+   * @param enable 開關
    */
   public void setFlash(boolean enable) {
     isFlash = enable;
